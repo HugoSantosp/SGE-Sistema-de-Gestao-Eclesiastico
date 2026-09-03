@@ -1,0 +1,116 @@
+<div class="mm-shell">
+  <div class="mm-header">
+    <div class="brand">
+      <img src="assets/logo-icert.png" alt="ICERT">
+      <div>
+        <div class="brand-name">Detalhe da Escala</div>
+        <div class="brand-sub">ICERT - Agência do Reino de Deus</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-sm" (click)="sair()" title="Sair">
+        <i class="bi bi-box-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="mm-section-title">
+    <a routerLink="/escalas" class="text-muted me-2"><i class="bi bi-arrow-left"></i></a>
+    {{ escala?.titulo }}
+  </div>
+  <div class="mm-section-sub">
+    <span class="badge" [class.badge-success]="escala?.aberta" [class.badge-secondary]="!escala?.aberta">
+      {{ escala?.aberta ? 'Aberta para confirmações' : 'Fechada' }}
+    </span>
+  </div>
+
+  <div *ngIf="loading" class="mm-spinner">
+    <div class="spinner-border" role="status"></div>
+  </div>
+
+  <div *ngIf="error && !escala" class="alert alert-danger d-flex align-items-center gap-2">
+    <i class="bi bi-exclamation-triangle"></i>
+    <span>{{ error }}</span>
+  </div>
+
+  <ng-container *ngIf="escala">
+
+    <!-- Avisos -->
+    <div *ngIf="sucesso" class="alert alert-success d-flex align-items-center gap-2">
+      <i class="bi bi-check-circle-fill"></i>
+      <span>{{ sucesso }}</span>
+    </div>
+    <div *ngIf="error && escala" class="alert alert-danger d-flex align-items-center gap-2">
+      <i class="bi bi-exclamation-triangle"></i>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Lista de datas -->
+    <div class="mm-section-sub fw-semibold text-uppercase mt-2" style="font-size:0.72rem;color:var(--text-muted);">
+      <i class="bi bi-calendar-event me-1"></i> {{ escala.datas.length }} data(s)
+    </div>
+
+    <ng-container *ngFor="let d of escala.datas">
+      <div class="data-option"
+           [class.selected]="selecionadas.has(d.id)"
+           [class.disabled]="!escala.aberta"
+           (click)="toggleData(d.id)">
+        <div class="data-day">
+          <span class="day-num">{{ diaNum(d.data) }}</span>
+          <span class="day-mon">{{ diaMes(d.data) }}</span>
+        </div>
+        <div class="data-info">
+          <div class="data-name">{{ d.nomeEvento }}</div>
+          <div class="data-detail">
+            {{ diaSemana(d.data) }} • {{ d.horario }} • {{ d.local }}
+          </div>
+          <div *ngIf="jaConfirmado(d.id)" class="mt-1">
+            <span class="badge badge-success"><i class="bi bi-check-circle me-1"></i>Você confirmou</span>
+          </div>
+        </div>
+        <div class="check-icon" *ngIf="escala.aberta">
+          <i class="bi bi-check-lg"></i>
+        </div>
+      </div>
+    </ng-container>
+
+    <div *ngIf="escala.datas.length === 0" class="empty-state">
+      <i class="bi bi-calendar-x"></i>
+      <p>Esta escala ainda não tem datas definidas.</p>
+    </div>
+
+    <!-- Ações -->
+    <ng-container *ngIf="escala.aberta">
+      <button class="btn btn-primary w-100 py-3 fw-semibold mt-3"
+              [disabled]="salvando || escala.datas.length === 0"
+              (click)="confirmar()">
+        <ng-container *ngIf="!salvando"><i class="bi bi-check2-circle me-1"></i> Confirmar disponibilidade</ng-container>
+        <ng-container *ngIf="salvando"><div class="loader-dots"><span></span><span></span><span></span></div></ng-container>
+      </button>
+
+      <button *ngIf="minhasDataIds.length > 0"
+              class="btn btn-outline-primary w-100 mt-2"
+              [disabled]="salvando"
+              (click)="cancelar()">
+        <i class="bi bi-x-circle me-1"></i> Cancelar minha confirmação
+      </button>
+    </ng-container>
+
+    <div *ngIf="!escala.aberta" class="text-center mt-3 text-muted small">
+      <i class="bi bi-lock me-1"></i> Escala fechada — não é possível alterar sua disponibilidade.
+    </div>
+
+  </ng-container>
+</div>
+
+<nav class="mm-bottom-nav">
+  <a routerLink="/ministerios">
+    <i class="bi bi-grid"></i> Ministérios
+  </a>
+  <a routerLink="/escalas" [class.active]="true">
+    <i class="bi bi-calendar-check"></i> Escalas
+  </a>
+  <a href="javascript:void(0)" (click)="sair()">
+    <i class="bi bi-box-arrow-right"></i> Sair
+  </a>
+</nav>

@@ -1,0 +1,66 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="assets/logo-icert.png" alt="Icert Logo">
+      <h2>Meu Ministério</h2>
+      <p>ICERT - Agência do Reino de Deus</p>
+    </div>
+
+    <form (ngSubmit)="login()">
+      <div class="mb-3">
+        <label class="form-label" for="userInput">
+          <i class="bi bi-person me-1"></i> Email ou CPF
+        </label>
+        <input id="userInput"
+               type="text"
+               class="form-control"
+               placeholder="Digite seu email ou cpf"
+               [(ngModel)]="user"
+               name="user"
+               required
+               autocomplete="username"
+               [disabled]="loading">
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="senhaInput">
+          <i class="bi bi-lock me-1"></i> Senha
+        </label>
+        <input id="senhaInput"
+               type="password"
+               class="form-control"
+               placeholder="Digite sua senha"
+               [(ngModel)]="senha"
+               name="senha"
+               required
+               autocomplete="current-password"
+               [disabled]="loading">
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger py-2 small d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle"></i>
+        <span>{{ error }}</span>
+      </div>
+
+      <button type="submit"
+              class="btn btn-primary w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2"
+              [disabled]="loading">
+        <ng-container *ngIf="!loading">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span>Entrar</span>
+        </ng-container>
+        <ng-container *ngIf="loading">
+          <div class="loader-dots"><span></span><span></span><span></span></div>
+          <span>Entrando…</span>
+        </ng-container>
+      </button>
+    </form>
+
+    <div class="text-center mt-4">
+      <small class="text-muted">
+        <i class="bi bi-shield-check me-1"></i>
+        Ambiente seguro • Meu Ministério
+      </small>
+    </div>
+  </div>
+</div>

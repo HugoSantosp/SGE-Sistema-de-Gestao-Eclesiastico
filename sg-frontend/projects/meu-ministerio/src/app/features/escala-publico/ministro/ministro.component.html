@@ -1,0 +1,175 @@
+<!-- Header -->
+<div class="public-header text-center py-4" style="background:#1a1a2e;">
+  <img src="assets/logo-icert.png" alt="ICERT" height="50">
+</div>
+
+<div class="container py-5">
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner mb-3"></div>
+    <p style="color:#4a5568;">Carregando repertório...</p>
+  </div>
+
+  <!-- Erro -->
+  <div *ngIf="!loading && erro" class="text-center py-5">
+    <i class="bi bi-exclamation-triangle fs-1 mb-3" style="color:#dc3545;"></i>
+    <h4 class="fw-bold mb-2" style="color:#1a1a2e;">Oops!</h4>
+    <p style="color:#4a5568;">{{ erro }}</p>
+    <button class="btn btn-primary mt-3" routerLink="/">Voltar ao início</button>
+  </div>
+
+  <!-- Conteúdo -->
+  <div *ngIf="!loading && !erro && escala" class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Cabeçalho -->
+      <div class="text-center mb-5">
+        <span class="badge mb-2 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">
+          <i class="bi bi-music-note me-1"></i> REPERTÓRIO DO MINISTRO
+        </span>
+        <h2 class="fw-bold mt-2" style="color:#1a1a2e;">{{ escala.titulo }}</h2>
+        <p style="color:#4a5568;">Adicione as músicas para cada data</p>
+      </div>
+
+      <!-- Instruções -->
+      <div class="alert alert-info d-flex align-items-center gap-2 mb-4 py-3" style="border-radius:12px;">
+        <i class="bi bi-info-circle fs-5"></i>
+        <div class="small">
+          <strong>Instruções:</strong> Selecione uma data para editar o repertório.
+          Adicione o nome da música, artista (opcional) e link (YouTube/Spotify).
+        </div>
+      </div>
+
+      <!-- Datas -->
+      <div *ngFor="let data of escala.datas" class="card border-0 shadow-sm mb-3">
+
+        <!-- Cabeçalho da data -->
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3"
+             style="border-bottom:1px solid #e2e8f0;"
+             [class.border-success]="editandoDataId === data.id">
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <h6 class="fw-bold mb-0" style="color:#1a1a2e;">
+                <i class="bi bi-calendar-event me-1" style="color:#f97316;"></i>{{ data.nomeEvento }}
+              </h6>
+              <span *ngIf="!isDataFutura(data.data)" class="badge bg-secondary" style="font-size:10px;">
+                ENCERRADA
+              </span>
+            </div>
+            <small style="color:#4a5568;">
+              {{ formatDate(data.data) }} • {{ data.horario }}
+              <span *ngIf="data.musicas.length > 0" class="ms-2">
+                🎵 {{ data.musicas.length }} músicas
+              </span>
+            </small>
+          </div>
+          <div>
+            <button *ngIf="editandoDataId !== data.id && isDataFutura(data.data)"
+                    class="btn btn-sm" style="background:#f97316;color:#fff;border-radius:8px;"
+                    (click)="editarData(data.id)">
+              <i class="bi bi-pencil me-1"></i> Editar Repertório
+            </button>
+            <span *ngIf="!isDataFutura(data.data)" class="badge bg-light text-muted py-2 px-3">
+              <i class="bi bi-lock me-1"></i> Data encerrada
+            </span>
+          </div>
+        </div>
+
+        <!-- Músicas (modo leitura) -->
+        <div class="card-body p-3" *ngIf="editandoDataId !== data.id">
+          <div *ngIf="data.musicas.length === 0" class="text-center py-3 text-muted">
+            <i class="bi bi-music-note fs-3 d-block mb-2"></i>
+            <small>Nenhuma música cadastrada ainda</small>
+          </div>
+
+          <div *ngIf="data.musicas.length > 0" class="table-responsive">
+            <table class="table table-borderless mb-0" style="max-width:600px;">
+              <tbody>
+                <tr *ngFor="let m of data.musicas">
+                  <td style="width:30px;color:#f97316;font-weight:600;" class="p-1">{{ (m.ordem ?? 0) + 1 }}.</td>
+                  <td class="p-1 fw-medium" style="color:#1a1a2e;">{{ m.nome }}</td>
+                  <td class="p-1" style="color:#4a5568;" *ngIf="m.artista">{{ m.artista }}</td>
+                  <td class="p-1" *ngIf="m.link">
+                    <a [href]="m.link" target="_blank" class="text-decoration-none" style="color:#0d6efd;">
+                      <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Músicas (modo edição) -->
+        <div class="card-body p-3" *ngIf="editandoDataId === data.id">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0" style="color:#1a1a2e;">
+              <i class="bi bi-pencil-square me-1" style="color:#f97316;"></i> Editando Repertório
+            </h6>
+            <span *ngIf="sucesso" class="badge bg-success">
+              <i class="bi bi-check-lg"></i> Salvo!
+            </span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-borderless mb-0">
+              <thead>
+                <tr class="small text-muted">
+                  <th style="width:30px;">#</th>
+                  <th>Música</th>
+                  <th>Artista</th>
+                  <th>Link</th>
+                  <th style="width:40px;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let m of musicasEditando[data.id]; let i = index">
+                  <td class="align-middle" style="color:#a0aec0;">{{ i + 1 }}</td>
+                  <td>
+                    <input type="text" class="form-control form-control-sm" [(ngModel)]="m.nome"
+                           placeholder="Nome da música">
+                  </td>
+                  <td>
+                    <input type="text" class="form-control form-control-sm" [(ngModel)]="m.artista"
+                           placeholder="Artista">
+                  </td>
+                  <td>
+                    <input type="url" class="form-control form-control-sm" [(ngModel)]="m.link"
+                           placeholder="https://youtube.com/...">
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-icon p-1" (click)="removerMusica(data.id, i)"
+                            style="color:#dc3545;" title="Remover">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-sm" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);"
+                    (click)="adicionarMusica(data.id)">
+              <i class="bi bi-plus-lg"></i> Adicionar Música
+            </button>
+            <button class="btn btn-sm btn-success" (click)="salvarRepertorio(data.id)"
+                    [disabled]="salvando">
+              <i class="bi bi-check-lg me-1"></i> {{ salvando ? 'Salvando...' : 'Salvar' }}
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="cancelarEdicao()">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="text-center py-4" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+  <div class="container">
+    <img src="assets/logo-icert.png" alt="ICERT" height="35" class="mb-2">
+    <p class="small mb-0" style="color:#a0aec0;">© 2026 ICERT - Agência do Reino de Deus</p>
+  </div>
+</footer>

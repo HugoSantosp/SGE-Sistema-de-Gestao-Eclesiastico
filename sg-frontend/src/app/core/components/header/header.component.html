@@ -1,0 +1,19 @@
+<header class="header">
+  <div class="d-flex align-items-center gap-3">
+    <button class="toggle-btn" (click)="onToggle()">
+      <i class="bi bi-list"></i>
+    </button>
+    <h1 class="page-title mb-0">{{ pageTitle }}</h1>
+  </div>
+
+  <div class="user-info">
+    <div class="text-end d-none d-md-block">
+      <div class="fw-semibold" style="font-size: 0.875rem;">{{ user?.nome || 'Usuário' }}</div>
+      <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ user?.nivel?.replace('_', ' ') || '' }}</div>
+    </div>
+    <div class="user-avatar">{{ user?.nome?.charAt(0) || 'U' }}</div>
+    <button class="btn btn-sm btn-icon" (click)="logout()" title="Sair">
+      <i class="bi bi-box-arrow-right"></i>
+    </button>
+  </div>
+</header>

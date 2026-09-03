@@ -1,0 +1,111 @@
+<!-- Header -->
+<div class="public-header text-center py-4" style="background:#1a1a2e;">
+  <img src="assets/logo-icert.png" alt="ICERT" height="50">
+</div>
+
+<div class="container py-5">
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner mb-3"></div>
+    <p style="color:#4a5568;">Carregando resultado...</p>
+  </div>
+
+  <!-- Erro -->
+  <div *ngIf="!loading && erro" class="text-center py-5">
+    <i class="bi bi-exclamation-triangle fs-1 mb-3" style="color:#dc3545;"></i>
+    <h4 class="fw-bold mb-2" style="color:#1a1a2e;">Oops!</h4>
+    <p style="color:#4a5568;">{{ erro }}</p>
+    <button class="btn btn-primary mt-3" routerLink="/">Voltar ao início</button>
+  </div>
+
+  <!-- Conteúdo -->
+  <div *ngIf="!loading && !erro && escala" class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Título -->
+      <div class="text-center mb-5">
+        <span class="badge mb-2 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">
+          <i class="bi bi-music-note-list me-1"></i> ESCALA DE LOUVOR
+        </span>
+        <h2 class="fw-bold mt-2" style="color:#1a1a2e;">{{ escala.titulo }}</h2>
+        <p style="color:#4a5568;">Escala completa — designações por data</p>
+      </div>
+
+      <!-- Cartões por data -->
+      <div *ngFor="let data of escala.datas" class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3"
+             style="border-bottom:2px solid #f97316;">
+          <div>
+            <h5 class="fw-bold mb-1" style="color:#1a1a2e;">
+              <i class="bi bi-calendar-event me-2" style="color:#f97316;"></i>{{ data.nomeEvento }}
+            </h5>
+            <small style="color:#4a5568;">
+              {{ formatDate(data.data) }} • {{ data.horario }} • {{ data.local }}
+            </small>
+          </div>
+          <span class="badge" style="background:#f97316;color:#fff;border-radius:20px;padding:6px 14px;">
+            {{ data.designacoes.length }} músicos
+          </span>
+        </div>
+
+        <div class="card-body p-4">
+          <div *ngIf="data.designacoes.length === 0" class="text-center py-3 text-muted">
+            <i class="bi bi-tools fs-3 d-block mb-2"></i>
+            <small>Escala em montagem — designações em breve</small>
+          </div>
+
+          <!-- Designações agrupadas por instrumento -->
+          <div *ngIf="data.designacoes.length > 0">
+            <div class="row g-3">
+              <ng-container *ngFor="let des of data.designacoes">
+                <div class="col-md-6 col-lg-4">
+                  <div class="d-flex align-items-center gap-3 p-3 rounded-3"
+                       style="background:#f8fafc;border:1px solid #e2e8f0;">
+                    <div class="instrument-icon d-flex align-items-center justify-content-center"
+                         style="width:48px;height:48px;border-radius:12px;background:rgba(249,115,22,0.1);color:#f97316;font-size:1.2rem;">
+                      <i class="bi" [ngClass]="getInstrumentIcon(des.instrumento)"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold small" style="color:#f97316;">{{ des.instrumento }}</div>
+                      <div style="color:#1a1a2e;font-weight:500;">{{ des.nomeIntegrante }}</div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+
+            <!-- Músicas -->
+            <div *ngIf="data.musicas.length > 0" class="mt-4 pt-3" style="border-top:1px solid #e2e8f0;">
+              <h6 class="fw-bold mb-2" style="color:#1a1a2e;">
+                <i class="bi bi-music-note me-2" style="color:#f97316;"></i>Repertório
+              </h6>
+              <div class="table-responsive">
+                <table class="table table-borderless mb-0" style="max-width:500px;">
+                  <tbody>
+                    <tr *ngFor="let m of data.musicas">
+                      <td style="width:30px;color:#f97316;" class="p-1">{{ (m.ordem ?? 0) + 1 }}.</td>
+                      <td class="p-1 fw-medium" style="color:#1a1a2e;">{{ m.nome }}</td>
+                      <td class="p-1" style="color:#4a5568;" *ngIf="m.artista">{{ m.artista }}</td>
+                      <td class="p-1" *ngIf="m.link">
+                        <a [href]="m.link" target="_blank" class="btn btn-sm" style="color:#0d6efd;">
+                          <i class="bi bi-play-circle"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="text-center py-4" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+  <div class="container">
+    <img src="assets/logo-icert.png" alt="ICERT" height="35" class="mb-2">
+    <p class="small mb-0" style="color:#a0aec0;">© 2026 ICERT - Agência do Reino de Deus</p>
+  </div>
+</footer>

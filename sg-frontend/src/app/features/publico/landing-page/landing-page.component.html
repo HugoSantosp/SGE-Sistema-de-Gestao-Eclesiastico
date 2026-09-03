@@ -1,0 +1,269 @@
+<app-public-navbar></app-public-navbar>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content text-center">
+    <img src="assets/logo-icert.png" alt="ICERT" class="hero-logo mb-4" height="120">
+    <h1 class="display-4 fw-bold mb-3" style="color:#1a1a2e;">Icert | Agência do Reino de Deus</h1>
+    <p class="lead mb-4" style="color:#4a5568;">"Lugar Perfeito Para Pessoas Imperfeitas"</p>
+    <div class="d-flex justify-content-center gap-3">
+      <a class="btn btn-lg px-5 py-3 fw-semibold" style="background:#f97316;border:none;color:#fff;border-radius:12px;" href="javascript:void(0)" (click)="scrollTo('horarios')">
+        <i class="bi bi-calendar-event me-2"></i> Nossos Cultos
+      </a>
+      <a class="btn btn-lg px-5 py-3 fw-semibold" style="background:#1a1a2e;border:none;color:#fff;border-radius:12px;" href="javascript:void(0)" (click)="scrollTo('pastores')">
+        <i class="bi bi-people me-2"></i> Nossa Liderança
+      </a>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="mouse"><div class="wheel"></div></div>
+  </div>
+</section>
+
+<!-- Sobre Section -->
+<section id="sobre" class="section" style="background:#f8fafc;">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="badge mb-3 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">QUEM SOMOS</span>
+        <h2 class="display-6 fw-bold mb-4" style="color:#1a1a2e;">Agência do Reino de Deus</h2>
+        <p class="mb-4" style="line-height:1.8;font-size:1.05rem;color:#4a5568;">
+          A ICERT é uma comunidade cristã dedicada a levar a mensagem de esperança e transformação 
+          através do amor de Deus. Localizada em São João de Meriti, nossa igreja é um lugar onde 
+          famílias se reúnem para adorar, aprender e crescer juntas na fé.
+        </p>
+        <p class="mb-4" style="line-height:1.8;color:#4a5568;">
+          Acreditamos no poder da oração, no valor da comunhão e na importância de servir ao 
+          próximo. Venha fazer parte desta família!
+        </p>
+        <div class="d-flex gap-4 mt-4">
+          <div class="text-center">
+            <div class="fs-1 fw-bold" style="color:#f97316;">10+</div>
+            <div class="small" style="color:#4a5568;">Anos de Ministério</div>
+          </div>
+          <div class="text-center">
+            <div class="fs-1 fw-bold" style="color:#f97316;">100+</div>
+            <div class="small" style="color:#4a5568;">Membros</div>
+          </div>
+          <div class="text-center">
+            <div class="fs-1 fw-bold" style="color:#f97316;">3</div>
+            <div class="small" style="color:#4a5568;">Cultos por Semana</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="position-relative">
+          <div class="rounded-4 overflow-hidden" style="border:2px solid rgba(249,115,22,0.2);background:#ffffff;padding:60px;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
+            <img src="assets/logo-icert.png" alt="ICERT" class="w-100" style="object-fit:contain;">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pastores / Liderança Section -->
+<section id="pastores" class="section" style="background:#ffffff;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge mb-3 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">LIDERANÇA</span>
+      <h2 class="display-6 fw-bold" style="color:#1a1a2e;">Nossos Pastores</h2>
+      <p style="color:#4a5568;">Conheça a liderança da nossa igreja</p>
+    </div>
+
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner"></div>
+    </div>
+
+    <div *ngIf="!loading && pastores.length === 0" class="text-center py-5" style="color:#a0aec0;">
+      <i class="bi bi-people fs-1 mb-3 d-block"></i>
+      <p>Em breve — informações sobre nossa liderança</p>
+    </div>
+
+    <div *ngIf="!loading && pastores.length > 0" class="row g-4 justify-content-center">
+      <div *ngFor="let pastor of pastores" class="col-lg-4 col-md-6">
+        <div class="pastor-card text-center p-4">
+          <div class="pastor-avatar mx-auto mb-3">
+            <div *ngIf="!pastor.foto" class="avatar-placeholder">
+              {{ pastor.nome?.charAt(0) || 'P' }}
+            </div>
+            <img *ngIf="pastor.foto" [src]="pastor.foto | uploadUrl" [alt]="pastor.nome" class="pastor-img">
+          </div>
+          <h5 class="fw-bold mb-1" style="color:#1a1a2e;">{{ pastor.nome }}</h5>
+          <span class="badge mb-2 px-3 py-1" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">
+            {{ pastor.cargo }}
+          </span>
+          <p class="small mt-2 mb-0" style="color:#4a5568;">{{ pastor.email }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Eventos Section - Calendar -->
+<section id="eventos" class="section" style="background:#f8fafc;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge mb-3 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">PROGRAMAÇÃO</span>
+      <h2 class="display-6 fw-bold" style="color:#1a1a2e;">Calendário de Eventos</h2>
+      <p style="color:#4a5568;">Navegue pelos meses e veja nossa programação</p>
+    </div>
+
+    <!-- Month Navigation -->
+    <div class="calendar-nav">
+      <button class="btn btn-nav" (click)="previousMonth()">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <div class="month-title">
+        <strong>{{ monthNames[currentMonth - 1] }}</strong>
+        <span>{{ currentYear }}</span>
+      </div>
+      <button class="btn btn-nav" (click)="nextMonth()">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div *ngIf="!loading" class="calendar-wrapper">
+      <!-- Day Names -->
+      <div class="calendar-header">
+        <div *ngFor="let name of dayNames" class="calendar-day-name">{{ name }}</div>
+      </div>
+
+      <!-- Calendar Days -->
+      <div class="calendar-grid">
+        <div *ngFor="let day of calendarDays"
+             class="calendar-cell"
+             [class.empty]="day === null"
+             [class.has-event]="hasEvent(day)"
+             [class.today]="isToday(day)"
+             [class.selected]="selectedDay === day">
+          <div *ngIf="day !== null" class="day-content" (click)="showDayEvents(day)">
+            <span class="day-number">{{ day }}</span>
+            <div *ngIf="hasEvent(day)" class="event-dot">
+              <i class="bi bi-circle-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Day Events -->
+    <div *ngIf="selectedDay !== null" class="day-events-panel mt-4">
+      <div class="day-events-header">
+        <strong><i class="bi bi-calendar-event me-2"></i>Eventos do dia {{ selectedDay }}/{{ currentMonth }}/{{ currentYear }}</strong>
+        <button class="btn-close-white" (click)="hideDayEvents()">&times;</button>
+      </div>
+      <div *ngIf="selectedDayEvents.length === 0" class="text-center py-4" style="color:#a0aec0;">
+        <i class="bi bi-emoji-neutral fs-3 mb-2 d-block"></i>
+        <p class="small mb-0">Nenhum evento neste dia</p>
+      </div>
+      <div *ngFor="let evento of selectedDayEvents" class="evento-card mt-3">
+        <div class="evento-date">
+          <span class="evento-month">{{ getMonthName(evento.data) }}</span>
+          <span class="evento-day">{{ getDay(evento.data) }}</span>
+        </div>
+        <div class="evento-body">
+          <h5 class="fw-bold mb-2" style="color:#1a1a2e;">{{ evento.titulo }}</h5>
+          <p class="small mb-2" style="color:#4a5568;" *ngIf="evento.descricao">{{ evento.descricao }}</p>
+          <div class="d-flex gap-3 small" style="color:#4a5568;">
+            <span *ngIf="evento.hora"><i class="bi bi-clock me-1"></i>{{ evento.hora }}</span>
+            <span *ngIf="evento.local"><i class="bi bi-geo-alt me-1"></i>{{ evento.local }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Horários Section -->
+<section id="horarios" class="section" style="background:#ffffff;">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-5">
+        <span class="badge mb-3 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">HORÁRIOS</span>
+        <h2 class="display-6 fw-bold mb-4" style="color:#1a1a2e;">Venha nos Visitar</h2>
+        <p class="mb-4" style="color:#4a5568;">
+          Na revelação da Palavra e no Poder do Espírito.
+        </p>
+        <div class="d-flex align-items-center gap-3 mb-3 p-3 rounded-3" style="background:rgba(249,115,22,0.06);border-left:3px solid #f97316;">
+          <i class="bi bi-geo-alt fs-4" style="color:#f97316;"></i>
+          <div>
+            <strong style="color:#1a1a2e;">{{ churchInfo.endereco }}</strong>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 offset-lg-1">
+        <div class="schedule-card p-4">
+          <h5 class="fw-bold mb-4" style="color:#1a1a2e;">📅 Horários de Cultos</h5>
+          <div *ngFor="let h of churchInfo.horarios" class="d-flex justify-content-between align-items-center py-3" style="border-bottom:1px solid #e2e8f0;">
+            <div>
+              <strong style="color:#1a1a2e;">{{ h.dia }}</strong>
+            </div>
+            <div>
+              <span class="badge px-3 py-2" style="background:#f97316;border-radius:8px;color:#fff;">{{ h.horario }}</span>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 text-center small" style="color:#a0aec0;">
+            <i class="bi bi-clock me-1"></i> Venha 15 minutos antes para um momento de oração
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contato Section -->
+<section id="contato" class="section" style="background:#f8fafc;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge mb-3 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">CONTATO</span>
+      <h2 class="display-6 fw-bold" style="color:#1a1a2e;">Entre em Contato</h2>
+      <p style="color:#4a5568;">Estamos aqui para ouvir você</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4">
+        <div class="text-center p-4 rounded-4" style="background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+          <div class="fs-2 mb-3" style="color:#f97316;"><i class="bi bi-geo-alt"></i></div>
+          <h6 class="fw-bold" style="color:#1a1a2e;">Endereço</h6>
+          <p class="small mb-0" style="color:#4a5568;">{{ churchInfo.endereco }}</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-center p-4 rounded-4" style="background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+          <div class="fs-2 mb-3" style="color:#f97316;"><i class="bi bi-envelope"></i></div>
+          <h6 class="fw-bold" style="color:#1a1a2e;">Email</h6>
+          <p class="small mb-0" style="color:#4a5568;">contato&#64;icertag.com.br</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-center p-4 rounded-4" style="background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+          <div class="fs-2 mb-3" style="color:#f97316;"><i class="bi bi-clock"></i></div>
+          <h6 class="fw-bold" style="color:#1a1a2e;">Horários</h6>
+          <p class="small mb-0" style="color:#4a5568;">Dom 09h | Qua 19h30</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-5 text-center" style="background:#1a1a2e;border-top:1px solid #2a2a3e;">
+  <div class="container">
+    <img src="assets/logo-icert.png" alt="ICERT" height="50" class="mb-3">
+    <p class="small mb-0" style="color:#a0aec0;">© 2026 ICERT - Agência do Reino de Deus. Todos os direitos reservados.</p>
+    <p class="small mt-2" style="color:#a0aec0;">
+      <i class="bi bi-instagram me-2"></i>
+      <i class="bi bi-facebook me-2"></i>
+      <i class="bi bi-youtube"></i>
+    </p>
+  </div>
+</footer>

@@ -1,0 +1,40 @@
+<app-public-navbar></app-public-navbar>
+
+<section class="section" style="padding-top:120px;background:#f5f7fa;min-height:80vh;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge mb-3 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">MURAL</span>
+      <h2 class="display-6 fw-bold" style="color:#1a1a2e;">Profissionais da Igreja</h2>
+      <p style="color:#4a5568;">Conheça os profissionais que fazem parte da nossa comunidade</p>
+    </div>
+    <div *ngIf="loading" class="text-center py-5"><div class="spinner"></div></div>
+    <div *ngIf="!loading && profissionais.length === 0" class="text-center py-5" style="color:#a0aec0;">
+      <i class="bi bi-briefcase fs-1 mb-3 d-block"></i>
+      <p>Em breve — nosso mural de profissionais</p>
+    </div>
+    <div *ngIf="!loading && profissionais.length > 0" class="row g-4 justify-content-center">
+      <div *ngFor="let p of profissionais" class="col-lg-4 col-md-6">
+        <div class="profissional-card text-center p-4">
+          <div class="prof-avatar mx-auto mb-3">
+            <div *ngIf="!p.foto" class="avatar-placeholder-sm">{{ p.nome?.charAt(0) || 'P' }}</div>
+            <img *ngIf="p.foto" [src]="p.foto | uploadUrl" [alt]="p.nome" class="prof-img">
+          </div>
+          <h5 class="fw-bold mb-1" style="color:#1a1a2e;">{{ p.nome }}</h5>
+          <span class="badge mb-2 px-3 py-1" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">{{ p.especialidade }}</span>
+          <p class="small mt-2 mb-0" style="color:#4a5568;" *ngIf="p.descricao">{{ p.descricao }}</p>
+          <div class="d-flex justify-content-center gap-3 mt-2 small" style="color:#4a5568;">
+            <span *ngIf="p.telefone"><i class="bi bi-telephone me-1"></i>{{ p.telefone }}</span>
+            <span *ngIf="p.email"><i class="bi bi-envelope me-1"></i>{{ p.email }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="py-5 text-center" style="background:#1a1a2e;border-top:1px solid #2a2a3e;">
+  <div class="container">
+    <img src="assets/logo-icert.png" alt="ICERT" height="50" class="mb-3">
+    <p class="small mb-0" style="color:#a0aec0;">© 2026 {{ churchInfo.nome }}. Todos os direitos reservados.</p>
+  </div>
+</footer>

@@ -1,0 +1,106 @@
+<div class="mm-shell">
+  <!-- Header -->
+  <div class="mm-header">
+    <div class="brand">
+      <img src="assets/logo-icert.png" alt="ICERT">
+      <div>
+        <div class="brand-name">Meu Ministério</div>
+        <div class="brand-sub">ICERT - Agência do Reino de Deus</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="badge badge-dark">{{ userName }}</span>
+      <button class="btn btn-secondary btn-sm" (click)="sair()" title="Sair">
+        <i class="bi bi-box-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="mm-section-title">Olá, {{ userName }} 👋</div>
+  <div class="mm-section-sub">Escolha um ministério para ver suas escalas</div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="mm-spinner">
+    <div class="spinner-border" role="status"></div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert alert-danger d-flex align-items-center gap-2">
+    <i class="bi bi-exclamation-triangle"></i>
+    <span>{{ error }}</span>
+    <button class="btn btn-sm btn-outline-primary ms-auto" (click)="carregar()">Tentar de novo</button>
+  </div>
+
+  <!-- Seção: liderados (pastores veem todos os ministérios com acesso de gestão) -->
+  <ng-container *ngIf="!loading && liderados.length > 0">
+    <div class="mm-section-sub fw-semibold text-uppercase mt-3" style="font-size:0.72rem;color:var(--text-muted);">
+      <i class="bi bi-star me-1"></i> {{ isPastor ? 'Ministérios (gestão)' : 'Você lidera' }}
+    </div>
+    <div class="mm-card" *ngFor="let m of liderados" (click)="abrirMinisterio(m.id)">
+      <div class="d-flex align-items-center gap-3">
+        <div class="mm-min-avatar" [class.no-foto]="!m.foto">
+          <img *ngIf="m.foto" [src]="m.foto | uploadUrl" alt="">
+          <i *ngIf="!m.foto" class="bi bi-people"></i>
+        </div>
+        <div class="flex-grow-1">
+          <div class="mm-card-title">{{ m.nome }}</div>
+          <div class="mm-card-sub">{{ m.descricao || 'Ministério da ICERT' }}</div>
+        </div>
+        <span class="badge badge-orange">{{ papelLabel(m.papel) || (isPastor ? 'Pastor' : 'Líder') }}</span>
+        <i class="bi bi-chevron-right text-muted"></i>
+      </div>
+      <div class="mt-2">
+        <button class="btn btn-outline-primary btn-sm" (click)="gerenciarMinisterio(m.id); $event.stopPropagation()">
+          <i class="bi bi-gear me-1"></i> Gerenciar
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Seção: demais ministérios (apenas para membros — pastores já viram todos acima) -->
+  <ng-container *ngIf="!loading && !isPastor">
+    <div class="mm-section-sub fw-semibold text-uppercase mt-3" style="font-size:0.72rem;color:var(--text-muted);">
+      <i class="bi bi-grid me-1"></i> Meus ministérios
+    </div>
+
+    <div class="mm-card" *ngFor="let m of ministerios" (click)="abrirMinisterio(m.id)">
+      <div class="d-flex align-items-center gap-3">
+        <div class="mm-min-avatar" [class.no-foto]="!m.foto">
+          <img *ngIf="m.foto" [src]="m.foto | uploadUrl" alt="">
+          <i *ngIf="!m.foto" class="bi bi-people"></i>
+        </div>
+        <div class="flex-grow-1">
+          <div class="mm-card-title">{{ m.nome }}</div>
+          <div class="mm-card-sub">{{ m.descricao || 'Ministério da ICERT' }}</div>
+        </div>
+        <span class="badge" [class.badge-orange]="m.papel === 'LIDER'" [class.badge-secondary]="m.papel !== 'LIDER'">
+          {{ papelLabel(m.papel) || 'Integrante' }}
+        </span>
+        <i class="bi bi-chevron-right text-muted"></i>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- Empty (membros sem vínculo ou pastor sem ministérios cadastrados) -->
+  <ng-container *ngIf="!loading && ministerios.length === 0">
+    <div class="empty-state">
+      <i class="bi bi-people"></i>
+      <p *ngIf="isPastor">Nenhum ministério cadastrado ainda.<br>Cadastre ministérios no painel administrativo.</p>
+      <p *ngIf="!isPastor">Você ainda não participa de nenhum ministério.<br>Fale com o líder ou com a secretaria da igreja.</p>
+    </div>
+  </ng-container>
+</div>
+
+<!-- Bottom nav -->
+<nav class="mm-bottom-nav">
+  <a routerLink="/ministerios" routerLinkActive="active">
+    <i class="bi bi-grid"></i> Ministérios
+  </a>
+  <a routerLink="/escalas" routerLinkActive="active">
+    <i class="bi bi-calendar-check"></i> Escalas
+  </a>
+  <a href="javascript:void(0)" (click)="sair()">
+    <i class="bi bi-box-arrow-right"></i> Sair
+  </a>
+</nav>

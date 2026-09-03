@@ -1,0 +1,21 @@
+{
+  "name": "SGE - ICERT",
+  "integrations": {
+    "capacitor": {
+      "android": {
+        "allowMixedContent": true
+      }
+    }
+  },
+  "type": "angular",
+  "root": "",
+  "sourceRoot": "src",
+  "projects": {
+    "app": {
+      "name": "SGE Mobile",
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "app"
+    }
+  }
+}

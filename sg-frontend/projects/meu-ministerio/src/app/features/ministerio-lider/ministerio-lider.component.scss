@@ -1,0 +1,32 @@
+.mm-tabs {
+  display: flex;
+  gap: 8px;
+  background: var(--bg-secondary);
+  border-radius: 14px;
+  padding: 4px;
+}
+
+.mm-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mm-tab.active {
+  background: var(--bg-card);
+  color: var(--orange);
+  box-shadow: var(--shadow);
+}
+
+.mm-papel-select {
+  width: 110px;
+  padding: 6px 8px;
+  font-size: 0.78rem;
+}

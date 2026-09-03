@@ -1,0 +1,9 @@
+node_modules/
+dist/
+out-tsc/
+*.log
+.DS_Store
+.env
+.vscode/
+.idea/
+*.iml

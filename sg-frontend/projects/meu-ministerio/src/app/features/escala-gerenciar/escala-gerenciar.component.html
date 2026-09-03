@@ -1,0 +1,198 @@
+<div class="mm-shell">
+  <div class="mm-header">
+    <div class="brand">
+      <img src="assets/logo-icert.png" alt="ICERT">
+      <div>
+        <div class="brand-name">Montar Escala</div>
+        <div class="brand-sub">ICERT - Agência do Reino de Deus</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-sm" (click)="sair()" title="Sair">
+        <i class="bi bi-box-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="mm-section-title">
+    <a href="javascript:void(0)" class="text-muted me-2" (click)="voltar()"><i class="bi bi-arrow-left"></i></a>
+    {{ escala?.titulo || 'Carregando…' }}
+  </div>
+  <div class="mm-section-sub">Adicione datas, monte as designações e o repertório</div>
+
+  <div *ngIf="loading" class="mm-spinner">
+    <div class="spinner-border" role="status"></div>
+  </div>
+
+  <div *ngIf="error && !escala" class="alert alert-danger d-flex align-items-center gap-2">
+    <i class="bi bi-exclamation-triangle"></i>
+    <span>{{ error }}</span>
+  </div>
+
+  <ng-container *ngIf="escala">
+
+    <div *ngIf="aviso" class="alert alert-success d-flex align-items-center gap-2">
+      <i class="bi bi-check-circle-fill"></i>
+      <span>{{ aviso }}</span>
+      <button class="btn btn-sm btn-close ms-auto" (click)="aviso = ''"></button>
+    </div>
+    <div *ngIf="error && escala" class="alert alert-danger d-flex align-items-center gap-2">
+      <i class="bi bi-exclamation-triangle"></i>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Status da escala -->
+    <div class="mm-card">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="mm-card-title">
+            <i class="bi bi-toggle-on me-1"></i> Escala {{ escala.aberta ? 'aberta' : 'fechada' }}
+          </div>
+          <div class="mm-card-sub">
+            {{ escala.aberta ? 'Membros podem confirmar disponibilidade' : 'Confirmações encerradas' }}
+          </div>
+        </div>
+        <button class="btn btn-sm" [class.btn-success]="!escala.aberta" [class.btn-secondary]="escala.aberta"
+                (click)="toggle()">
+          <i class="bi me-1" [class.bi-play-fill]="!escala.aberta" [class.bi-pause-fill]="escala.aberta"></i>
+          {{ escala.aberta ? 'Fechar' : 'Abrir' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Link do resultado -->
+    <div class="mm-card">
+      <div class="mm-card-title mb-2"><i class="bi bi-link-45deg me-1"></i> Link do resultado</div>
+      <div *ngIf="!resultadoLink" class="d-flex gap-2">
+        <button class="btn btn-outline-primary flex-grow-1" (click)="gerarLink()" [disabled]="gerandoLink">
+          <i class="bi bi-magic me-1"></i> Gerar link do resultado
+        </button>
+      </div>
+      <div *ngIf="resultadoLink" class="d-flex gap-2">
+        <input class="form-control" [value]="resultadoLink" readonly>
+        <button class="btn btn-primary flex-shrink-0" (click)="copiarLink()" title="Copiar">
+          <i class="bi bi-clipboard"></i>
+        </button>
+      </div>
+      <small class="text-muted d-block mt-1">Compartilhe para os ministros verem o resultado montado e o repertório.</small>
+    </div>
+
+    <!-- Nova data -->
+    <div class="mm-card">
+      <div class="mm-card-title mb-2"><i class="bi bi-calendar-plus me-1"></i> Adicionar data</div>
+      <div class="row g-2">
+        <div class="col-12">
+          <input class="form-control" type="text" placeholder="Nome do evento (ex.: Culto de Domingo)"
+                 [(ngModel)]="novaData.nomeEvento">
+        </div>
+        <div class="col-6">
+          <input class="form-control" type="date" [(ngModel)]="novaData.data">
+        </div>
+        <div class="col-6">
+          <input class="form-control" type="time" [(ngModel)]="novaData.horario">
+        </div>
+        <div class="col-12">
+          <input class="form-control" type="text" placeholder="Local (ex.: ICERT - Sede)" [(ngModel)]="novaData.local">
+        </div>
+        <div class="col-12">
+          <button class="btn btn-primary w-100" (click)="adicionarData()" [disabled]="adicionandoData">
+            <i class="bi bi-plus-lg me-1"></i> Adicionar data
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datas com designações -->
+    <div *ngFor="let data of escala.datas" class="mm-card">
+      <div class="d-flex align-items-start justify-content-between mb-2">
+        <div>
+          <div class="mm-card-title">{{ data.nomeEvento }}</div>
+          <div class="mm-card-sub">
+            <i class="bi bi-calendar me-1"></i>{{ formatData(data.data) }}
+            <i class="bi bi-clock ms-2 me-1"></i>{{ data.horario }}
+            <i class="bi bi-geo-alt ms-2 me-1"></i>{{ data.local }}
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm btn-icon" (click)="removerData(data.id)" title="Remover data">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+
+      <!-- Confirmados -->
+      <div class="mb-3">
+        <small class="text-muted fw-semibold">
+          <i class="bi bi-people me-1"></i>{{ confirmadosDaData(data).length }} confirmado(s)
+        </small>
+        <div *ngIf="confirmadosDaData(data).length === 0" class="text-muted small mt-1">
+          Nenhuma confirmação ainda. Compartilhe o link público.
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-1">
+          <span *ngFor="let c of confirmadosDaData(data)" class="badge badge-success">
+            <i class="bi bi-person-check me-1"></i>{{ c.nome }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Designações -->
+      <div class="mb-2">
+        <small class="text-muted fw-semibold"><i class="bi bi-tools me-1"></i>Designações</small>
+      </div>
+      <div *ngFor="let des of designacoes[data.id] || []; let i = index" class="mm-des-row">
+        <button class="btn btn-sm btn-icon text-danger" (click)="removerDesignacao(data.id, i)" title="Remover">
+          <i class="bi bi-x-circle"></i>
+        </button>
+        <select class="form-select form-select-sm" [(ngModel)]="des.instrumento">
+          <option *ngFor="let inst of instrumentos" [value]="inst">{{ inst }}</option>
+        </select>
+        <select class="form-select form-select-sm" [(ngModel)]="des.confirmacaoId">
+          <option *ngFor="let c of confirmadosDaData(data)" [value]="c.id">{{ c.nome }}</option>
+        </select>
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-sm btn-outline-primary" (click)="adicionarDesignacao(data.id)">
+          <i class="bi bi-plus-lg me-1"></i> Designação
+        </button>
+        <button class="btn btn-sm btn-success" (click)="salvarDesignacoes(data.id)" [disabled]="salvando">
+          <i class="bi bi-check-lg me-1"></i> Salvar
+        </button>
+      </div>
+
+      <!-- Repertório -->
+      <hr class="my-3">
+      <small class="text-muted fw-semibold"><i class="bi bi-music-note me-1"></i>Repertório</small>
+      <div *ngFor="let m of musicas[data.id] || []; let i = index" class="mm-mus-row">
+        <button class="btn btn-sm btn-icon text-danger" (click)="removerMusica(data.id, i)" title="Remover">
+          <i class="bi bi-x-circle"></i>
+        </button>
+        <input class="form-control form-control-sm" type="text" placeholder="Música" [(ngModel)]="m.nome">
+        <input class="form-control form-control-sm" type="text" placeholder="Artista" [(ngModel)]="m.artista">
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-sm btn-outline-primary" (click)="adicionarMusica(data.id)">
+          <i class="bi bi-plus-lg me-1"></i> Música
+        </button>
+        <button class="btn btn-sm btn-success" (click)="salvarMusicas(data.id)" [disabled]="salvando">
+          <i class="bi bi-check-lg me-1"></i> Salvar
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="escala.datas.length === 0" class="empty-state">
+      <i class="bi bi-calendar-x"></i>
+      <p>Nenhuma data adicionada ainda.<br>Use o formulário acima para criar a primeira.</p>
+    </div>
+
+  </ng-container>
+</div>
+
+<nav class="mm-bottom-nav">
+  <a routerLink="/ministerios">
+    <i class="bi bi-grid"></i> Ministérios
+  </a>
+  <a routerLink="/escalas" [class.active]="true">
+    <i class="bi bi-calendar-check"></i> Escalas
+  </a>
+  <a href="javascript:void(0)" (click)="sair()">
+    <i class="bi bi-box-arrow-right"></i> Sair
+  </a>
+</nav>

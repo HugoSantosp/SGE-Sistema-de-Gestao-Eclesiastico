@@ -1,0 +1,81 @@
+<div class="table-container">
+  <div class="table-header">
+    <h5 class="mb-0 fw-semibold">
+      <i class="bi bi-music-note-list me-2"></i>Escalas de Louvor
+    </h5>
+    <div class="d-flex gap-2">
+      <input type="text" class="form-control form-control-sm" style="width: 220px;"
+             placeholder="Buscar escala..." [(ngModel)]="searchTerm">
+      <button class="btn btn-primary btn-sm" (click)="novo()">
+        <i class="bi bi-plus-lg"></i> Nova Escala
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner"></div>
+  </div>
+
+  <div *ngIf="!loading && filtered.length === 0" class="empty-state">
+    <i class="bi bi-music-note-list"></i>
+    <p>Nenhuma escala encontrada</p>
+    <button class="btn btn-primary" (click)="novo()">Criar Primeira Escala</button>
+  </div>
+
+  <table *ngIf="!loading && filtered.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Datas</th>
+        <th>Confirmações</th>
+        <th>Status</th>
+        <th>Criada em</th>
+        <th style="width: 240px;">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let e of filtered">
+        <td class="fw-medium">{{ e.titulo }}</td>
+        <td><span class="badge bg-secondary">{{ e.datasCount }}</span></td>
+        <td><span class="badge" [ngClass]="e.confirmacoesCount > 0 ? 'bg-success' : 'bg-secondary'">{{ e.confirmacoesCount }}</span></td>
+        <td>
+          <span class="badge" [ngClass]="e.aberta ? 'bg-success' : 'bg-secondary'">
+            {{ e.aberta ? 'Aberta' : 'Fechada' }}
+          </span>
+        </td>
+        <td>{{ formatDate(e.createdAt) }}</td>
+        <td>
+          <div class="d-flex gap-1 flex-wrap">
+            <!-- Copiar link público -->
+            <button class="btn btn-sm btn-icon" (click)="copiarLinkPublico(e.publicToken)"
+                    title="Copiar link público" style="color:#0d6efd;">
+              <i class="bi bi-share"></i>
+            </button>
+            <!-- Toggle aberta/fechada -->
+            <button class="btn btn-sm btn-icon" (click)="toggle(e.id)"
+                    [title]="e.aberta ? 'Fechar escala' : 'Abrir escala'"
+                    [style.color]="e.aberta ? '#dc3545' : '#198754'">
+              <i class="bi" [ngClass]="e.aberta ? 'bi-lock' : 'bi-unlock'"></i>
+            </button>
+            <!-- Montar escala -->
+            <button class="btn btn-sm btn-icon" (click)="montar(e.id)" title="Montar escala" style="color:#f97316;">
+              <i class="bi bi-tools"></i>
+            </button>
+            <!-- Gerar link do resultado -->
+            <button class="btn btn-sm btn-icon" (click)="gerarLink(e.id)" title="Gerar link do resultado" style="color:#6f42c1;">
+              <i class="bi bi-link-45deg"></i>
+            </button>
+            <!-- Editar -->
+            <button class="btn btn-sm btn-icon" (click)="editar(e.id)" title="Editar">
+              <i class="bi bi-pencil text-info"></i>
+            </button>
+            <!-- Excluir -->
+            <button class="btn btn-sm btn-icon" (click)="deletar(e.id)" title="Excluir">
+              <i class="bi bi-trash text-danger"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

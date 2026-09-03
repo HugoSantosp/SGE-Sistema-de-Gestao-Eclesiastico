@@ -1,0 +1,87 @@
+<div class="login-page">
+  <div class="login-card" [class.loading]="loading">
+    <div class="login-logo">
+      <img src="assets/logo-icert.png" alt="Icert Logo" [class.loading-pulse]="loading">
+      <h2>SGE - Icert</h2>
+      <p>Sistema de Gerenciamento Eclesiástico</p>
+    </div>
+
+    <form (ngSubmit)="login()">
+      <div class="mb-3">
+        <label class="form-label" for="userInput">
+          <i class="bi bi-person me-1"></i> Email ou CPF
+        </label>
+        <input #emailInput
+               id="userInput"
+               type="text"
+               class="form-control"
+               [class.input-error]="hasError"
+               placeholder="Digite seu email ou cpf"
+               [(ngModel)]="user"
+               name="user"
+               required
+               autocomplete="username"
+               [disabled]="loading">
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="senhaInput">
+          <i class="bi bi-lock me-1"></i> Senha
+        </label>
+        <input id="senhaInput"
+               type="password"
+               class="form-control"
+               [class.input-error]="hasError"
+               placeholder="Digite sua senha"
+               [(ngModel)]="senha"
+               name="senha"
+               required
+               autocomplete="current-password"
+               [disabled]="loading">
+      </div>
+
+      <!-- Animated Error Message -->
+      <div *ngIf="error" class="alert alert-danger py-2 small d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle"></i>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit"
+              class="btn btn-primary w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2"
+              [disabled]="loading">
+        <ng-container *ngIf="!loading">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span>Entrar</span>
+        </ng-container>
+        <ng-container *ngIf="loading">
+          <div class="loader-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <span>Entrando…</span>
+        </ng-container>
+      </button>
+
+      <!-- Esqueci Minha Senha -->
+      <div class="text-center mt-3">
+        <a href="javascript:void(0)" class="forgot-password-link" (click)="abrirEsqueciSenha()">
+          <i class="bi bi-question-circle me-1"></i>
+          Esqueci minha senha
+        </a>
+      </div>
+    </form>
+
+    <div class="text-center mt-4">
+      <small class="text-muted">
+        <i class="bi bi-shield-check me-1"></i>
+        Ambiente seguro • SGE v1.0
+      </small>
+    </div>
+  </div>
+
+  <!-- Esqueci Senha Modal -->
+  <app-esqueci-senha *ngIf="showEsqueciSenha"
+                     (fechou)="fecharEsqueciSenha()"
+                     (voltarLogin)="fecharEsqueciSenha()">
+  </app-esqueci-senha>
+</div>

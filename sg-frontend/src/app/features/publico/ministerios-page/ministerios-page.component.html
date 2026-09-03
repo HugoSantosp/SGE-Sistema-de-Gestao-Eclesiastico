@@ -1,0 +1,33 @@
+<app-public-navbar></app-public-navbar>
+
+<section class="section" style="padding-top:120px;background:#f5f7fa;min-height:80vh;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge mb-3 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">MINISTÉRIOS</span>
+      <h2 class="display-6 fw-bold" style="color:#1a1a2e;">Nossos Ministérios</h2>
+      <p style="color:#4a5568;">Áreas de atuação e serviço na igreja</p>
+    </div>
+    <div *ngIf="loading" class="text-center py-5"><div class="spinner"></div></div>
+    <div *ngIf="!loading && ministerios.length === 0" class="text-center py-5" style="color:#a0aec0;">
+      <i class="bi bi-layers fs-1 mb-3 d-block"></i>
+      <p>Em breve — informações sobre nossos ministérios</p>
+    </div>
+    <div *ngIf="!loading && ministerios.length > 0" class="row g-4 justify-content-center">
+      <div *ngFor="let m of ministerios" class="col-lg-4 col-md-6">
+        <div class="info-card text-center p-4">
+          <div *ngIf="!m.foto" class="info-icon mx-auto mb-3"><i class="bi bi-layers"></i></div>
+          <img *ngIf="m.foto" [src]="m.foto | uploadUrl" [alt]="m.nome" class="w-100 rounded-3 mb-3" style="height:180px;object-fit:cover;">
+          <h5 class="fw-bold mb-2" style="color:#1a1a2e;">{{ m.nome }}</h5>
+          <p class="small mb-0" style="color:#4a5568;">{{ m.descricao }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="py-5 text-center" style="background:#1a1a2e;border-top:1px solid #2a2a3e;">
+  <div class="container">
+    <img src="assets/logo-icert.png" alt="ICERT" height="50" class="mb-3">
+    <p class="small mb-0" style="color:#a0aec0;">© 2026 {{ churchInfo.nome }}. Todos os direitos reservados.</p>
+  </div>
+</footer>

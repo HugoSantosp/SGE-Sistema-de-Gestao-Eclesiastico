@@ -1,0 +1,177 @@
+/* ===== Enhanced Login Styles ===== */
+
+/* Card Entrance Animation */
+.login-card {
+  animation: cardEntrance 0.6s ease-out;
+}
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Subtle animated background */
+.login-page::before {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.06) 0%, transparent 70%);
+  top: -200px;
+  right: -200px;
+  animation: floatBg 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.login-page::after {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.04) 0%, transparent 70%);
+  bottom: -100px;
+  left: -150px;
+  animation: floatBg 10s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+@keyframes floatBg {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(30px, -30px); }
+}
+
+/* Input focus improvements */
+.form-control {
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.form-control:focus {
+  transform: translateY(-1px);
+}
+
+.form-control.input-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* Error message animation */
+.alert-danger {
+  animation: slideInError 0.35s ease-out;
+}
+
+@keyframes slideInError {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scaleY(0.95);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+/* Custom loader - animated dots */
+.loader-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.loader-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  display: inline-block;
+  animation: dotPulse 1.4s ease-in-out infinite both;
+}
+
+.loader-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loader-dots span:nth-child(2) { animation-delay: -0.16s; }
+.loader-dots span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes dotPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* Logo pulse during loading */
+.login-logo img.loading-pulse {
+  animation: logoPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+/* Button smooth transition */
+.btn-primary {
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:disabled {
+  opacity: 0.85;
+  cursor: not-allowed;
+}
+
+/* Subtle inner glow on hover */
+.btn-primary:not(:disabled)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.btn-primary:not(:disabled):hover::after {
+  opacity: 1;
+}
+
+
+/* Login icon highlight */
+.login-logo img {
+  transition: filter 0.4s ease;
+}
+
+.login-card.loading .login-logo img {
+  filter: drop-shadow(0 0 20px rgba(249, 115, 22, 0.3));
+}
+
+/* Forgot password link */
+.forgot-password-link {
+  color: #6b7280;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.forgot-password-link:hover {
+  color: #f97316;
+}

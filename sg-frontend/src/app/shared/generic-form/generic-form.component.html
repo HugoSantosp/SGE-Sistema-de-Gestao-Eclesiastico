@@ -1,0 +1,122 @@
+<!-- Loading Spinner -->
+<app-loading-spinner [loading]="loading" [text]="'Carregando dados...'"></app-loading-spinner>
+
+<!-- Toast para notificações -->
+<app-toast></app-toast>
+
+<div *ngIf="!loading" class="card">
+  <h5 class="fw-semibold mb-4">{{ isEdit ? 'Editar' : 'Novo' }} {{ title }}</h5>
+
+  <form [formGroup]="formGroup" (ngSubmit)="save()" novalidate>
+    <div class="row g-3">
+      <div class="col-md-6" *ngFor="let field of fields" 
+           [class.col-12]="field.type === 'textarea' || field.type === 'image'">
+        
+        <!-- Label -->
+        <label class="form-label">
+          {{ field.label }} 
+          <span *ngIf="field.required" class="text-danger">*</span>
+        </label>
+
+        <!-- IMAGE type with upload -->
+        <div *ngIf="field.type === 'image'" class="d-flex align-items-center gap-3">
+          <div class="photo-upload-wrapper" style="position:relative;width:100px;height:100px;">
+            <div *ngIf="!formGroup.get(field.name)?.value"
+                 class="photo-placeholder d-flex align-items-center justify-content-center"
+                 style="width:100px;height:100px;border-radius:12px;border:2px dashed var(--border-color);background:var(--bg-secondary);cursor:pointer;transition:all 0.2s;"
+                 (click)="triggerUpload(field.name)">
+              <i class="bi bi-camera fs-2" style="color:var(--text-muted);"></i>
+            </div>
+            <img *ngIf="formGroup.get(field.name)?.value"
+                 [src]="formGroup.get(field.name)?.value | uploadUrl"
+                 class="photo-preview"
+                 style="width:100px;height:100px;border-radius:12px;object-fit:cover;border:2px solid var(--border-color);cursor:pointer;"
+                 (click)="triggerUpload(field.name)"
+                 (error)="onImageError(field.name)">
+            <input #fileInput
+                   type="file"
+                   accept="image/*"
+                   style="display:none"
+                   [attr.data-field]="field.name"
+                   (change)="onFileSelected($event, field.name)">
+            <button *ngIf="formGroup.get(field.name)?.value" type="button" class="btn btn-sm btn-icon position-absolute"
+                    style="top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:var(--danger);color:#fff;border:none;font-size:0.7rem;display:flex;align-items:center;justify-content:center;"
+                    (click)="removeImage(field.name); $event.stopPropagation()">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+          <div class="small" style="color:var(--text-muted);">
+            <span *ngIf="field.uploadHint">{{ field.uploadHint }}</span>
+            <span *ngIf="!field.uploadHint">Clique para fazer upload</span>
+            <div *ngIf="uploading[field.name]" class="mt-1">
+              <div class="spinner-border spinner-border-sm" role="status"></div>
+              <span class="ms-1">Enviando…</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Select -->
+        <select *ngIf="field.type === 'select'" 
+                class="form-select"
+                [formControlName]="field.name"
+                [class.is-invalid]="isFieldInvalid(field.name)">
+          <option value="">Selecione...</option>
+          <option *ngFor="let opt of field.options" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+
+        <!-- Textarea -->
+        <textarea *ngIf="field.type === 'textarea'" 
+                  class="form-control" 
+                  rows="3"
+                  [formControlName]="field.name"
+                  [placeholder]="field.placeholder || ''"
+                  [class.is-invalid]="isFieldInvalid(field.name)"></textarea>
+
+        <!-- Input padrão (text, email, password, date, number, etc) -->
+        <input *ngIf="field.type !== 'select' && field.type !== 'textarea' && field.type !== 'image'"
+               [type]="field.type" 
+               class="form-control"
+               [formControlName]="field.name"
+               [placeholder]="field.placeholder || ''"
+               [class.is-invalid]="isFieldInvalid(field.name)">
+        
+        <!-- Mensagem de erro de validação -->
+        <div *ngIf="isFieldInvalid(field.name)" class="invalid-feedback d-block">
+          {{ getErrorMessage(field.name) }}
+        </div>
+        
+        <!-- Texto de ajuda -->
+        <div *ngIf="field.helpText && !isFieldInvalid(field.name)" class="form-text text-muted">
+          {{ field.helpText }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Erro geral do formulário -->
+    <div *ngIf="error" class="alert alert-danger mt-3 py-2 small">
+      <i class="bi bi-exclamation-circle me-1"></i>
+      {{ error }}
+    </div>
+
+    <!-- Erros de validação do backend -->
+    <div *ngIf="getFieldErrorKeys().length > 0" class="alert alert-warning mt-3 py-2 small">
+      <strong>Por favor, corrija os seguintes erros:</strong>
+      <ul class="mb-0 mt-1">
+        <li *ngFor="let key of getFieldErrorKeys()">{{ fieldErrors[key] }}</li>
+      </ul>
+    </div>
+
+    <!-- Botões -->
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn btn-primary" [disabled]="saving">
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+        <i *ngIf="!saving" class="bi bi-check-lg me-1"></i>
+        {{ isEdit ? 'Atualizar' : 'Salvar' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        <i class="bi bi-x-lg me-1"></i>
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

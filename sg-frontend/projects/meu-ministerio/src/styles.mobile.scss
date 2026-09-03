@@ -1,0 +1,54 @@
+/* ===== Ionic CSS core (mobile only) ===== */
+@import '@ionic/angular/css/core.css';
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/float-elements.css';
+@import '@ionic/angular/css/text-alignment.css';
+@import '@ionic/angular/css/text-transformation.css';
+@import '@ionic/angular/css/flex-utils.css';
+@import '@ionic/angular/css/display.css';
+
+/* Tema web (Bootstrap + identidade ICERT) — mantém os estilos dos componentes */
+@import './styles.scss';
+
+/* ===== Overrides Ionic com identidade ICERT ===== */
+:root {
+  --ion-color-primary: #f97316;
+  --ion-color-primary-rgb: 249, 115, 22;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #ea580c;
+  --ion-color-primary-tint: #fb923c;
+
+  --ion-color-dark: #111827;
+  --ion-color-dark-rgb: 17, 24, 39;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #0f1521;
+  --ion-color-dark-tint: #2f3a4c;
+
+  --ion-color-light: #ffffff;
+  --ion-color-light-rgb: 255, 255, 255;
+  --ion-color-light-contrast: #111827;
+  --ion-color-light-contrast-rgb: 17, 24, 39;
+  --ion-color-light-shade: #e0e2e5;
+  --ion-color-light-tint: #ffffff;
+
+  --ion-background-color: #f7f8fa;
+  --ion-background-color-rgb: 247, 248, 250;
+  --ion-text-color: #111827;
+  --ion-text-color-rgb: 17, 24, 39;
+  --ion-border-color: #e5e7eb;
+
+  --ion-toolbar-background: #ffffff;
+  --ion-toolbar-color: #111827;
+  --ion-item-background: #ffffff;
+  --ion-card-background: #ffffff;
+}
+
+/* No mobile, a navegação fica na tab bar do Ionic — esconde a bottom-nav do web */
+body.mm-mobile .mm-bottom-nav {
+  display: none;
+}

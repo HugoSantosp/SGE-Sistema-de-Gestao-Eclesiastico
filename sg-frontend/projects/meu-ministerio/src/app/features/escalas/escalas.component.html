@@ -1,0 +1,69 @@
+<div class="mm-shell">
+  <div class="mm-header">
+    <div class="brand">
+      <img src="assets/logo-icert.png" alt="ICERT">
+      <div>
+        <div class="brand-name">Minhas Escalas</div>
+        <div class="brand-sub">ICERT - Agência do Reino de Deus</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-sm" (click)="sair()" title="Sair">
+        <i class="bi bi-box-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="mm-section-title">
+    <a routerLink="/ministerios" class="text-muted me-2"><i class="bi bi-arrow-left"></i></a>
+    {{ ministerioFiltro ? 'Escalas do ministério' : 'Minhas escalas' }}
+  </div>
+  <div class="mm-section-sub">Veja as datas e confirme sua disponibilidade</div>
+
+  <div *ngIf="loading" class="mm-spinner">
+    <div class="spinner-border" role="status"></div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger d-flex align-items-center gap-2">
+    <i class="bi bi-exclamation-triangle"></i>
+    <span>{{ error }}</span>
+    <button class="btn btn-sm btn-outline-primary ms-auto" (click)="carregar()">Tentar de novo</button>
+  </div>
+
+  <ng-container *ngIf="!loading">
+    <div class="mm-card" *ngFor="let e of escalas" (click)="abrirEscala(e.id)">
+      <div class="d-flex align-items-center gap-3">
+        <div class="mm-escala-icon">
+          <i class="bi bi-music-note-beamed"></i>
+        </div>
+        <div class="flex-grow-1">
+          <div class="mm-card-title">{{ e.titulo }}</div>
+          <div class="mm-card-sub">
+            {{ e.datasCount }} data(s) • {{ e.confirmacoesCount }} confirmação(ões)
+          </div>
+        </div>
+        <span class="badge" [class.badge-success]="e.aberta" [class.badge-secondary]="!e.aberta">
+          {{ e.aberta ? 'Aberta' : 'Fechada' }}
+        </span>
+        <i class="bi bi-chevron-right text-muted"></i>
+      </div>
+    </div>
+
+    <div *ngIf="escalas.length === 0" class="empty-state">
+      <i class="bi bi-calendar-x"></i>
+      <p>Nenhuma escala disponível no momento.<br>Quando o líder abrir uma escala, ela aparecerá aqui.</p>
+    </div>
+  </ng-container>
+</div>
+
+<nav class="mm-bottom-nav">
+  <a routerLink="/ministerios" routerLinkActive="active">
+    <i class="bi bi-grid"></i> Ministérios
+  </a>
+  <a routerLink="/escalas" routerLinkActive="active">
+    <i class="bi bi-calendar-check"></i> Escalas
+  </a>
+  <a href="javascript:void(0)" (click)="sair()">
+    <i class="bi bi-box-arrow-right"></i> Sair
+  </a>
+</nav>

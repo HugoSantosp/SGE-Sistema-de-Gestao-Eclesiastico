@@ -1,0 +1,147 @@
+<!-- Header simples -->
+<div class="public-header text-center py-4" style="background:#1a1a2e;">
+  <img src="assets/logo-icert.png" alt="ICERT" height="50">
+</div>
+
+<div class="container py-5">
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner mb-3"></div>
+    <p style="color:#4a5568;">Carregando escala...</p>
+  </div>
+
+  <!-- Erro -->
+  <div *ngIf="!loading && erro" class="text-center py-5">
+    <div class="mb-4">
+      <i class="bi bi-exclamation-triangle fs-1" style="color:#dc3545;"></i>
+    </div>
+    <h4 class="fw-bold mb-2" style="color:#1a1a2e;">Oops!</h4>
+    <p style="color:#4a5568;">{{ erro }}</p>
+    <button class="btn btn-primary mt-3" routerLink="/">Voltar ao início</button>
+  </div>
+
+  <!-- Sucesso -->
+  <div *ngIf="sucesso" class="text-center py-5">
+    <div class="mb-4">
+      <div class="success-check">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+    </div>
+    <h4 class="fw-bold mb-2" style="color:#1a1a2e;">Confirmação Enviada! 🎵</h4>
+    <p style="color:#4a5568;">Sua disponibilidade foi registrada com sucesso.</p>
+    <p class="small mb-4" style="color:#a0aec0;">Você receberá a confirmação da escala montada em breve.</p>
+    <button class="btn btn-primary" (click)="voltarHome()">Voltar ao início</button>
+  </div>
+
+  <!-- Formulário -->
+  <div *ngIf="!loading && !erro && !sucesso && escala" class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <!-- Card da escala -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4 text-center">
+          <span class="badge mb-2 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">
+            <i class="bi bi-music-note-list me-1"></i> ESCALA DE LOUVOR
+          </span>
+          <h3 class="fw-bold mt-2" style="color:#1a1a2e;">{{ escala.titulo }}</h3>
+          <p style="color:#4a5568;">Confirme sua disponibilidade para as datas abaixo</p>
+        </div>
+      </div>
+
+      <!-- Lista de datas -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-3" style="color:#1a1a2e;">
+            <i class="bi bi-calendar-check me-2"></i>Selecione as datas disponíveis
+          </h6>
+
+          <div *ngFor="let d of escala.datas" class="data-option mb-2 p-3 rounded-3"
+               [class.selected]="dataSelecionadas.includes(d.id)"
+               [class.border-success]="dataSelecionadas.includes(d.id)"
+               style="border:2px solid #e2e8f0;cursor:pointer;transition:all 0.2s;background:#fff;"
+               (click)="toggleData(d.id)">
+            <div class="d-flex align-items-center gap-3">
+              <div class="data-badge text-center" style="min-width:60px;">
+                <div class="small text-uppercase" style="color:#f97316;font-weight:600;">
+                  {{ formatDate(d.data).split(' ')[1] }}
+                </div>
+                <div class="fs-4 fw-bold" style="color:#1a1a2e;">
+                  {{ formatDate(d.data).split(' ')[0] }}
+                </div>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="fw-bold mb-1" style="color:#1a1a2e;">{{ d.nomeEvento }}</h6>
+                <div class="small" style="color:#4a5568;">
+                  <i class="bi bi-clock me-1"></i>{{ d.horario }}
+                  <i class="bi bi-geo-alt ms-2 me-1"></i>{{ d.local }}
+                </div>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       [checked]="dataSelecionadas.includes(d.id)"
+                       (click)="$event.stopPropagation()"
+                       (change)="toggleData(d.id)"
+                       style="width:22px;height:22px;border-color:#f97316;">
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="escala.datas.length === 0" class="text-center py-4 text-muted">
+            <i class="bi bi-calendar-x fs-2 d-block mb-2"></i>
+            <small>Nenhuma data disponível para confirmação</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dados pessoais -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-3" style="color:#1a1a2e;">
+            <i class="bi bi-person me-2"></i>Seus Dados
+          </h6>
+
+          <div *ngIf="mensagemErro" class="alert alert-danger py-2 small mb-3">
+            <i class="bi bi-exclamation-circle me-1"></i>{{ mensagemErro }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Nome *</label>
+            <input type="text" class="form-control" [(ngModel)]="nome"
+                   placeholder="Seu nome completo">
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Email</label>
+              <input type="email" class="form-control" [(ngModel)]="email"
+                     placeholder="seu@email.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">WhatsApp</label>
+              <input type="tel" class="form-control" [(ngModel)]="celular"
+                     placeholder="(21) 99999-9999">
+            </div>
+          </div>
+
+          <button class="btn btn-lg w-100 fw-semibold" style="background:#f97316;color:#fff;border:none;border-radius:12px;"
+                  (click)="confirmar()" [disabled]="enviando">
+            <div *ngIf="enviando" class="spinner-border spinner-border-sm me-2" role="status"></div>
+            <i class="bi bi-check-lg me-2" *ngIf="!enviando"></i>
+            {{ enviando ? 'Enviando...' : 'Confirmar Disponibilidade' }}
+          </button>
+
+          <p class="text-center small mt-3" style="color:#a0aec0;">
+            <i class="bi bi-shield-check me-1"></i>
+            Seus dados serão usados apenas para organização da escala
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="text-center py-4" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+  <div class="container">
+    <img src="assets/logo-icert.png" alt="ICERT" height="35" class="mb-2">
+    <p class="small mb-0" style="color:#a0aec0;">© 2026 ICERT - Agência do Reino de Deus</p>
+  </div>
+</footer>

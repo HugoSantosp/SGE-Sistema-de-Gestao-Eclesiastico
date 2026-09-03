@@ -1,0 +1,168 @@
+<div class="table-container">
+  <!-- Cabeçalho -->
+  <div class="table-header">
+    <h5 class="mb-0 fw-semibold">
+      <i class="bi bi-music-note-list me-2"></i>
+      {{ escalaId ? escala?.titulo : 'Nova Escala de Louvor' }}
+    </h5>
+    <button class="btn btn-outline-secondary btn-sm" (click)="voltar()">
+      <i class="bi bi-arrow-left"></i> Voltar
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- NOVA ESCALA (sem ID) -->
+  <div *ngIf="!loading && !escalaId" class="p-4">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">Criar Nova Escala</h6>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Título da Escala</label>
+              <input type="text" class="form-control" [(ngModel)]="editTitulo"
+                     placeholder="Ex: Escala Julho 2026">
+            </div>
+            <button class="btn btn-primary w-100" (click)="salvarTitulo()"
+                    [disabled]="!editTitulo.trim()">
+              <i class="bi bi-plus-lg"></i> Criar Escala
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESCALA EXISTENTE -->
+  <div *ngIf="!loading && escalaId && escala" class="p-4">
+    <div class="row g-4">
+      <!-- Coluna esquerda: info da escala -->
+      <div class="col-md-5">
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>Informações da Escala</h6>
+            <div class="mb-2">
+              <small class="text-muted">Título</small>
+              <p class="fw-semibold mb-2">{{ escala.titulo }}</p>
+            </div>
+            <div class="row mb-2">
+              <div class="col-6">
+                <small class="text-muted">Status</small>
+                <p><span class="badge" [ngClass]="escala.aberta ? 'bg-success' : 'bg-secondary'">
+                  {{ escala.aberta ? 'Aberta' : 'Fechada' }}
+                </span></p>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Confirmações</small>
+                <p class="fw-bold">{{ escala.confirmacoes.length }}</p>
+              </div>
+            </div>
+            <div class="mb-2">
+              <small class="text-muted">Token Público</small>
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control" [value]="escala.publicToken" readonly>
+                <button class="btn btn-outline-primary" (click)="copiarLinkPublico()" title="Copiar link">
+                  <i class="bi bi-clipboard"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adicionar nova data -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-calendar-plus me-2"></i>Adicionar Data</h6>
+            <div class="mb-2">
+              <label class="form-label small">Nome do Evento</label>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="novaData.nomeEvento"
+                     placeholder="Ex: Culto Dominical">
+            </div>
+            <div class="row mb-2">
+              <div class="col-6">
+                <label class="form-label small">Data</label>
+                <input type="date" class="form-control form-control-sm" [(ngModel)]="novaData.data">
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Horário</label>
+                <input type="time" class="form-control form-control-sm" [(ngModel)]="novaData.horario">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small">Local</label>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="novaData.local"
+                     placeholder="Ex: Sede">
+            </div>
+            <button class="btn btn-primary btn-sm w-100" (click)="adicionarData()"
+                    [disabled]="salvandoData">
+              <i class="bi bi-plus-lg"></i> Adicionar Data
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna direita: lista de datas -->
+      <div class="col-md-7">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">
+              <i class="bi bi-calendar-event me-2"></i>Datas da Escala
+              <span class="badge bg-secondary ms-2">{{ escala.datas.length }}</span>
+            </h6>
+
+            <div *ngIf="escala.datas.length === 0" class="text-center py-4 text-muted">
+              <i class="bi bi-calendar-plus fs-2 d-block mb-2"></i>
+              <small>Nenhuma data adicionada ainda</small>
+            </div>
+
+            <div *ngFor="let d of escala.datas" class="data-card mb-2 p-3 rounded-3"
+                 style="background:#f8fafc;border:1px solid #e2e8f0;">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h6 class="fw-bold mb-1" style="color:#1a1a2e;">{{ d.nomeEvento }}</h6>
+                  <div class="d-flex gap-3 small" style="color:#4a5568;">
+                    <span><i class="bi bi-calendar me-1"></i>{{ formatDate(d.data) }}</span>
+                    <span><i class="bi bi-clock me-1"></i>{{ d.horario }}</span>
+                    <span><i class="bi bi-geo-alt me-1"></i>{{ d.local }}</span>
+                  </div>
+                </div>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm btn-icon" (click)="montarEscala(escala.id, d.id)"
+                          title="Montar escala para esta data" style="color:#f97316;">
+                    <i class="bi bi-tools"></i>
+                  </button>
+                  <button class="btn btn-sm btn-icon" (click)="removerData(d.id)"
+                          title="Remover data" style="color:#dc3545;">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- Designações existentes -->
+              <div *ngIf="d.designacoes.length > 0" class="mt-2 pt-2" style="border-top:1px solid #e2e8f0;">
+                <small class="text-muted">Designações:</small>
+                <div class="d-flex flex-wrap gap-1 mt-1">
+                  <span *ngFor="let des of d.designacoes" class="badge" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">
+                    {{ des.instrumento }}: {{ des.nomeIntegrante }}
+                  </span>
+                </div>
+              </div>
+              <!-- Músicas existentes -->
+              <div *ngIf="d.musicas.length > 0" class="mt-2 pt-2" style="border-top:1px solid #e2e8f0;">
+                <small class="text-muted">Repertório:</small>
+                <div class="mt-1">
+                  <span *ngFor="let m of d.musicas" class="badge bg-light text-dark me-1 mb-1">
+                    🎵 {{ m.nome }}{{ m.artista ? ' - ' + m.artista : '' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

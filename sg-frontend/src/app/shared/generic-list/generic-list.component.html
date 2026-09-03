@@ -1,0 +1,84 @@
+<!-- Componente de Toast para notificações -->
+<app-toast></app-toast>
+
+<!-- Modal de Confirmação de Exclusão -->
+<app-confirm-dialog
+  [visible]="showDeleteConfirm"
+  title="Confirmar Exclusão"
+  [message]="'Tem certeza que deseja excluir ' + (itemToDelete?.nome || itemToDelete?.titulo || 'este registro') + '? Esta ação não pode ser desfeita.'"
+  confirmText="Excluir"
+  cancelText="Cancelar"
+  type="danger"
+  [loading]="deleting"
+  (confirm)="deletar()"
+  (cancel)="cancelDelete()">
+</app-confirm-dialog>
+
+<div class="table-container">
+  <div class="table-header">
+    <h5 class="mb-0 fw-semibold"><i class="bi {{ icon }} me-2"></i>{{ title }}</h5>
+    <button class="btn btn-primary btn-sm" (click)="novo()">
+      <i class="bi bi-plus-lg"></i> Novo
+    </button>
+  </div>
+
+  <!-- Componente de Busca e Filtros -->
+  <div class="px-4 pt-4">
+    <app-search-filter
+      [filters]="filters"
+      [searchPlaceholder]="'Buscar ' + title.toLowerCase() + '...'"></app-search-filter>
+  </div>
+
+  <!-- Loading Spinner -->
+  <app-loading-spinner [loading]="loading" [text]="'Carregando registros...'"></app-loading-spinner>
+
+  <!-- Estado vazio -->
+  <div *ngIf="!loading && filtered.length === 0" class="empty-state">
+    <i class="bi {{ icon }}"></i>
+    <p>Nenhum registro encontrado</p>
+    <button class="btn btn-primary" (click)="novo()">Adicionar</button>
+  </div>
+
+  <!-- Tabela -->
+  <div *ngIf="!loading && filtered.length > 0" class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th *ngFor="let col of columns">{{ col.charAt(0).toUpperCase() + col.slice(1) }}</th>
+          <th style="width: 140px;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of paginatedItems">
+          <td *ngFor="let col of columns" class="fw-medium">{{ formatValue(item, col) }}</td>
+          <td>
+            <!-- Ações extras (ex: resetar senha) -->
+            <ng-container *ngFor="let acao of extraActions">
+              <button class="btn btn-sm btn-icon" (click)="executarAcaoExtra(acao, item)"
+                      [title]="acao.label" [ngStyle]="{'color': acao.class}">
+                <i [class]="acao.icon"></i>
+              </button>
+            </ng-container>
+            <!-- Ações padrão -->
+            <button class="btn btn-sm btn-icon" (click)="editar(item.id)" title="Editar">
+              <i class="bi bi-pencil text-info"></i>
+            </button>
+            <button class="btn btn-sm btn-icon" (click)="confirmDelete(item)" title="Excluir">
+              <i class="bi bi-trash text-danger"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginação -->
+  <div class="px-4 pb-4" *ngIf="!loading && filtered.length > 0">
+    <app-pagination
+      [totalItems]="filtered.length"
+      [itemsPerPage]="itemsPerPage"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
+</div>

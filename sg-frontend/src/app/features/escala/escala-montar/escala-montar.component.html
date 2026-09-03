@@ -1,0 +1,114 @@
+<div class="table-container">
+  <div class="table-header">
+    <h5 class="mb-0 fw-semibold">
+      <i class="bi bi-tools me-2"></i>Montar Escala: {{ escala?.titulo || 'Carregando...' }}
+    </h5>
+    <div class="d-flex gap-2">
+      <button class="btn btn-success btn-sm" (click)="salvarTodasDesignacoes()"
+              [disabled]="salvando || !escala">
+        <i class="bi bi-save me-1"></i> Salvar Todas
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" (click)="voltar()">
+        <i class="bi bi-arrow-left"></i> Voltar
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- CONTEÚDO -->
+  <div *ngIf="!loading && escala" class="p-4">
+    <!-- Legenda -->
+    <div class="mb-4 d-flex gap-3 small" style="color:#4a5568;">
+      <span><i class="bi bi-circle-fill text-success me-1" style="font-size:8px;"></i> Confirmado</span>
+      <span><i class="bi bi-circle-fill text-secondary me-1" style="font-size:8px;"></i> Sem confirmação</span>
+    </div>
+
+    <!-- Lista de datas -->
+    <div *ngFor="let data of escala.datas" class="mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3"
+             style="border-bottom:1px solid #e2e8f0;">
+          <div>
+            <h6 class="fw-bold mb-1" style="color:#1a1a2e;">{{ data.nomeEvento }}</h6>
+            <small style="color:#4a5568;">
+              <i class="bi bi-calendar me-1"></i>{{ formatDate(data.data) }}
+              <i class="bi bi-clock ms-2 me-1"></i>{{ data.horario }}
+              <i class="bi bi-geo-alt ms-2 me-1"></i>{{ data.local }}
+            </small>
+          </div>
+          <span class="badge" [ngClass]="confirmadosDaData(data).length > 0 ? 'bg-success' : 'bg-secondary'">
+            {{ confirmadosDaData(data).length }} confirmações
+          </span>
+        </div>
+
+        <div class="card-body p-4">
+          <!-- Confirmados disponíveis -->
+          <div *ngIf="confirmadosDaData(data).length === 0" class="text-center py-3 text-muted">
+            <i class="bi bi-people fs-3 d-block mb-2"></i>
+            <small>Nenhuma confirmação ainda. Compartilhe o link público da escala.</small>
+          </div>
+
+          <div *ngIf="confirmadosDaData(data).length > 0" class="mb-3">
+            <small class="text-muted fw-semibold">Integrantes confirmados:</small>
+            <div class="d-flex flex-wrap gap-2 mt-1">
+              <span *ngFor="let c of confirmadosDaData(data)" class="badge bg-light text-dark py-2 px-3">
+                <i class="bi bi-person-check text-success me-1"></i>
+                {{ c.nome }}
+                <span *ngIf="c.membroNome" class="text-muted ms-1">({{ c.membroNome }})</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Designações atuais -->
+          <div *ngIf="designacoes[data.id] && designacoes[data.id].length > 0" class="mb-3">
+            <small class="text-muted fw-semibold">Designações:</small>
+            <div class="table-responsive mt-1">
+              <table class="table table-sm table-borderless mb-0" style="max-width:600px;">
+                <tbody>
+                  <tr *ngFor="let des of designacoes[data.id]; let i = index">
+                    <td style="width:30px;" class="p-1">
+                      <button class="btn btn-sm btn-icon p-0" (click)="removerDesignacao(data.id, i)"
+                              title="Remover" style="color:#dc3545;">
+                        <i class="bi bi-x-circle"></i>
+                      </button>
+                    </td>
+                    <td class="p-1">
+                      <select class="form-select form-select-sm" [(ngModel)]="des.instrumento">
+                        <option *ngFor="let inst of instrumentos" [value]="inst">{{ inst }}</option>
+                      </select>
+                    </td>
+                    <td class="p-1">
+                      <select class="form-select form-select-sm" [(ngModel)]="des.confirmacaoId">
+                        <option *ngFor="let c of confirmadosDaData(data)" [value]="c.id">{{ c.nome }}</option>
+                      </select>
+                    </td>
+                    <td class="p-1">
+                      <input type="number" class="form-control form-control-sm" style="width:60px;"
+                             [(ngModel)]="des.ordem" placeholder="Ordem">
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Botões ação -->
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-sm" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);"
+                    (click)="adicionarDesignacao(data.id)">
+              <i class="bi bi-plus-lg"></i> Adicionar Designação
+            </button>
+            <button class="btn btn-sm btn-success" (click)="salvarDesignacoes(data.id)"
+                    [disabled]="salvando">
+              <i class="bi bi-check-lg"></i> Salvar Data
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

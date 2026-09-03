@@ -1,0 +1,53 @@
+<div *ngIf="loading" class="d-flex justify-content-center py-5"><div class="spinner"></div></div>
+
+<div *ngIf="!loading" class="card">
+  <h5 class="fw-semibold mb-4">{{ isEdit ? 'Editar' : 'Novo' }} Membro</h5>
+
+  <form (ngSubmit)="save()">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Nome *</label>
+        <input type="text" class="form-control" [(ngModel)]="form.nome" name="nome" required>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Documento</label>
+        <input type="text" class="form-control" [(ngModel)]="form.documento" name="documento">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Telefone</label>
+        <input type="text" class="form-control" [(ngModel)]="form.telefone" name="telefone">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Endereço</label>
+        <input type="text" class="form-control" [(ngModel)]="form.endereco" name="endereco">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Situação *</label>
+        <select class="form-select" [(ngModel)]="form.situacao" name="situacao" required>
+          <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Ministério</label>
+        <select class="form-select" [(ngModel)]="form.ministerioId" name="ministerioId">
+          <option [ngValue]="null">— Sem ministério —</option>
+          <option *ngFor="let m of ministerios" [ngValue]="m.id">{{ m.nome }}</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Data de Nascimento</label>
+        <input type="date" class="form-control" [(ngModel)]="form.dataNasc" name="dataNasc">
+      </div>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger mt-3 py-2 small">{{ error }}</div>
+
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn btn-primary" [disabled]="saving">
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+        {{ isEdit ? 'Atualizar' : 'Salvar' }}
+      </button>
+      <button type="button" class="btn btn-secondary" routerLink="/membros">Cancelar</button>
+    </div>
+  </form>
+</div>

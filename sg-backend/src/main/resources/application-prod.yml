@@ -1,0 +1,139 @@
+# Configuração de Produção - SGE Backend
+# Este arquivo é carregado quando spring.profiles.active=prod
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
+
+spring:
+  application:
+    name: sge-backend
+  profiles:
+    active: prod
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN:5}
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 30000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate  # Nunca usar update em produção
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+  flyway:
+    enabled: ${FLYWAY_ENABLED:false}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
+
+app:
+  upload:
+    dir: ${UPLOAD_DIR:uploads}
+    max-size: ${MAX_FILE_SIZE:5242880}  # 5MB
+    allowed-types: image/jpeg,image/png,image/gif,image/webp,application/pdf
+  name: ${APP_NAME:SGE - Sistema de Gerenciamento Eclesiástico}
+  base-url: ${APP_BASE_URL:https://icertag.com.br}
+
+jwt:
+  secret: ${JWT_SECRET}  # Obrigatório em produção
+  expiration: ${JWT_EXPIRATION:86400000}  # 24 horas
+
+# Configuração do Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      roles: ADMIN
+    info:
+      enabled: true
+  health:
+    db:
+      enabled: true
+    diskspace:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+# Configuração de logs
+logging:
+  level:
+    root: WARN
+    com.sg: INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+  pattern:
+    console: \"%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n\"
+  file:
+    name: ${LOG_DIR:logs}/sge-backend.log
+  logback:
+    rollingpolicy:
+      max-file-size: ${LOG_MAX_SIZE:10MB}
+      max-history: ${LOG_RETENTION:30}
+      total-size-cap: ${LOG_TOTAL_SIZE:1GB}
+      clean-history-on-start: true
+
+# Rate Limiting
+bucket4j:
+  enabled: true
+  filters:
+    - cache-name: rate-limit-buckets
+      url: /auth/.*
+      bandwidths:
+        - capacity: 5
+          time: 1
+          unit: minutes
+    - cache-name: rate-limit-buckets
+      url: /api/.*
+      bandwidths:
+        - capacity: 120
+          time: 1
+          unit: minutes
+
+# Sentry (monitoramento de erros)
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:production}
+  release: ${SENTRY_RELEASE:1.0.0}
+  traces-sample-rate: ${SENTRY_TRACES_SAMPLE_RATE:0.1}
+  enable-tracing: true
+
+# CORS
+app.cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:https://icertag.com.br}
+app.cors.allowed-methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
+app.cors.allowed-headers: *
+app.cors.allow-credentials: true
+app.cors.max-age: 3600

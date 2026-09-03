@@ -1,0 +1,55 @@
+<nav class="sidebar" [class.collapsed]="collapsed">
+  <div class="logo-details">
+    <img src="assets/logo-icert.png" alt="Icert" class="logo-img">
+    <span class="logo_name">SGE - Icert</span>
+  </div>
+
+  <ul class="nav-links">
+    <li *ngFor="let item of menuItems">
+      <!-- Item com submenu -->
+      <ng-container *ngIf="item.children; else singleItem">
+        <div class="iocn-link" (click)="toggleSubMenu(item)">
+          <a href="javascript:void(0)">
+            <i class="bi" [ngClass]="item.icon"></i>
+            <span class="link_name">{{ item.label }}</span>
+          </a>
+          <i class="bi bi-chevron-down arrow" [class.rotate]="item.expanded"></i>
+        </div>
+        <ul class="sub-menu" [class.open]="item.expanded">
+          <li><a class="link_name" href="javascript:void(0)">{{ item.label }}</a></li>
+          <li *ngFor="let child of item.children">
+            <a [routerLink]="child.route" routerLinkActive="active-link">
+              <i class="bi" [ngClass]="child.icon"></i>
+              <span>{{ child.label }}</span>
+            </a>
+          </li>
+        </ul>
+      </ng-container>
+
+      <!-- Item único -->
+      <ng-template #singleItem>
+        <a [routerLink]="item.route" routerLinkActive="active-link">
+          <i class="bi" [ngClass]="item.icon"></i>
+          <span class="link_name">{{ item.label }}</span>
+        </a>
+      </ng-template>
+    </li>
+
+    <!-- Perfil / Logout -->
+    <li class="mt-auto">
+      <div class="profile-details">
+        <div class="profile-content">
+          <div class="user-avatar-sm">{{ user?.nome?.charAt(0) || 'U' }}</div>
+        </div>
+        <div class="name-job" *ngIf="!collapsed">
+          <div class="profile_name">{{ user?.nome || 'Usuário' }}</div>
+          <div class="job">
+            <a href="javascript:void(0)" (click)="logout()" class="text-decoration-none">
+              <i class="bi bi-box-arrow-right text-danger"></i> Sair
+            </a>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</nav>

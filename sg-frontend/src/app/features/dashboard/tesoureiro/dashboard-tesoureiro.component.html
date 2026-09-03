@@ -1,0 +1,79 @@
+<div *ngIf="loading" class="d-flex justify-content-center py-5"><div class="spinner"></div></div>
+
+<div *ngIf="!loading">
+  <div class="mb-3">
+    <h4 class="fw-bold" style="color:var(--orange);">💰 Painel Financeiro</h4>
+    <p style="color:var(--text-secondary); font-size:0.875rem;">Resumo das finanças da igreja</p>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card" style="border-left-color: #ef4444;">
+        <div class="d-flex align-items-center gap-3">
+          <div class="stat-icon" style="color:#ef4444"><i class="bi bi-arrow-down-circle"></i></div>
+          <div>
+            <div class="stat-number">{{ stats.contasPagar }}</div>
+            <div class="stat-label">Contas a Pagar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card" style="border-left-color: #22c55e;">
+        <div class="d-flex align-items-center gap-3">
+          <div class="stat-icon" style="color:#22c55e"><i class="bi bi-arrow-up-circle"></i></div>
+          <div>
+            <div class="stat-number">{{ stats.contasReceber }}</div>
+            <div class="stat-label">Contas a Receber</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card" style="border-left-color: #ef4444;">
+        <div class="d-flex align-items-center gap-3">
+          <div class="stat-icon" style="color:#ef4444"><i class="bi bi-cash-stack"></i></div>
+          <div>
+            <div class="stat-number">R$ {{ stats.totalPagar.toFixed(2) }}</div>
+            <div class="stat-label">Total a Pagar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card" style="border-left-color: #22c55e;">
+        <div class="d-flex align-items-center gap-3">
+          <div class="stat-icon" style="color:#22c55e"><i class="bi bi-cash"></i></div>
+          <div>
+            <div class="stat-number">R$ {{ stats.totalReceber.toFixed(2) }}</div>
+            <div class="stat-label">Total a Receber</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-xl-6">
+      <div class="card">
+        <h5 class="mb-3 fw-semibold">Ações Rápidas</h5>
+        <div class="d-grid gap-2">
+          <a routerLink="/financeiro/pagar" class="btn btn-primary d-flex align-items-center gap-2"><i class="bi bi-arrow-down-circle"></i> Contas a Pagar</a>
+          <a routerLink="/financeiro/receber" class="btn" style="background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border-light);"><i class="bi bi-arrow-up-circle"></i> Contas a Receber</a>
+          <a routerLink="/fornecedores" class="btn" style="background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border-light);"><i class="bi bi-truck"></i> Fornecedores</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-6">
+      <div class="card">
+        <h5 class="mb-3 fw-semibold">Saldo Previsto</h5>
+        <div class="text-center py-4">
+          <div class="display-4 fw-bold" [style.color]="stats.totalReceber - stats.totalPagar >= 0 ? '#22c55e' : '#ef4444'">
+            R$ {{ (stats.totalReceber - stats.totalPagar).toFixed(2) }}
+          </div>
+          <p style="color:var(--text-secondary);">Receitas - Despesas</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

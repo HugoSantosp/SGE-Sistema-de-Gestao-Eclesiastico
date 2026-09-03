@@ -1,0 +1,163 @@
+<div class="mm-shell">
+  <div class="mm-header">
+    <div class="brand">
+      <img src="assets/logo-icert.png" alt="ICERT">
+      <div>
+        <div class="brand-name">Gerenciar Ministério</div>
+        <div class="brand-sub">ICERT - Agência do Reino de Deus</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-sm" (click)="sair()" title="Sair">
+        <i class="bi bi-box-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="mm-section-title">
+    <a routerLink="/ministerios" class="text-muted me-2"><i class="bi bi-arrow-left"></i></a>
+    {{ ministerioNome }}
+    <span class="badge badge-orange ms-2">{{ papelLabel(meuPapel) || (isPastor ? 'Pastor' : 'Líder') }}</span>
+  </div>
+  <div class="mm-section-sub">Gerencie os membros e as escalas do seu ministério</div>
+
+  <!-- Tabs -->
+  <div class="mm-tabs mb-3">
+    <button class="mm-tab" [class.active]="aba === 'membros'" (click)="aba = 'membros'">
+      <i class="bi bi-people me-1"></i> Membros
+    </button>
+    <button class="mm-tab" [class.active]="aba === 'escalas'" (click)="aba = 'escalas'">
+      <i class="bi bi-music-note-list me-1"></i> Escalas
+    </button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger d-flex align-items-center gap-2">
+    <i class="bi bi-exclamation-triangle"></i>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- ===== ABA MEMBROS ===== -->
+  <ng-container *ngIf="aba === 'membros'">
+
+    <div *ngIf="loading" class="mm-spinner">
+      <div class="spinner-border" role="status"></div>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <!-- Form adicionar -->
+      <div class="mm-card">
+        <div class="mm-card-title mb-2"><i class="bi bi-person-plus me-1"></i> Adicionar membro</div>
+        <div class="d-flex flex-column gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <select class="form-select" [(ngModel)]="membroSelecionado">
+              <option [ngValue]="null" disabled>Selecione um membro…</option>
+              <option *ngFor="let m of membrosDisponiveis" [ngValue]="m.id">{{ m.nome }}</option>
+            </select>
+            <button class="btn btn-outline-secondary btn-sm flex-shrink-0"
+                    (click)="carregarDisponiveis()"
+                    [disabled]="carregandoMembros"
+                    title="Atualizar lista de membros">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+          </div>
+          <div class="d-flex gap-2">
+            <select class="form-select" [(ngModel)]="papelNovo">
+              <option *ngFor="let p of papeis" [value]="p">{{ papelLabels[p] }}</option>
+            </select>
+            <button class="btn btn-primary flex-shrink-0" (click)="adicionarMembro()" [disabled]="salvandoMembro || carregandoMembros">
+              <i class="bi bi-plus-lg me-1"></i> Adicionar
+            </button>
+          </div>
+          <small class="text-muted" *ngIf="carregandoMembros">
+            <i class="bi bi-arrow-repeat me-1"></i> Carregando membros disponíveis…
+          </small>
+        </div>
+      </div>
+
+      <!-- Lista de membros -->
+      <div class="mm-section-sub fw-semibold text-uppercase mt-3" style="font-size:0.72rem;color:var(--text-muted);">
+        <i class="bi bi-people me-1"></i> {{ membros.length }} membro(s)
+      </div>
+
+      <div class="mm-card" *ngFor="let m of membros">
+        <div class="d-flex align-items-center gap-3">
+          <div class="mm-min-avatar" [class.no-foto]="!m.foto">
+            <img *ngIf="m.foto" [src]="m.foto | uploadUrl" alt="">
+            <i *ngIf="!m.foto" class="bi bi-person"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="mm-card-title">{{ m.nome }}</div>
+            <div class="mm-card-sub">{{ m.telefone || m.documento || 'Sem contato' }}</div>
+          </div>
+          <select class="form-select mm-papel-select"
+                  [ngModel]="m.papel"
+                  (ngModelChange)="mudarPapel(m, $event)">
+            <option *ngFor="let p of papeis" [value]="p">{{ papelLabels[p] }}</option>
+          </select>
+          <button class="btn btn-danger btn-sm btn-icon" (click)="removerMembro(m)" title="Remover">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="membros.length === 0" class="empty-state">
+        <i class="bi bi-people"></i>
+        <p>Nenhum membro neste ministério ainda.</p>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <!-- ===== ABA ESCALAS ===== -->
+  <ng-container *ngIf="aba === 'escalas'">
+
+    <!-- Form criar escala -->
+    <div class="mm-card">
+      <div class="mm-card-title mb-2"><i class="bi bi-plus-circle me-1"></i> Nova escala</div>
+      <div class="d-flex gap-2">
+        <input class="form-control" type="text" placeholder="Ex.: Culto de Domingo" [(ngModel)]="novoTitulo">
+        <button class="btn btn-primary flex-shrink-0" (click)="criarEscala()" [disabled]="criandoEscala">
+          <i class="bi bi-plus-lg me-1"></i> Criar
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="carregandoEscalas" class="mm-spinner">
+      <div class="spinner-border" role="status"></div>
+    </div>
+
+    <ng-container *ngIf="!carregandoEscalas">
+      <div class="mm-card" *ngFor="let e of escalas" (click)="abrirMontagem(e.id)">
+        <div class="d-flex align-items-center gap-3">
+          <div class="mm-escala-icon">
+            <i class="bi bi-music-note-beamed"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="mm-card-title">{{ e.titulo }}</div>
+            <div class="mm-card-sub">{{ e.datasCount }} data(s) • {{ e.confirmacoesCount }} confirmação(ões)</div>
+          </div>
+          <span class="badge" [class.badge-success]="e.aberta" [class.badge-secondary]="!e.aberta">
+            {{ e.aberta ? 'Aberta' : 'Fechada' }}
+          </span>
+          <i class="bi bi-chevron-right text-muted"></i>
+        </div>
+      </div>
+
+      <div *ngIf="escalas.length === 0" class="empty-state">
+        <i class="bi bi-music-note"></i>
+        <p>Nenhuma escala criada ainda.<br>Crie a primeira acima.</p>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
+
+<nav class="mm-bottom-nav">
+  <a routerLink="/ministerios" routerLinkActive="active">
+    <i class="bi bi-grid"></i> Ministérios
+  </a>
+  <a routerLink="/escalas" routerLinkActive="active">
+    <i class="bi bi-calendar-check"></i> Escalas
+  </a>
+  <a href="javascript:void(0)" (click)="sair()">
+    <i class="bi bi-box-arrow-right"></i> Sair
+  </a>
+</nav>

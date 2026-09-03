@@ -1,0 +1,83 @@
+<div *ngIf="loading" class="d-flex justify-content-center py-5">
+  <div class="spinner"></div>
+</div>
+
+<div *ngIf="!loading">
+  <!-- Stats Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-xl-4 col-md-6">
+      <div class="stat-card" style="border-left-color: var(--primary);">
+        <div class="d-flex align-items-center gap-3">
+          <div class="stat-icon text-primary"><i class="bi bi-people"></i></div>
+          <div>
+            <div class="stat-number">{{ stats.totalMembros }}</div>
+            <div class="stat-label">Total de Membros</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+      <div class="stat-card" style="border-left-color: var(--success);">
+        <div class="d-flex align-items-center gap-3">
+          <div class="stat-icon text-success"><i class="bi bi-person-check"></i></div>
+          <div>
+            <div class="stat-number">{{ stats.membrosAtivos }}</div>
+            <div class="stat-label">Membros Ativos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+      <div class="stat-card" style="border-left-color: var(--warning);">
+        <div class="d-flex align-items-center gap-3">
+          <div class="stat-icon text-warning"><i class="bi bi-person-x"></i></div>
+          <div>
+            <div class="stat-number">{{ stats.membrosInativos }}</div>
+            <div class="stat-label">Membros Inativos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-xl-6">
+      <div class="card">
+        <h5 class="mb-3 fw-semibold">Membros Ativos vs Inativos</h5>
+        <div class="d-flex align-items-center justify-content-center py-4">
+          <div style="width: 200px; height: 200px; position: relative;">
+            <canvas id="membrosChart"></canvas>
+          </div>
+          <div class="ms-4">
+            <div class="d-flex align-items-center mb-2">
+              <span class="badge bg-success me-2">&nbsp;</span>
+              <span>Ativos: {{ stats.membrosAtivos }}</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <span class="badge bg-warning me-2">&nbsp;</span>
+              <span>Inativos: {{ stats.membrosInativos }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-6">
+      <div class="card">
+        <h5 class="mb-3 fw-semibold">Quick Actions</h5>
+        <div class="d-grid gap-2">
+          <a routerLink="/membros" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="bi bi-person-plus"></i> Novo Membro
+          </a>
+          <a routerLink="/financeiro/pagar" class="btn btn-outline-warning d-flex align-items-center gap-2">
+            <i class="bi bi-cash"></i> Contas a Pagar
+          </a>
+          <a routerLink="/tarefas" class="btn btn-outline-success d-flex align-items-center gap-2">
+            <i class="bi bi-check2-square"></i> Tarefas
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

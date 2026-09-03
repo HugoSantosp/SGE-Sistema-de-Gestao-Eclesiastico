@@ -1,0 +1,183 @@
+<div class="perfil-page">
+  <div class="container py-4">
+    <!-- ⚠️ Banner de Senha Temporária -->
+    <div *ngIf="senhaTemporaria" class="alert alert-warning temp-password-banner d-flex align-items-center gap-3 mb-4 p-3">
+      <div class="banner-icon">
+        <i class="bi bi-shield-exclamation fs-3"></i>
+      </div>
+      <div class="flex-grow-1">
+        <h6 class="mb-1 fw-bold">🔐 Senha Temporária</h6>
+        <p class="mb-1 small">
+          Você está usando uma senha temporária. <strong>Altere sua senha agora</strong> para continuar usando o sistema com segurança.
+        </p>
+        <p class="mb-0 small text-muted">
+          Seu acesso será bloqueado até que a senha seja alterada.
+        </p>
+      </div>
+      <button class="btn btn-warning fw-semibold px-4" (click)="abrirAlterarSenha()">
+        <i class="bi bi-key me-1"></i> Alterar Senha
+      </button>
+    </div>
+
+    <!-- Cabeçalho -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <div class="page-icon">
+        <i class="bi bi-person-circle fs-2"></i>
+      </div>
+      <div>
+        <h4 class="mb-1">Meu Perfil</h4>
+        <p class="text-muted mb-0 small">Visualize e edite suas informações pessoais</p>
+      </div>
+    </div>
+
+    <!-- Success toast -->
+    <div *ngIf="success" class="alert alert-success d-flex align-items-center gap-2 py-2 mb-4">
+      <i class="bi bi-check-circle"></i>
+      <span>Perfil atualizado com sucesso!</span>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="alert alert-danger d-flex align-items-center gap-2 py-2 mb-4">
+      <i class="bi bi-exclamation-triangle"></i>
+      <span>{{ error }}</span>
+    </div>
+
+    <div class="row g-4">
+      <!-- Card de Avatar -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center py-4">
+            <!-- Profile Photo -->
+            <div class="avatar-wrapper mb-3" (click)="!editando && iniciarEdicao()">
+              <div *ngIf="getFotoSrc(); else avatarFallback" class="avatar-img"
+                   [style.background-image]="'url(' + getFotoSrc() + ')'">
+              </div>
+              <ng-template #avatarFallback>
+                <div class="avatar-fallback">
+                  <span>{{ profile?.nome?.charAt(0)?.toUpperCase() || 'U' }}</span>
+                </div>
+              </ng-template>
+              <div class="avatar-edit-badge" *ngIf="!editando">
+                <i class="bi bi-pencil"></i>
+              </div>
+            </div>
+
+            <h5 class="mb-1">{{ profile?.nome }}</h5>
+            <p class="text-muted small mb-2">{{ profile?.email }}</p>
+            <span class="badge bg-orange">
+              <i class="bi bi-shield-check me-1"></i>
+              {{ nivelLabel[profile?.nivel || ''] || profile?.nivel }}
+            </span>
+
+            <hr class="my-3">
+
+            <div class="text-start small">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Documento</span>
+                <span>{{ profile?.documento || '—' }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">ID</span>
+                <span>#{{ profile?.id }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card de Edição -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center py-3">
+            <h6 class="mb-0 fw-semibold">
+              <i class="bi bi-pencil-square me-2"></i>
+              {{ editando ? 'Editando Perfil' : 'Informações do Perfil' }}
+            </h6>
+            <div *ngIf="!editando" class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-secondary" (click)="abrirAlterarSenha()">
+                <i class="bi bi-key me-1"></i> Alterar Senha
+              </button>
+              <button class="btn btn-sm btn-outline-primary" (click)="iniciarEdicao()">
+                <i class="bi bi-pencil me-1"></i> Editar
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- View Mode -->
+            <div *ngIf="!editando" class="row g-3">
+              <div class="col-md-6">
+                <label class="text-muted small d-block mb-1">Nome</label>
+                <p class="fw-medium mb-0">{{ profile?.nome }}</p>
+              </div>
+              <div class="col-md-6">
+                <label class="text-muted small d-block mb-1">Email</label>
+                <p class="fw-medium mb-0">{{ profile?.email }}</p>
+              </div>
+              <div class="col-12">
+                <label class="text-muted small d-block mb-1">Nível de Acesso</label>
+                <p class="fw-medium mb-0">{{ nivelLabel[profile?.nivel || ''] || profile?.nivel }}</p>
+              </div>
+            </div>
+
+            <!-- Edit Mode -->
+            <form *ngIf="editando" (ngSubmit)="salvar()">
+              <!-- Foto -->
+              <div class="mb-4">
+                <label class="form-label fw-medium">Foto de Perfil</label>
+                <div class="photo-upload" (click)="fileInput.click()">
+                  <input #fileInput type="file" accept="image/*" hidden
+                         (change)="onFotoSelected($event)">
+                  <div *ngIf="getFotoSrc()" class="photo-preview">
+                    <img [src]="getFotoSrc()" alt="Preview">
+                    <button type="button" class="btn-remove" (click)="removerFoto(); $event.stopPropagation()">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </div>
+                  <div *ngIf="!getFotoSrc()" class="photo-placeholder">
+                    <i class="bi bi-camera fs-2"></i>
+                    <span class="small">Clique para adicionar foto</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Nome -->
+              <div class="mb-3">
+                <label class="form-label fw-medium">Nome</label>
+                <input type="text" class="form-control" [(ngModel)]="nome" name="nome"
+                       placeholder="Seu nome" required [disabled]="loading">
+              </div>
+
+              <!-- Email -->
+              <div class="mb-4">
+                <label class="form-label fw-medium">Email</label>
+                <input type="email" class="form-control" [(ngModel)]="email" name="email"
+                       placeholder="Seu email" required [disabled]="loading">
+              </div>
+
+              <!-- Actions -->
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4"
+                        [disabled]="loading || uploading">
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                  <i *ngIf="!loading" class="bi bi-check-lg me-1"></i>
+                  {{ uploading ? 'Enviando foto…' : loading ? 'Salvando…' : 'Salvar' }}
+                </button>
+                <button type="button" class="btn btn-outline-secondary px-4"
+                        (click)="cancelarEdicao()" [disabled]="loading">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alterar Senha Modal -->
+  <app-alterar-senha *ngIf="showAlterarSenha"
+                     (fechou)="fecharAlterarSenha(false)"
+                     (senhaAlterada)="fecharAlterarSenha(true)">
+  </app-alterar-senha>
+</div>

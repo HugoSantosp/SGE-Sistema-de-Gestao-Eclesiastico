@@ -1,0 +1,24 @@
+.mm-min-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--orange-light);
+  color: var(--orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.mm-min-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mm-min-avatar.no-foto {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+}

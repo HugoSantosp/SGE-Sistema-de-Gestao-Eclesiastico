@@ -1,0 +1,27 @@
+<div class="table-container">
+  <div class="table-header">
+    <h5 class="mb-0 fw-semibold">Bispos / Pastor Presidente</h5>
+    <div class="d-flex gap-2">
+      <input type="text" class="form-control form-control-sm" style="width: 200px;" placeholder="Buscar..." [(ngModel)]="searchTerm">
+      <button class="btn btn-primary btn-sm" (click)="novo()"><i class="bi bi-plus-lg"></i> Novo Bispo</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-5"><div class="spinner"></div></div>
+  <div *ngIf="!loading && filtered.length === 0" class="empty-state"><i class="bi bi-person-badge"></i><p>Nenhum bispo encontrado</p></div>
+
+  <table *ngIf="!loading && filtered.length > 0" class="table">
+    <thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th style="width: 120px;">Ações</th></tr></thead>
+    <tbody>
+      <tr *ngFor="let i of filtered">
+        <td class="fw-medium">{{ i.nome }}</td>
+        <td>{{ i.email }}</td>
+        <td>{{ i.telefone || '-' }}</td>
+        <td>
+          <button class="btn btn-sm btn-icon" (click)="editar(i.id)" title="Editar"><i class="bi bi-pencil text-info"></i></button>
+          <button class="btn btn-sm btn-icon" (click)="deletar(i.id)" title="Excluir"><i class="bi bi-trash text-danger"></i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,52 @@
+<div class="table-container">
+  <div class="table-header">
+    <h5 class="mb-0 fw-semibold">Membros</h5>
+    <div class="d-flex gap-2">
+      <input type="text" class="form-control form-control-sm" style="width: 200px;"
+             placeholder="Buscar membro..." [(ngModel)]="searchTerm">
+      <button class="btn btn-primary btn-sm" (click)="novo()">
+        <i class="bi bi-plus-lg"></i> Novo Membro
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner"></div>
+  </div>
+
+  <div *ngIf="!loading && filtered.length === 0" class="empty-state">
+    <i class="bi bi-people"></i>
+    <p>Nenhum membro encontrado</p>
+    <button class="btn btn-primary" (click)="novo()">Cadastrar Primeiro Membro</button>
+  </div>
+
+  <table *ngIf="!loading && filtered.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Documento</th>
+        <th>Telefone</th>
+        <th>Ministério</th>
+        <th>Situação</th>
+        <th style="width: 120px;">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of filtered">
+        <td class="fw-medium">{{ m.nome }}</td>
+        <td>{{ m.documento || '-' }}</td>
+        <td>{{ m.telefone || '-' }}</td>
+        <td>{{ getMinisterioNome(m.ministerioId) }}</td>
+        <td><span class="badge" [ngClass]="statusClass(m.situacao)">{{ m.situacao }}</span></td>
+        <td>
+          <button class="btn btn-sm btn-icon" (click)="editar(m.id)" title="Editar">
+            <i class="bi bi-pencil text-info"></i>
+          </button>
+          <button class="btn btn-sm btn-icon" (click)="deletar(m.id)" title="Excluir">
+            <i class="bi bi-trash text-danger"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

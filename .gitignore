@@ -1,0 +1,38 @@
+# SGE - Git Ignore
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.test
+.env.*.local
+
+# Freebuff (ferramenta de desenvolvimento)
+.freebuff/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+sg-backend/target/
+sg-frontend/dist/
+sg-frontend/node_modules/
+sg-frontend/.angular/
+
+# Uploads
+sg-backend/uploads/
+
+# Docker
+.docker/

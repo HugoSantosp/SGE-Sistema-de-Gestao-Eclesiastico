@@ -1,0 +1,45 @@
+<app-public-navbar></app-public-navbar>
+
+<section class="section" style="padding-top:120px;background:#f5f7fa;min-height:80vh;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge mb-3 px-3 py-2" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">CÉLULAS</span>
+      <h2 class="display-6 fw-bold" style="color:#1a1a2e;">Nossas Células</h2>
+      <p style="color:#4a5568;">Grupos pequenos que se reúnem durante a semana</p>
+    </div>
+    <div *ngIf="loading" class="text-center py-5"><div class="spinner"></div></div>
+    <div *ngIf="!loading && celulas.length === 0" class="text-center py-5" style="color:#a0aec0;">
+      <i class="bi bi-people fs-1 mb-3 d-block"></i>
+      <p>Em breve — informações sobre nossas células</p>
+    </div>
+    <div *ngIf="!loading && celulas.length > 0" class="row g-4 justify-content-center">
+      <div *ngFor="let c of celulas" class="col-lg-4 col-md-6">
+        <div class="info-card p-4">
+          <div *ngIf="c.foto" class="rounded-3 overflow-hidden mb-3">
+            <img [src]="c.foto | uploadUrl" [alt]="c.nome" class="w-100" style="height:160px;object-fit:cover;">
+          </div>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div *ngIf="!c.foto" class="info-icon-sm"><i class="bi bi-people"></i></div>
+            <h5 class="fw-bold mb-0" style="color:#1a1a2e;">{{ c.nome }}</h5>
+          </div>
+          <p class="small mb-2" style="color:#4a5568;" *ngIf="c.descricao">{{ c.descricao }}</p>
+          <div class="d-flex flex-wrap gap-3 small" style="color:#4a5568;">
+            <span *ngIf="c.lider"><i class="bi bi-person-badge me-1"></i>{{ c.lider }}</span>
+            <span *ngIf="c.diaSemana"><i class="bi bi-calendar-week me-1"></i>{{ c.diaSemana }}</span>
+            <span *ngIf="c.horario"><i class="bi bi-clock me-1"></i>{{ c.horario }}</span>
+          </div>
+          <p *ngIf="c.endereco" class="small mt-2 mb-0" style="color:#4a5568;">
+            <i class="bi bi-geo-alt me-1"></i>{{ c.endereco }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="py-5 text-center" style="background:#1a1a2e;border-top:1px solid #2a2a3e;">
+  <div class="container">
+    <img src="assets/logo-icert.png" alt="ICERT" height="50" class="mb-3">
+    <p class="small mb-0" style="color:#a0aec0;">© 2026 {{ churchInfo.nome }}. Todos os direitos reservados.</p>
+  </div>
+</footer>

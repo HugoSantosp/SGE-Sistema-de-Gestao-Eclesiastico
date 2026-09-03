@@ -1,0 +1,69 @@
+<div *ngIf="loading" class="d-flex justify-content-center py-5"><div class="spinner"></div></div>
+
+<div *ngIf="!loading">
+  <div class="row g-3 mb-4">
+    <div class="col-xl-4 col-md-6">
+      <div class="stat-card" style="border-left-color: var(--orange);">
+        <div class="d-flex align-items-center gap-3">
+          <div class="stat-icon" style="color:var(--orange)"><i class="bi bi-people"></i></div>
+          <div>
+            <div class="stat-number">{{ stats.totalMembros }}</div>
+            <div class="stat-label">Total de Membros</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+      <div class="stat-card" style="border-left-color: #22c55e;">
+        <div class="d-flex align-items-center gap-3">
+          <div class="stat-icon" style="color:#22c55e"><i class="bi bi-person-check"></i></div>
+          <div>
+            <div class="stat-number">{{ stats.membrosAtivos }}</div>
+            <div class="stat-label">Membros Ativos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+      <div class="stat-card" style="border-left-color: #f59e0b;">
+        <div class="d-flex align-items-center gap-3">
+          <div class="stat-icon" style="color:#f59e0b"><i class="bi bi-person-x"></i></div>
+          <div>
+            <div class="stat-number">{{ stats.membrosInativos }}</div>
+            <div class="stat-label">Membros Inativos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-xl-6">
+      <div class="card">
+        <h5 class="mb-3 fw-semibold">Membros Ativos vs Inativos</h5>
+        <div class="d-flex align-items-center justify-content-center py-3">
+          <div style="width: 180px; height: 180px;"><canvas id="presidenteChart"></canvas></div>
+          <div class="ms-4">
+            <div class="d-flex align-items-center mb-2">
+              <span class="badge" style="background:#f97316; width:12px; height:12px; border-radius:50%; padding:0;">&nbsp;</span>
+              <span class="ms-2">Ativos: {{ stats.membrosAtivos }}</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <span class="badge" style="background:rgba(107,114,128,0.5); width:12px; height:12px; border-radius:50%; padding:0;">&nbsp;</span>
+              <span class="ms-2">Inativos: {{ stats.membrosInativos }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-6">
+      <div class="card">
+        <h5 class="mb-3 fw-semibold">Acesso Rápido</h5>
+        <div class="d-grid gap-2">
+          <a routerLink="/membros" class="btn btn-primary d-flex align-items-center gap-2"><i class="bi bi-person-plus"></i> Novo Membro</a>
+          <a routerLink="/financeiro/pagar" class="btn" style="background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border-light);"><i class="bi bi-cash"></i> Contas a Pagar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
