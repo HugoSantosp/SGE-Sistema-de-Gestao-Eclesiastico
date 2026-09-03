@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang=\"pt-BR\">
+<head>
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+    <title>Notificação de Escala</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+        }
+        .header {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px;
+        }
+        .schedule-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .schedule-card h3 {
+            margin-top: 0;
+            color: #16a34a;
+            font-size: 18px;
+        }
+        .schedule-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .schedule-icon {
+            font-size: 20px;
+            width: 30px;
+            text-align: center;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+            border-top: 1px solid #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class=\"container\">
+        <div class=\"header\">
+            <h1>📋 Nova Escala</h1>
+        </div>
+        
+        <div class=\"content\">
+            <p>Olá <strong th:text=\"${userName}\">Usuário</strong>,</p>
+            
+            <p>Você foi designado para uma nova escala. Confira os detalhes abaixo:</p>
+            
+            <div class=\"schedule-card\">
+                <h3 th:text=\"${scheduleTitle}\">Escala de Domingo</h3>
+                
+                <div class=\"schedule-item\">
+                    <span class=\"schedule-icon\">📅</span>
+                    <div>
+                        <strong>Data:</strong>
+                        <span th:text=\"${scheduleDate}\">25/12/2026</span>
+                    </div>
+                </div>
+                
+                <div class=\"schedule-item\">
+                    <span class=\"schedule-icon\">⏰</span>
+                    <div>
+                        <strong>Horário:</strong>
+                        <span th:text=\"${scheduleTime}\">19:00</span>
+                    </div>
+                </div>
+                
+                <div class=\"schedule-item\">
+                    <span class=\"schedule-icon\">📍</span>
+                    <div>
+                        <strong>Local:</strong>
+                        <span th:text=\"${scheduleLocation}\">Templo Principal</span>
+                    </div>
+                </div>
+            </div>
+            
+            <p>Por favor, confirme sua disponibilidade o mais rápido possível através do sistema.</p>
+            
+            <div style=\"text-align: center;\">
+                <a th:href=\"${baseUrl + '/escalas'}\" style=\"display: inline-block; background: #22c55e; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0;\">Ver Minhas Escalas</a>
+            </div>
+        </div>
+        
+        <div class=\"footer\">
+            <p th:text=\"${appName} + ' © ' + ${currentYear}\">SGE © 2026</p>
+            <p>Este é um email automático, por favor não responda.</p>
+        </div>
+    </div>
+</body>
+</html>

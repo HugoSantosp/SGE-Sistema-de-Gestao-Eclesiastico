@@ -1,0 +1,22 @@
+# =============================================
+# Configurações exclusivas do perfil "dev"
+# (profile padrão — application.yml define spring.profiles.active: dev)
+# =============================================
+
+spring:
+  datasource:
+    # Banco de desenvolvimento. Se sua senha do Postgres for diferente, ajuste aqui.
+    url: jdbc:postgresql://localhost:5432/sge-dev
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+jwt:
+  # Chave apenas para desenvolvimento local (NUNCA usar em produção)
+  secret: cGxhY2Vob2xkZXItc2VjcmV0LWtleS1mb3Itc2dlLXN5c3RlbS0yMDI0LWJhY2tlbmQ=
+
+app:
+  # Senha inicial do admin em dev (bootstrap)
+  admin-initial-password: "123"
+  # URL base usada nos links de email (esqueci senha)
+  base-url: http://localhost:4200
