@@ -28,16 +28,13 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: validate  # Nunca usar update em produção
+      # Hibernate nativo cria/atualiza o schema automaticamente (sem migrações manuais)
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
-  flyway:
-    enabled: ${FLYWAY_ENABLED:false}
-    locations: classpath:db/migration
-    baseline-on-migrate: true
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -106,23 +103,6 @@ logging:
       max-history: ${LOG_RETENTION:30}
       total-size-cap: ${LOG_TOTAL_SIZE:1GB}
       clean-history-on-start: true
-
-# Rate Limiting
-bucket4j:
-  enabled: true
-  filters:
-    - cache-name: rate-limit-buckets
-      url: /auth/.*
-      bandwidths:
-        - capacity: 5
-          time: 1
-          unit: minutes
-    - cache-name: rate-limit-buckets
-      url: /api/.*
-      bandwidths:
-        - capacity: 120
-          time: 1
-          unit: minutes
 
 # Sentry (monitoramento de erros)
 sentry:

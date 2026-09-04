@@ -128,7 +128,7 @@ public class DataInitializer implements CommandLineRunner {
         criarConfigSeNaoExistir("qtd_tarefa", "20");
 
         // Dados essenciais (cargo 'Membro', admin) — criados se ausentes.
-        // Necessário sem Flyway: em banco novo essas linhas não existem (antes vinham da migration V2).
+        // Em banco novo (schema criado pelo Hibernate) esses registros não existem até este bootstrap.
         bootstrapDadosIniciais();
 
         if (isProd) {
@@ -146,7 +146,7 @@ public class DataInitializer implements CommandLineRunner {
 
     /**
      * Cria os dados essenciais caso não existam: cargo 'Membro' e o usuário admin.
-     * Substitui o papel da migration V2 em ambientes sem Flyway (ddl-auto: update).
+     * Como o schema é criado/atualizado pelo Hibernate (ddl-auto), o seed essencial vive aqui.
      */
     private void bootstrapDadosIniciais() {
         // Cargo padrão 'Membro'
@@ -182,9 +182,8 @@ public class DataInitializer implements CommandLineRunner {
      * <p>
      * O Hibernate cria constraints `{tabela}_{coluna}_check` quando gera a tabela,
      * numa época em que os enums tinham apenas alguns valores (ex.: NivelAcesso sem
-     * MEMBRO, PapelMinisterio sem MUSICO). Como o Flyway está desabilitado e o
-     * ddl-auto=update não altera constraints existentes, elas continuariam rejeitando
-     * novos valores (SQLState 23514).
+     * MEMBRO, PapelMinisterio sem MUSICO). Como o ddl-auto=update não altera
+     * constraints existentes, elas continuariam rejeitando novos valores (SQLState 23514).
      * <p>
      * Aqui recriamos cada constraint com TODOS os valores atuais do enum, mantendo a
      * validação no banco em sincronia com o Java — resolve de vez e acompanha
