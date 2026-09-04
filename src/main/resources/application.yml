@@ -59,8 +59,6 @@ management:
       enabled: true
     diskspace:
       enabled: true
-    mail:
-      enabled: false
     rabbit:
       enabled: false
     redis:

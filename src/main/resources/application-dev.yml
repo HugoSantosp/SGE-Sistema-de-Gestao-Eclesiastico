@@ -18,5 +18,5 @@ jwt:
 app:
   # Senha inicial do admin em dev (bootstrap)
   admin-initial-password: "123"
-  # URL base usada nos links de email (esqueci senha)
+  # URL base usada nos links de redefinição de senha (exibidos no log — não há envio de e-mail)
   base-url: http://localhost:4200
