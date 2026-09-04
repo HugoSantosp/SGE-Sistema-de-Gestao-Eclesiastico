@@ -13,8 +13,6 @@ server:
 spring:
   application:
     name: sge-backend
-  profiles:
-    active: prod
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
@@ -43,6 +41,8 @@ app:
     allowed-types: image/jpeg,image/png,image/gif,image/webp,application/pdf
   name: ${APP_NAME:SGE - Sistema de Gerenciamento Eclesiástico}
   base-url: ${APP_BASE_URL:https://icertag.com.br}
+  # Senha inicial do admin (bootstrap no 1º boot). Vazia em prod = admin não é criado.
+  admin-initial-password: ${ADMIN_INITIAL_PASSWORD:}
 
 jwt:
   secret: ${JWT_SECRET}  # Obrigatório em produção
