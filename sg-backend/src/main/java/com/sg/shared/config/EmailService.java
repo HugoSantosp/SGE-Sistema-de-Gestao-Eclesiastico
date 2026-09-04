@@ -8,9 +8,8 @@ import org.springframework.stereotype.Service;
 /**
  * Serviço de email para envio de tokens de redefinição de senha.
  * 
- * Atualmente registra no log (modo desenvolvimento).
- * Para produção, configure spring.mail.host/username/password
- * e substitua o corpo do método enviarEmail para usar JavaMailSender.
+ * Não há serviço de SMTP: o link é apenas registrado no log do servidor.
+ * Em produção (Render), o link aparece nos logs do serviço.
  */
 @Service
 public class EmailService {
