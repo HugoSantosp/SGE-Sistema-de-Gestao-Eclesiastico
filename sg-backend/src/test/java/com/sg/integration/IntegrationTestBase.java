@@ -35,7 +35,6 @@ public abstract class IntegrationTestBase {
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
-        registry.add("spring.flyway.enabled", () -> false);
     }
 
     @Autowired

@@ -59,10 +59,6 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
 
         <!-- JWT -->
         <dependency>
@@ -94,11 +90,6 @@
         <dependency>
             <groupId>com.bucket4j</groupId>
             <artifactId>bucket4j-core</artifactId>
-            <version>${bucket4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.bucket4j</groupId>
-            <artifactId>bucket4j-spring-boot-starter</artifactId>
             <version>${bucket4j.version}</version>
         </dependency>
 
@@ -192,17 +183,6 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>9.22.3</version>
-                <configuration>
-                    <!-- Credenciais via env vars (mvn flyway:migrate/flyway:repair). Nunca commitadas. -->
-                    <url>${env.FLYWAY_URL}</url>
-                    <user>${env.FLYWAY_USER}</user>
-                    <password>${env.FLYWAY_PASSWORD}</password>
                 </configuration>
             </plugin>
             <!-- JaCoCo para cobertura de código -->

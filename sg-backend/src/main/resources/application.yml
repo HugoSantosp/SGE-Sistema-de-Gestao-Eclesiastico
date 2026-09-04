@@ -20,10 +20,6 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  flyway:
-    enabled: false
-    locations: classpath:db/migration
-    baseline-on-migrate: true
 
   web:
     resources:
