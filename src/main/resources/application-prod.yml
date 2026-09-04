@@ -2,7 +2,8 @@
 # Este arquivo é carregado quando spring.profiles.active=prod
 
 server:
-  port: ${SERVER_PORT:8080}
+  # Render injeta a env PORT automaticamente; usamos ela primeiro (fallback: SERVER_PORT, depois 8080)
+  port: ${PORT:${SERVER_PORT:8080}}
   error:
     include-message: never
     include-binding-errors: never
