@@ -31,7 +31,7 @@ import { Subscription, filter } from 'rxjs';
              style="color:#4a5568;">Horários</a>
           <a class="nav-link" href="javascript:void(0)" (click)="navigateToLanding('contato')" 
              style="color:#4a5568;">Contato</a>
-          <a routerLink="/login" class="btn btn-sm fw-semibold px-4" 
+          <a [href]="loginUrl" class="btn btn-sm fw-semibold px-4" 
              style="background:#f97316;color:#fff;border-radius:10px;">
             <i class="bi bi-box-arrow-in-right me-1"></i> Entrar
           </a>
@@ -51,6 +51,13 @@ export class PublicNavbarComponent implements OnInit, OnDestroy {
   private isLandingPage = false;
 
   constructor(private router: Router) {}
+
+  /** URL do login do painel administrativo (app separado, em /SGE-Administracao). */
+  get loginUrl(): string {
+    const host = window.location.hostname;
+    const isLocal = host === 'localhost' || host === '127.0.0.1';
+    return isLocal ? 'http://localhost:4200/login' : '/SGE-Administracao/login';
+  }
 
   ngOnInit(): void {
     // Verifica se está na landing page

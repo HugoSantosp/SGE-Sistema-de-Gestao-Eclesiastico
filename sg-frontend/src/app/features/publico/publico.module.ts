@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { SharedModule } from '../../shared/shared.module';
+import { PipesModule } from '../../shared/pipes/pipes.module';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { MinisteriosPageComponent } from './ministerios-page/ministerios-page.component';
 import { CelulasPageComponent } from './celulas-page/celulas-page.component';
@@ -23,6 +23,6 @@ const routes: Routes = [
     MuralPageComponent,
     PublicNavbarComponent
   ],
-  imports: [CommonModule, RouterModule.forChild(routes), SharedModule]
+  imports: [CommonModule, RouterModule.forChild(routes), PipesModule]
 })
 export class PublicoModule { }

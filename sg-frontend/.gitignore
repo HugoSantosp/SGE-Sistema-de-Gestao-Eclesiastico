@@ -7,3 +7,5 @@ out-tsc/
 .vscode/
 .idea/
 *.iml
+.angular/
+.abacusai/

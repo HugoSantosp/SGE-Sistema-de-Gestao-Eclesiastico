@@ -1,0 +1,12 @@
+/* Bootstrap and Icons (site público — não carrega o CSS do painel admin) */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+/* Fonte e reset básico (equivalente ao reboot + Inter do app admin) */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #ffffff;
+  color: #1a1a2e;
+  min-height: 100vh;
+  overflow-x: hidden;
+}

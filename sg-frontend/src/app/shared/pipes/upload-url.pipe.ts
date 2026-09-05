@@ -1,21 +1,20 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 /**
- * Pipe para converter URLs de uploads relativas em URLs absolutas do backend.
- * 
- * Problema: O Angular dev server não redireciona /uploads/ para o backend,
- * então precisamos usar a URL absoluta do backend.
- * 
+ * Pipe para converter URLs de uploads relativas em URLs servíveis.
+ *
+ * As fotos são servidas pelo backend em /api/uploads/** (mesma origem em
+ * produção, via proxy do Nginx; em dev, o proxy do Angular CLI encaminha
+ * /api para o backend). Por isso o pipe devolve caminhos RELATIVOS —
+ * em produção o domínio é o mesmo, não há host fixo.
+ *
  * Uso: <img [src]="foto | uploadUrl">
- * 
+ *
  * Se a URL já começa com http, retorna direto.
- * Se começa com /uploads/, converte para http://localhost:8080/api/uploads/
+ * Se começa com /uploads/, converte para /api/uploads/
  */
 @Pipe({ name: 'uploadUrl' })
 export class UploadUrlPipe implements PipeTransform {
-
-  // URL base do backend - mudar em produção
-  private static readonly BACKEND_URL = 'http://localhost:8080';
 
   transform(fotoUrl: string | null | undefined): string {
     if (!fotoUrl) return '';
@@ -31,6 +30,6 @@ export class UploadUrlPipe implements PipeTransform {
       path = '/api' + path;
     }
 
-    return UploadUrlPipe.BACKEND_URL + path;
+    return path;
   }
 }

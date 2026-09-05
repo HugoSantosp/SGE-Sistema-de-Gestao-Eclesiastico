@@ -87,8 +87,10 @@ export class AppComponent implements OnInit, OnDestroy {
     const url = this.currentUrl;
     // Remove fragment da URL para verificação
     const cleanUrl = url.split('#')[0].split('?')[0];
-    const publicPages = ['/login', '/ministerios', '/celulas', '/mural'];
-    this.isPublicPage = cleanUrl === '/' || publicPages.some(p => cleanUrl.startsWith(p));
+    // Sem páginas públicas neste app: só o login fica sem o layout de admin.
+    // (As páginas públicas do site vivem em build separado, na raiz do domínio.)
+    const publicPages = ['/login'];
+    this.isPublicPage = publicPages.some(p => cleanUrl.startsWith(p));
   }
 
   toggleSidebar(): void {

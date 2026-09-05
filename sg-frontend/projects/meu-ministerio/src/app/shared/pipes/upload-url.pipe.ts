@@ -1,12 +1,15 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 /**
- * Pipe para converter URLs de uploads relativas em URLs absolutas do backend.
+ * Pipe para converter URLs de uploads relativas em URLs servíveis.
+ *
+ * As fotos são servidas pelo backend em /api/uploads/** (mesma origem em
+ * produção, via proxy do Nginx; em dev, o proxy do Angular CLI encaminha
+ * /api para o backend). Por isso o pipe devolve caminhos RELATIVOS —
+ * em produção o domínio é o mesmo, não há host fixo.
  */
 @Pipe({ name: 'uploadUrl' })
 export class UploadUrlPipe implements PipeTransform {
-
-  private static readonly BACKEND_URL = 'http://localhost:8080';
 
   transform(fotoUrl: string | null | undefined): string {
     if (!fotoUrl) return '';
@@ -19,6 +22,6 @@ export class UploadUrlPipe implements PipeTransform {
       path = '/api' + path;
     }
 
-    return UploadUrlPipe.BACKEND_URL + path;
+    return path;
   }
 }

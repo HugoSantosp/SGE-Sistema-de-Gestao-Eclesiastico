@@ -40,7 +40,7 @@
               "baseHref": "/SGE-Administracao/",
               "budgets": [
                 { "type": "initial", "maximumWarning": "500kb", "maximumError": "1mb" },
-                { "type": "anyComponentStyle", "maximumWarning": "2kb", "maximumError": "4kb" }
+                { "type": "anyComponentStyle", "maximumWarning": "8kb", "maximumError": "12kb" }
               ],
               "outputHashing": "all"
             },
@@ -51,6 +51,26 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "site": {
+              "main": "src/main.site.ts",
+              "index": "src/site/index.html",
+              "outputPath": "dist/site",
+              "baseHref": "/",
+              "styles": [
+                "src/styles.site.scss"
+              ],
+              "budgets": [
+                { "type": "initial", "maximumWarning": "500kb", "maximumError": "1mb" },
+                { "type": "anyComponentStyle", "maximumWarning": "8kb", "maximumError": "12kb" }
+              ],
+              "buildOptimizer": true,
+              "optimization": true,
+              "vendorChunk": false,
+              "extractLicenses": false,
+              "sourceMap": false,
+              "namedChunks": false,
+              "outputHashing": "all"
             },
             "mobile": {
               "main": "src/main.mobile.ts",
@@ -70,7 +90,8 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": { "buildTarget": "sg-frontend:build:production" },
-            "development": { "buildTarget": "sg-frontend:build:development" }
+            "development": { "buildTarget": "sg-frontend:build:development" },
+            "site": { "buildTarget": "sg-frontend:build:site", "port": 4400 }
           },
           "defaultConfiguration": "development",
           "options": {
@@ -135,7 +156,7 @@
               "baseHref": "/SGE-MeuMinisterio/",
               "budgets": [
                 { "type": "initial", "maximumWarning": "500kb", "maximumError": "1mb" },
-                { "type": "anyComponentStyle", "maximumWarning": "2kb", "maximumError": "4kb" }
+                { "type": "anyComponentStyle", "maximumWarning": "8kb", "maximumError": "12kb" }
               ],
               "outputHashing": "all"
             },

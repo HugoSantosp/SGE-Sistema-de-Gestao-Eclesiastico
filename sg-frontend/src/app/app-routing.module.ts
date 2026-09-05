@@ -4,11 +4,10 @@ import { AuthGuard } from './core/auth/auth.guard';
 import { RoleGuard } from './core/auth/role.guard';
 
 const routes: Routes = [
-  // Public routes (no auth) — must be first to match root paths
-  {
-    path: '',
-    loadChildren: () => import('./features/publico/publico.module').then(m => m.PublicoModule)
-  },
+  // NOTA: as páginas PÚBLICAS do site (Início, Ministérios, Células, Mural)
+  // são servidas na raiz do domínio (icertag.com.br) por um build separado
+  // (configuration "site" — ver src/app/site e src/main.site.ts).
+  // Este app administrativo começa no login: /SGE-Administracao/login.
   {
     path: 'login',
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)

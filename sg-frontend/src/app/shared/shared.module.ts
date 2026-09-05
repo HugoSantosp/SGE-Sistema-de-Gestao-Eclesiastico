@@ -14,7 +14,9 @@ import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dial
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { SearchFilterComponent } from './components/search-filter/search-filter.component';
-import { UploadUrlPipe } from './pipes/upload-url.pipe';
+
+// Pipes compartilhados (UploadUrlPipe)
+import { PipesModule } from './pipes/pipes.module';
 
 @NgModule({
   declarations: [
@@ -25,14 +27,14 @@ import { UploadUrlPipe } from './pipes/upload-url.pipe';
     ConfirmDialogComponent,
     LoadingSpinnerComponent,
     PaginationComponent,
-    SearchFilterComponent,
-    UploadUrlPipe
+    SearchFilterComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    PipesModule
   ],
   exports: [
     // Componentes existentes
@@ -45,11 +47,11 @@ import { UploadUrlPipe } from './pipes/upload-url.pipe';
     LoadingSpinnerComponent,
     PaginationComponent,
     SearchFilterComponent,
-    UploadUrlPipe,
     // Módulos
     CommonModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    PipesModule
   ]
 })
 export class SharedModule { }
