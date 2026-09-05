@@ -1,6 +1,7 @@
 package com.sg.shared.config;
 
 import com.sg.auth.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -35,6 +36,13 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity // Habilita @PreAuthorize, @Secured, etc.
 public class SecurityConfig {
+
+    /**
+     * Origens permitidas no CORS (separadas por vírgula).
+     * Mesma env usada pelo CorsConfig — nunca duplicar lista fixa aqui.
+     */
+    @Value("${app.cors.allowed-origins:http://localhost:4200}")
+    private String allowedOrigins;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final MetricsConfig metricsConfig;
@@ -105,12 +113,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:4200",
-            "http://localhost:4300",
-            "https://icertag.com.br",
-            "https://www.icertag.com.br"
-        ));
+        configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList());
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
