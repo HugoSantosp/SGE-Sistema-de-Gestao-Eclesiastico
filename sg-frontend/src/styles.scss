@@ -294,6 +294,18 @@ a {
   margin-left: var(--sidebar-width);  /* 260px when expanded */
 }
 
+/* Fundo escurecido atrás da gaveta do sidebar (usado no mobile) */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 999;  /* abaixo do .sidebar (1000) e acima do conteúdo */
+}
+
 /* Header stays fixed at top */
 .header {
   height: var(--header-height);
@@ -703,18 +715,32 @@ hr {
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .sidebar {
-    width: var(--sidebar-collapsed-width);
+  /* Sidebar vira gaveta (off-canvas): fica escondida e o hamburger a abre por cima */
+  .sidebar,
+  .sidebar.collapsed {
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.25);
   }
 
-  .sidebar .logo-details .logo_name,
-  .sidebar .nav-links li a span,
-  .sidebar .nav-links .sub-menu {
-    display: none;
+  .sidebar:not(.collapsed) {
+    transform: translateX(0);
   }
 
-  .main-content {
-    margin-left: var(--sidebar-collapsed-width);
+  /* A gaveta fica sobre o conteúdo: sem margem lateral reservada */
+  .main-content,
+  .main-content.sidebar-open {
+    margin-left: 0;
+  }
+
+  /* Header sempre acima da gaveta: o hamburger continua clicável para fechá-la */
+  .header {
+    z-index: 1001;
+  }
+
+  .sidebar-backdrop.show {
+    display: block;
   }
 
   .content-area {

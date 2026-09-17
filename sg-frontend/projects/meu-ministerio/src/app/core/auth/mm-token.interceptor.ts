@@ -3,6 +3,7 @@ import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MmAuthService } from './mm-auth.service';
+import { getBackendUrl } from '../config/backend-config';
 
 @Injectable()
 export class MmTokenInterceptor implements HttpInterceptor {
@@ -10,15 +11,26 @@ export class MmTokenInterceptor implements HttpInterceptor {
   constructor(private authService: MmAuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = this.authService.getToken();
+    // Prefixa a URL com a URL do backend (variável de ambiente)
+    const backendUrl = getBackendUrl();
+    let url = req.url;
+    if (backendUrl && !req.url.startsWith('http')) {
+      url = backendUrl + req.url;
+    }
 
-    if (token) {
-      req = req.clone({
+    let request = req;
+    if (url !== req.url) {
+      request = req.clone({ url });
+    }
+
+    const token = this.authService.getToken();
+    if (token && request) {
+      request = request.clone({
         setHeaders: { Authorization: `Bearer ${token}` }
       });
     }
 
-    return next.handle(req).pipe(
+    return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401 && !req.url.includes('/auth/login') && !req.url.includes('/api/publico/')) {
           this.authService.logout();

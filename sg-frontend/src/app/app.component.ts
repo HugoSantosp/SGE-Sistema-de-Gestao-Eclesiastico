@@ -37,6 +37,8 @@ function isNativeApp(): boolean {
               <router-outlet></router-outlet>
             </div>
           </div>
+          <!-- Mobile: fundo escurecido atrás da gaveta do menu (fecha ao toque) -->
+          <div class="sidebar-backdrop" [class.show]="isSmallScreen && !sidebarCollapsed" (click)="toggleSidebar()"></div>
         </div>
       </ng-template>
     </ng-container>
@@ -51,11 +53,13 @@ export class AppComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   isPublicPage = false;
   isMobile = false;
+  isSmallScreen = false;
   sidebarCollapsed = false;
 
   private currentUrl = '/';
   private authSub?: Subscription;
   private routerSub?: Subscription;
+  private smallScreenQuery?: MediaQueryList;
 
   constructor(
     private router: Router,
@@ -66,11 +70,16 @@ export class AppComponent implements OnInit, OnDestroy {
     ).subscribe((event: any) => {
       this.currentUrl = event.urlAfterRedirects || event.url;
       this.updatePublicPage();
+      // No mobile o menu é uma gaveta: fecha ao navegar para o conteúdo aparecer
+      if (this.isSmallScreen) {
+        this.sidebarCollapsed = true;
+      }
     });
   }
 
   ngOnInit(): void {
     this.isMobile = isNativeApp();
+    this.setupSmallScreenWatcher();
     // Escuta o estado de autenticação REAL (não calcula pela URL)
     this.authSub = this.authService.user$.subscribe(user => {
       this.isLoggedIn = user !== null;
@@ -81,7 +90,25 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.authSub?.unsubscribe();
     this.routerSub?.unsubscribe();
+    this.smallScreenQuery?.removeEventListener('change', this.onSmallScreenChange);
   }
+
+  /**
+   * Acompanha o breakpoint do layout (mesmo valor do CSS: 768px).
+   * Em telas pequenas o menu começa fechado, pois vira uma gaveta sobre o conteúdo.
+   */
+  private setupSmallScreenWatcher(): void {
+    this.smallScreenQuery = window.matchMedia('(max-width: 768px)');
+    this.isSmallScreen = this.smallScreenQuery.matches;
+    this.sidebarCollapsed = this.isSmallScreen;
+    this.smallScreenQuery.addEventListener('change', this.onSmallScreenChange);
+  }
+
+  private onSmallScreenChange = (event: MediaQueryListEvent): void => {
+    this.isSmallScreen = event.matches;
+    // Ao entrar no mobile fecha a gaveta; ao voltar para o desktop reabre o menu
+    this.sidebarCollapsed = event.matches;
+  };
 
   private updatePublicPage(): void {
     const url = this.currentUrl;

@@ -82,9 +82,7 @@ public class PublicController {
         List<Usuario> pastores = usuarioRepository.findByNivelIn(
                 List.of(NivelAcesso.PASTOR_PRESIDENTE, NivelAcesso.PASTOR_AUXILIAR)
         );
-        pastores.stream()
-                .filter(u -> !"admin@sge.com".equals(u.getEmail()))
-                .forEach(u -> result.add(Map.of(
+        pastores.forEach(u -> result.add(Map.of(
                         "nome", u.getNome(),
                         "email", u.getEmail() != null ? u.getEmail() : "",
                         "foto", u.getFoto() != null ? u.getFoto() : "",
@@ -107,7 +105,13 @@ public class PublicController {
                 "cargo", "Presbítero"
         )));
 
-        return ResponseEntity.ok(result);
+        // 4. Remove a conta administrativa (Super ADM) de qualquer origem da lista,
+        //    garantindo que ela nunca apareça na seção pública de Lideranças.
+        var visiveis = result.stream()
+                .filter(item -> !"admin@sge.com".equalsIgnoreCase(String.valueOf(item.get("email"))))
+                .toList();
+
+        return ResponseEntity.ok(visiveis);
     }
 
     @GetMapping("/eventos")

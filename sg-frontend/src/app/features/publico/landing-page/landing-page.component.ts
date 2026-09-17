@@ -12,7 +12,7 @@ export class LandingPageComponent implements OnInit {
     endereco: 'São João de Meriti, RJ',
     telefone: '',
     horarios: [
-      { dia: 'Domingo', horario: '09:00' },
+      { dia: 'Domingo', horario: '18:00' },
       { dia: 'Quarta-feira', horario: '19:30' }
     ]
   };

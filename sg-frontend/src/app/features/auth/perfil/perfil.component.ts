@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../core/auth/auth.service';
 import { PerfilResponse } from '../../../core/models/sge.models';
+import { getBackendUrl } from '../../../core/config/backend-config';
 
 @Component({
   selector: 'app-perfil',
@@ -112,7 +113,10 @@ export class PerfilComponent implements OnInit {
         const formData = new FormData();
         formData.append('file', this.fotoFile);
 
-        const uploadResult = await fetch('/api/upload', {
+        const backendUrl = getBackendUrl();
+        const uploadUrl = backendUrl ? backendUrl + '/api/upload' : '/api/upload';
+
+        const uploadResult = await fetch(uploadUrl, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${this.authService.getToken()}` },
           body: formData
@@ -159,16 +163,18 @@ export class PerfilComponent implements OnInit {
     if (this.fotoUrl) {
       // Se já começa com http, retorna direto
       if (this.fotoUrl.startsWith('http')) return this.fotoUrl;
-      // Para fotos locais, usa a URL absoluta do backend (porta 8080)
-      // O Angular proxy não redireciona /uploads/ corretamente,
-      // então acessamos direto no backend
-      const backendUrl = 'http://localhost:8080';
-      // Converte /uploads/ para /api/uploads/ para compatibilidade
+      // Converte /uploads/ para /api/uploads/
       let path = this.fotoUrl.startsWith('/') ? this.fotoUrl : '/' + this.fotoUrl;
       if (path.startsWith('/uploads/') && !path.startsWith('/api/uploads/')) {
         path = '/api' + path;
       }
-      return backendUrl + path;
+      // Usa a URL do backend via variável de ambiente
+      const backendUrl = getBackendUrl();
+      if (backendUrl) {
+        return backendUrl + path;
+      }
+      // Fallback para dev local com proxy
+      return path;
     }
     return '';
   }

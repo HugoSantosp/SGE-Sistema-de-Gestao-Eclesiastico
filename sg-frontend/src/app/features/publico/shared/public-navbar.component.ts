@@ -15,26 +15,14 @@ import { Subscription, filter } from 'rxjs';
         <div class="d-flex align-items-center gap-3">
           <a class="nav-link" routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" 
              style="color:#4a5568;">Início</a>
-          <a class="nav-link" href="javascript:void(0)" (click)="navigateToLanding('sobre')" 
-             style="color:#4a5568;">Sobre</a>
-          <a class="nav-link" href="javascript:void(0)" (click)="navigateToLanding('pastores')" 
-             style="color:#4a5568;">Liderança</a>
+
           <a class="nav-link" routerLink="/ministerios" routerLinkActive="active-link" 
              style="color:#4a5568;">Ministérios</a>
           <a class="nav-link" routerLink="/celulas" routerLinkActive="active-link" 
              style="color:#4a5568;">Células</a>
           <a class="nav-link" routerLink="/mural" routerLinkActive="active-link" 
              style="color:#4a5568;">Mural</a>
-          <a class="nav-link" href="javascript:void(0)" (click)="navigateToLanding('eventos')" 
-             style="color:#4a5568;">Eventos</a>
-          <a class="nav-link" href="javascript:void(0)" (click)="navigateToLanding('horarios')" 
-             style="color:#4a5568;">Horários</a>
-          <a class="nav-link" href="javascript:void(0)" (click)="navigateToLanding('contato')" 
-             style="color:#4a5568;">Contato</a>
-          <a [href]="loginUrl" class="btn btn-sm fw-semibold px-4" 
-             style="background:#f97316;color:#fff;border-radius:10px;">
-            <i class="bi bi-box-arrow-in-right me-1"></i> Entrar
-          </a>
+
         </div>
       </div>
     </nav>
@@ -51,13 +39,6 @@ export class PublicNavbarComponent implements OnInit, OnDestroy {
   private isLandingPage = false;
 
   constructor(private router: Router) {}
-
-  /** URL do login do painel administrativo (app separado, em /SGE-Administracao). */
-  get loginUrl(): string {
-    const host = window.location.hostname;
-    const isLocal = host === 'localhost' || host === '127.0.0.1';
-    return isLocal ? 'http://localhost:4200/login' : '/SGE-Administracao/login';
-  }
 
   ngOnInit(): void {
     // Verifica se está na landing page

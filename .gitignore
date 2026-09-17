@@ -36,3 +36,7 @@ sg-backend/uploads/
 
 # Docker
 .docker/
+
+# Abacus AI
+.abacusai/
+sg-backend/.abacusai/

@@ -20,3 +20,6 @@ app:
   admin-initial-password: "123"
   # URL base usada nos links de redefinição de senha (exibidos no log — não há envio de e-mail)
   base-url: http://localhost:4200
+  cors:
+    # Origens dos apps em dev: 4200 admin, 4300 MeuMinistério, 4400 site
+    allowed-origins: http://localhost:4200,http://localhost:4300,http://localhost:4400
