@@ -37,7 +37,7 @@
           },
           "configurations": {
             "production": {
-              "baseHref": "/SGE-Administracao/",
+              "baseHref": "/",
               "fileReplacements": [
                 { "replace": "src/environments/environment.ts", "with": "src/environments/environment.prod.ts" }
               ],
@@ -180,7 +180,7 @@
           },
           "configurations": {
             "production": {
-              "baseHref": "/SGE-MeuMinisterio/",
+              "baseHref": "/",
               "fileReplacements": [
                 { "replace": "projects/meu-ministerio/src/environments/environment.ts", "with": "projects/meu-ministerio/src/environments/environment.prod.ts" }
               ],
