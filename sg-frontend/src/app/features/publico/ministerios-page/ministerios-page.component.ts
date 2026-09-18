@@ -14,10 +14,10 @@ export class MinisteriosPageComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.get('/api/public/info').subscribe({
+    this.http.get(getApiUrl('/api/public/info')).subscribe({
       next: (data: any) => { this.churchInfo = { ...this.churchInfo, ...data }; }
     });
-    this.http.get<any[]>('/api/public/ministerios').subscribe({
+    this.http.get<any>(getApiUrl('/api/public/ministerios')).subscribe({
       next: (data) => { this.ministerios = data; },
       complete: () => { this.loading = false; }
     });
