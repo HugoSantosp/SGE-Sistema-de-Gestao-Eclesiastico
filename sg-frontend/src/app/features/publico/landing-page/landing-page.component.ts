@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { getApiUrl } from '../../../core/config/backend-config';
 
 @Component({
   selector: 'app-landing-page',
@@ -37,11 +38,11 @@ export class LandingPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.http.get('/api/public/info').subscribe({
+    this.http.get(getApiUrl('/api/public/info')).subscribe({
       next: (data: any) => { this.churchInfo = { ...this.churchInfo, ...data }; }
     });
 
-    this.http.get<any[]>('/api/public/pastores').subscribe({
+    this.http.get(getApiUrl('/api/public/pastores')).subscribe({
       next: (data) => { this.pastores = data; }
     });
 
@@ -50,7 +51,9 @@ export class LandingPageComponent implements OnInit {
 
   private loadEvents(): void {
     this.loading = true;
-    this.http.get<any[]>(`/api/public/eventos?mes=${this.currentMonth}&ano=${this.currentYear}`).subscribe({
+   this.http.get(
+  getApiUrl(`/api/public/eventos?mes=${this.currentMonth}&ano=${this.currentYear}`)
+  ).subscribe({
       next: (data) => {
         this.eventos = data;
         this.buildCalendar();
