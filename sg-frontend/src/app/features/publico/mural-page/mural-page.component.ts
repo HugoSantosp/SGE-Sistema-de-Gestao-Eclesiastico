@@ -14,10 +14,10 @@ export class MuralPageComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.get('/api/public/info').subscribe({
+    this.http.get(getApiUrl('/api/public/info')).subscribe({
       next: (data: any) => { this.churchInfo = { ...this.churchInfo, ...data }; }
     });
-    this.http.get<any[]>('/api/public/profissionais').subscribe({
+    this.http.get<any[]>(getApiUrl('/api/public/profissionais')).subscribe({
       next: (data) => { this.profissionais = data; },
       complete: () => { this.loading = false; }
     });
