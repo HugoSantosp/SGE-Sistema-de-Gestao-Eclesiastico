@@ -38,11 +38,11 @@ export class LandingPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.http.get(getApiUrl('/api/public/info')).subscribe({
+    this.http.get<any[]>(getApiUrl('/api/public/info')).subscribe({
       next: (data: any) => { this.churchInfo = { ...this.churchInfo, ...data }; }
     });
 
-    this.http.get(getApiUrl('/api/public/pastores')).subscribe({
+    this.http.get<any[]>(getApiUrl('/api/public/pastores')).subscribe({
       next: (data) => { this.pastores = data; }
     });
 
@@ -51,7 +51,7 @@ export class LandingPageComponent implements OnInit {
 
   private loadEvents(): void {
     this.loading = true;
-   this.http.get(
+   this.http.get<any[]>(
   getApiUrl(`/api/public/eventos?mes=${this.currentMonth}&ano=${this.currentYear}`)
   ).subscribe({
       next: (data) => {
