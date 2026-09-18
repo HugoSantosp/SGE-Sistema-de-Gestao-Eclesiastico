@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { getApiUrl } from '../../../core/config/backend-config';
 
 @Component({
   selector: 'app-celulas-page',
@@ -14,10 +15,10 @@ export class CelulasPageComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.get('/api/public/info').subscribe({
+    this.http.get(getApiUrl('/api/public/info')).subscribe({
       next: (data: any) => { this.churchInfo = { ...this.churchInfo, ...data }; }
     });
-    this.http.get<any[]>('/api/public/celulas').subscribe({
+    this.http.get<any[]>(getApiUrl('/api/public/celulas')).subscribe({
       next: (data) => { this.celulas = data; },
       complete: () => { this.loading = false; }
     });
