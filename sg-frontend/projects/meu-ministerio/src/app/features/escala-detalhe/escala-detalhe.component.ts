@@ -135,18 +135,28 @@ export class EscalaDetalheComponent implements OnInit {
 
   // ===== Helpers de formatação =====
 
+  /**
+   * Parseia uma data no formato yyyy-MM-dd manualmente (sem passar por
+   * new Date(string), que interpreta como UTC e pode "voltar" 1 dia
+   * em fusos negativos como o do Brasil).
+   */
+  private parseDataLocal(dataISO: string): Date {
+    const [y, m, d] = dataISO.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
   diaNum(dataISO: string): string {
-    return new Date(dataISO).getDate().toString();
+    return this.parseDataLocal(dataISO).getDate().toString();
   }
 
   diaMes(dataISO: string): string {
     const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
-    return meses[new Date(dataISO).getMonth()];
+    return meses[this.parseDataLocal(dataISO).getMonth()];
   }
 
   diaSemana(dataISO: string): string {
     const dias = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
-    return dias[new Date(dataISO).getDay()];
+    return dias[this.parseDataLocal(dataISO).getDay()];
   }
 
   jaConfirmado(dataId: number): boolean {

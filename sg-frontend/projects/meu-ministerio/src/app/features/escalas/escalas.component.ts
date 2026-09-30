@@ -56,7 +56,7 @@ export class EscalasComponent implements OnInit {
 
   formatarData(dataISO: string): string {
     if (!dataISO) return '';
-    const d = new Date(dataISO);
-    return d.toLocaleDateString('pt-BR');
+    const [y, m, d] = dataISO.split('-');
+    return `${d}/${m}/${y}`;
   }
 }
