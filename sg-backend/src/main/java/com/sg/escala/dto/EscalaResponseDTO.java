@@ -8,6 +8,7 @@ public record EscalaResponseDTO(
         Long id,
         String titulo,
         Long ministerioId,
+        String nomeMinisterio,
         String publicToken,
         String resultadoToken,
         boolean aberta,
@@ -16,11 +17,21 @@ public record EscalaResponseDTO(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public static EscalaResponseDTO fromEntity(Escala e, int datasCount, int confirmacoesCount) {
+
+    public static EscalaResponseDTO fromEntity(
+            Escala e,
+            int datasCount,
+            int confirmacoesCount
+    ) {
+        return fromEntity(e, datasCount, confirmacoesCount, null);
+    }
+
+    public static EscalaResponseDTO fromEntity(Escala e, int datasCount, int confirmacoesCount, String nomeMinisterio) {
         return new EscalaResponseDTO(
                 e.getId(),
                 e.getTitulo(),
                 e.getMinisterioId(),
+                nomeMinisterio,
                 e.getPublicToken(),
                 e.getResultadoToken(),
                 e.isAberta(),
@@ -30,4 +41,6 @@ public record EscalaResponseDTO(
                 e.getUpdatedAt()
         );
     }
+
+
 }

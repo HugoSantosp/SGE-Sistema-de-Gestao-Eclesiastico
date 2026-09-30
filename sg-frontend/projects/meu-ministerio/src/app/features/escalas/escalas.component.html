@@ -39,6 +39,9 @@
         <div class="flex-grow-1">
           <div class="mm-card-title">{{ e.titulo }}</div>
           <div class="mm-card-sub">
+            <span *ngIf="!ministerioFiltro && e.nomeMinisterio" class="d-block fw-semibold text-primary">
+              {{ e.nomeMinisterio }}
+            </span>
             {{ e.datasCount }} data(s) • {{ e.confirmacoesCount }} confirmação(ões)
           </div>
         </div>

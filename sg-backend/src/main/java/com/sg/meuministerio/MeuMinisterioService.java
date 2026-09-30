@@ -225,21 +225,59 @@ public class MeuMinisterioService {
     // ===== ESCALAS =====
 
     /** Escalas dos ministérios do usuário (todas para pastor). */
+//    @Transactional(readOnly = true)
+//    public List<EscalaResponseDTO> listarMinhasEscalas(Usuario usuario) {
+//        if (isAcessoAmpliado(usuario)) {
+//            return escalaService.listar();
+//        }
+//        Long membroId = membroDoUsuario(usuario).map(Membro::getId).orElse(null);
+//        if (membroId == null) return List.of();
+//        var ministerioIds = ministerioMembroRepository.findByMembroId(membroId).stream()
+//                .map(v -> v.getMinisterio().getId())
+//                .toList();
+//        if (ministerioIds.isEmpty()) return List.of();
+//        return escalaRepository.findByMinisterioIdIn(ministerioIds).stream()
+//                .map(e -> EscalaResponseDTO.fromEntity(e, e.getDatas().size(), e.getConfirmacoes().size()))
+//                .toList();
+//    }
+
     @Transactional(readOnly = true)
     public List<EscalaResponseDTO> listarMinhasEscalas(Usuario usuario) {
+        List<Escala> escalas;
+
         if (isAcessoAmpliado(usuario)) {
-            return escalaService.listar();
+            escalas = escalaRepository.findAll();
+        } else {
+            Long membroId = membroDoUsuario(usuario).map(Membro::getId).orElse(null);
+            if (membroId == null) return List.of();
+            var ministerioIds = ministerioMembroRepository.findByMembroId(membroId).stream()
+                    .map(v -> v.getMinisterio().getId())
+                    .toList();
+            if (ministerioIds.isEmpty()) return List.of();
+            escalas = escalaRepository.findByMinisterioIdIn(ministerioIds);
         }
-        Long membroId = membroDoUsuario(usuario).map(Membro::getId).orElse(null);
-        if (membroId == null) return List.of();
-        var ministerioIds = ministerioMembroRepository.findByMembroId(membroId).stream()
-                .map(v -> v.getMinisterio().getId())
+
+        // Busca em lote os nomes dos ministérios envolvidos
+        var idsMinisterios = escalas.stream()
+                .map(Escala::getMinisterioId)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
                 .toList();
-        if (ministerioIds.isEmpty()) return List.of();
-        return escalaRepository.findByMinisterioIdIn(ministerioIds).stream()
-                .map(e -> EscalaResponseDTO.fromEntity(e, e.getDatas().size(), e.getConfirmacoes().size()))
+
+        Map<Long, String> nomesPorMinisterio = ministerioRepository.findAllById(idsMinisterios).stream()
+                .collect(Collectors.toMap(m -> m.getId(), m -> m.getNome()));
+
+        return escalas.stream()
+                .sorted(java.util.Comparator.comparing(Escala::getCreatedAt).reversed())
+                .map(e -> EscalaResponseDTO.fromEntity(
+                        e,
+                        e.getDatas().size(),
+                        e.getConfirmacoes().size(),
+                        nomesPorMinisterio.get(e.getMinisterioId())
+                ))
                 .toList();
     }
+
 
     /** Escalas de um ministério específico (membro do ministério ou pastor). */
     @Transactional(readOnly = true)

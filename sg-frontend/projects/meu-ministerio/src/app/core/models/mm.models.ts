@@ -84,6 +84,7 @@ export interface EscalaResponse {
   id: number;
   titulo: string;
   ministerioId: number | null;
+  nomeMinisterio: string | null;
   publicToken: string;
   resultadoToken: string | null;
   aberta: boolean;
