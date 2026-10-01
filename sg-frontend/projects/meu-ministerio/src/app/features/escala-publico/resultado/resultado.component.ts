@@ -65,18 +65,27 @@ export class EscalaPublicaResultadoComponent implements OnInit {
     this.instrumentosAbertos[inst] = !this.instrumentosAbertos[inst];
   }
 
-  getInstrumentIcon(instrumento: string): string {
+  getInstrumentIcon(funcao: string): string {
     const icons: { [key: string]: string } = {
       'Ministro': 'bi-mic',
+      'Vocalista': 'bi-mic',
+      'Backing Vocal': 'bi-people',
       'Guitarra': 'bi-music-note',
       'Violão': 'bi-music-note',
       'Baixo': 'bi-music-note',
       'Bateria': 'bi-music-note',
       'Teclado': 'bi-music-note-beamed',
       'Sax': 'bi-music-note-beamed',
-      'Backing Vocal': 'bi-people'
+      'Técnico de Som': 'bi-sliders',
+      'Projeção': 'bi-display',
+      'Câmera/Live': 'bi-camera-video',
+      'Iluminação': 'bi-lightbulb',
+      'Recepção': 'bi-door-open',
+      'Intercessão': 'bi-heart',
+      'Diaconato': 'bi-hand-thumbs-up',
+      'Crianças': 'bi-emoji-smile'
     };
-    return icons[instrumento] || 'bi-person-music';
+    return icons[funcao] || 'bi-person-badge';
   }
 
   formatDate(dateStr: string): string {

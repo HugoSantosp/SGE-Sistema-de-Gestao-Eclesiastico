@@ -14,9 +14,18 @@ import java.util.stream.Collectors;
 @Service
 public class EscalaService {
 
+    /**
+     * Funções universais para designação em escalas (não apenas músicos).
+     * Ainda é possível informar uma função livre via opção "Outro…" no app.
+     */
     public static final List<String> INSTRUMENTOS = List.of(
-            "Ministro", "Guitarra", "Violão", "Baixo",
-            "Bateria", "Teclado", "Sax", "Backing Vocal"
+            // Louvor
+            "Ministro", "Vocalista", "Backing Vocal",
+            "Guitarra", "Violão", "Baixo", "Bateria", "Teclado", "Sax",
+            // Técnica e mídia
+            "Técnico de Som", "Projeção", "Câmera/Live", "Iluminação",
+            // Apoio e serviço
+            "Recepção", "Intercessão", "Diaconato", "Crianças"
     );
 
     private final EscalaRepository escalaRepository;

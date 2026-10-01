@@ -34,7 +34,7 @@ export class EscalaMontarComponent implements OnInit {
     // Carrega instrumentos
     this.service.listarInstrumentos().subscribe({
       next: (data) => { this.instrumentos = data; },
-      error: () => { this.instrumentos = ['Ministro','Guitarra','Violão','Baixo','Bateria','Teclado','Sax','Backing Vocal']; }
+      error: () => { this.instrumentos = ['Ministro','Vocalista','Backing Vocal','Guitarra','Violão','Baixo','Bateria','Teclado','Sax','Técnico de Som','Projeção','Câmera/Live','Iluminação','Recepção','Intercessão','Diaconato','Crianças']; }
     });
 
     // Carrega escala

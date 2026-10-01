@@ -21,12 +21,17 @@ export class EscalaGerenciarComponent implements OnInit {
   salvando = false;
   aviso = '';
 
+  /** Rótulo da opção que revela o campo de texto livre */
+  readonly OUTRO = 'Outro…';
+
   instrumentos: string[] = [];
 
   // Designações em edição por data
   designacoes: { [dataId: number]: DesignacaoRequest[] } = {};
   // Músicas em edição por data
   musicas: { [dataId: number]: MusicaSimple[] } = {};
+  /** Funções "Outro…" com texto livre, por data: índice da designação → texto digitado */
+  outroTexto: { [dataId: number]: { [index: number]: string } } = {};
 
   // Form nova data
   novaData: EscalaDataDTO = { nomeEvento: '', data: '', horario: '', local: '' };
@@ -50,9 +55,9 @@ export class EscalaGerenciarComponent implements OnInit {
       return;
     }
     this.api.listarInstrumentos().subscribe({
-      next: (data) => { this.instrumentos = data; },
+      next: (data) => { this.instrumentos = [...data, this.OUTRO]; },
       error: () => {
-        this.instrumentos = ['Ministro', 'Guitarra', 'Violão', 'Baixo', 'Bateria', 'Teclado', 'Sax', 'Backing Vocal'];
+        this.instrumentos = ['Ministro', 'Vocalista', 'Backing Vocal', 'Guitarra', 'Violão', 'Baixo', 'Bateria', 'Teclado', 'Sax', 'Técnico de Som', 'Projeção', 'Câmera/Live', 'Iluminação', 'Recepção', 'Intercessão', 'Diaconato', 'Crianças', this.OUTRO];
       }
     });
     this.carregar();
@@ -72,6 +77,7 @@ export class EscalaGerenciarComponent implements OnInit {
             ordem: des.ordem
           }));
           this.musicas[d.id] = d.musicas.map(m => ({ ...m }));
+          this.outroTexto[d.id] = this.outroTexto[d.id] || {};
         });
         this.loading = false;
       },
@@ -82,6 +88,19 @@ export class EscalaGerenciarComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  /**
+   * Opções do select de função para uma designação:
+   * lista curada + "Outro…"; se a função salva é customizada (texto livre),
+   * ela aparece como opção selecionável diretamente no select.
+   */
+  opcoesFuncao(des: DesignacaoRequest): string[] {
+    if (des.instrumento && des.instrumento !== this.OUTRO && !this.instrumentos.includes(des.instrumento)) {
+      const semOutro = this.instrumentos.filter(i => i !== this.OUTRO);
+      return [...semOutro, des.instrumento, this.OUTRO];
+    }
+    return this.instrumentos;
   }
 
   confirmadosDaData(data: DataDetalhada): ConfirmacaoResponse[] {
@@ -132,6 +151,7 @@ export class EscalaGerenciarComponent implements OnInit {
       return;
     }
     if (!this.designacoes[dataId]) this.designacoes[dataId] = [];
+    this.outroTexto[dataId] = this.outroTexto[dataId] || {};
     this.designacoes[dataId].push({
       confirmacaoId: confirmados[0].id,
       instrumento: this.instrumentos[0] || 'Ministro',
@@ -141,13 +161,33 @@ export class EscalaGerenciarComponent implements OnInit {
 
   removerDesignacao(dataId: number, index: number): void {
     this.designacoes[dataId].splice(index, 1);
+    // Reindexa os textos "Outro…" para acompanhar os novos índices
+    const mapa = this.outroTexto[dataId] || {};
+    delete mapa[index];
+    const novo: { [i: number]: string } = {};
+    Object.keys(mapa).forEach(k => {
+      const i = Number(k);
+      novo[i > index ? i - 1 : i] = mapa[i];
+    });
+    this.outroTexto[dataId] = novo;
   }
 
   salvarDesignacoes(dataId: number): void {
     if (!this.escalaId) return;
+    // "Outro…" vira o texto livre digitado
+    const lista = (this.designacoes[dataId] || []).map((des, i) => ({
+      ...des,
+      instrumento: des.instrumento === this.OUTRO
+        ? (this.outroTexto[dataId]?.[i] || '').trim()
+        : des.instrumento
+    }));
+    if (lista.some(d => !d.instrumento)) {
+      this.error = 'Preencha a função da designação marcada como "Outro…".';
+      return;
+    }
     this.salvando = true;
     this.error = '';
-    this.api.salvarDesignacoes(this.escalaId, dataId, this.designacoes[dataId] || []).subscribe({
+    this.api.salvarDesignacoes(this.escalaId, dataId, lista).subscribe({
       next: () => {
         this.salvando = false;
         this.aviso = 'Designações salvas com sucesso!';
@@ -158,6 +198,24 @@ export class EscalaGerenciarComponent implements OnInit {
         this.error = 'Erro ao salvar designações.';
       }
     });
+  }
+
+  setOutroTexto(dataId: number, index: number, valor: string): void {
+    this.outroTexto[dataId] = this.outroTexto[dataId] || {};
+    this.outroTexto[dataId][index] = valor;
+  }
+
+  /** Ao escolher "Outro…", pré-preenche o campo com a função customizada anterior, se houver. */
+  onFuncaoChange(dataId: number, index: number, des: DesignacaoRequest, novo: string): void {
+    if (novo === this.OUTRO) {
+      const anterior = des.instrumento;
+      this.outroTexto[dataId] = this.outroTexto[dataId] || {};
+      if (anterior && anterior !== this.OUTRO && !this.instrumentos.includes(anterior)
+          && !this.outroTexto[dataId][index]) {
+        this.outroTexto[dataId][index] = anterior;
+      }
+    }
+    des.instrumento = novo;
   }
 
   // ===== Músicas =====
