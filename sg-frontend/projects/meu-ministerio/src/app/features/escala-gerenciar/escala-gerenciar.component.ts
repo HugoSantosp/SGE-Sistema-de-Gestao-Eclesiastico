@@ -264,7 +264,7 @@ export class EscalaGerenciarComponent implements OnInit {
       next: (res) => {
         this.gerandoLink = false;
         // O resultado público fica neste próprio app (rota /escala/resultado/:token)
-        this.resultadoLink = mmSelfUrl(`/escala/resultado/${res.resultadoToken}`);
+        this.resultadoLink = mmSelfUrl(`escala/resultado/${res.resultadoToken}`);
       },
       error: () => {
         this.gerandoLink = false;

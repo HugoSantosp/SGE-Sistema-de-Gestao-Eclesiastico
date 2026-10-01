@@ -9,7 +9,7 @@
  * referências cruzadas quando necessário.
  */
 export const MM_CONFIG = {
-  selfBase: '/SGE-MeuMinisterio',
+  selfBase: '/',
   selfDevUrl: 'http://localhost:4300',
 
   adminAppBase: '/SGE-Administracao',
