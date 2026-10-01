@@ -57,7 +57,7 @@ export class EscalaGerenciarComponent implements OnInit {
     this.api.listarInstrumentos().subscribe({
       next: (data) => { this.instrumentos = [...data, this.OUTRO]; },
       error: () => {
-        this.instrumentos = ['Ministro', 'Vocalista', 'Backing Vocal', 'Guitarra', 'Violão', 'Baixo', 'Bateria', 'Teclado', 'Sax', 'Técnico de Som', 'Projeção', 'Câmera/Live', 'Iluminação', 'Recepção', 'Intercessão', 'Diaconato', 'Crianças', this.OUTRO];
+        this.instrumentos = ['Ministro', 'Vocalista', 'Backing Vocal', 'Guitarra', 'Violão', 'Baixo', 'Bateria', 'Teclado', 'Sax', 'Técnico de Som', 'Projeção', 'Stories/Fotografia' , 'Câmera/Live', 'Iluminação', 'Recepção', 'Intercessão', 'Diaconato', 'Crianças', this.OUTRO];
       }
     });
     this.carregar();
@@ -264,7 +264,7 @@ export class EscalaGerenciarComponent implements OnInit {
       next: (res) => {
         this.gerandoLink = false;
         // O resultado público fica neste próprio app (rota /escala/resultado/:token)
-        this.resultadoLink = mmSelfUrl(`escala/resultado/${res.resultadoToken}`);
+        this.resultadoLink = mmSelfUrl(`/escala/resultado/${res.resultadoToken}`);
       },
       error: () => {
         this.gerandoLink = false;
