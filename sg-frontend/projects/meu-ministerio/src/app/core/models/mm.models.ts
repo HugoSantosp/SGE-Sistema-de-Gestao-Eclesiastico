@@ -23,6 +23,21 @@ export interface AlterarSenhaRequest {
   novaSenha: string;
 }
 
+export interface PerfilResponse {
+  id: number;
+  nome: string;
+  email: string;
+  documento: string | null;
+  nivel: string;
+  foto: string | null;
+}
+
+export interface AtualizarPerfilRequest {
+  nome: string;
+  email: string;
+  foto: string | null;
+}
+
 // ===== MeuMinisterio =====
 
 /** Papéis que um membro pode ter dentro de um ministério (papéis compostos). */

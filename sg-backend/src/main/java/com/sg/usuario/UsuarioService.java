@@ -14,6 +14,8 @@ import com.sg.shared.enums.StatusMembro;
 import com.sg.shared.exceptions.ResourceNotFoundException;
 import com.sg.tesoureiros.Tesoureiro;
 import com.sg.tesoureiros.TesoureiroRepository;
+import com.sg.usuario.dto.UsuarioRequestDTO;
+import com.sg.usuario.dto.UsuarioResponseDTO;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService implements UserDetailsService {
@@ -89,11 +92,15 @@ public class UsuarioService implements UserDetailsService {
             // Novo usuário: sempre define senha temporária
             usuario.setSenha(passwordEncoder.encode(SENHA_TEMPORARIA));
             usuario.setSenhaTemporaria(true);
-        } else if (usuario.getSenha() != null && !usuario.getSenha().isEmpty()
-                && !usuario.getSenha().startsWith("$2a$") && !usuario.getSenha().startsWith("$2b$")) {
-            // Atualização: codifica a senha se foi alterada (senha em texto puro)
+        } else if (usuario.getSenha() != null && !usuario.getSenha().trim().isEmpty()) {
+            // Atualização: SOMENTE codifica a senha se foi informada uma nova (texto puro)
             usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+            // Se era temporária, marca como não-temporária
+            if (usuario.isSenhaTemporaria()) {
+                usuario.setSenhaTemporaria(false);
+            }
         }
+        // Se a senha é null ou vazia em atualização, não faz nada (mantém a anterior)
 
         Usuario saved = usuarioRepository.save(usuario);
 
@@ -216,5 +223,57 @@ public class UsuarioService implements UserDetailsService {
                         .ifPresent(m -> ministerioMembroRepository.deleteByMembroId(m.getId()));
             }
         }
+    }
+
+    // ===== Conversão DTO =====
+
+    /**
+     * Converte um Usuario para UsuarioResponseDTO.
+     * Garante que senha e informações sensíveis nunca são expostas.
+     */
+    public UsuarioResponseDTO entityToDTO(Usuario usuario) {
+        return new UsuarioResponseDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getDocumento(),
+                usuario.getEmail(),
+                usuario.getNivel(),
+                usuario.getFoto()
+        );
+    }
+
+    /**
+     * Converte um UsuarioRequestDTO para Usuario.
+     * A senha não é codificada aqui — será codificada no método salvar().
+     */
+    public Usuario dtoToEntity(UsuarioRequestDTO dto) {
+        return Usuario.builder()
+                .nome(dto.nome())
+                .documento(dto.documento())
+                .email(dto.email())
+                .senha(dto.senha())
+                .nivel(dto.nivel())
+                .idPessoa(dto.idPessoa())
+                .foto(dto.foto())
+                .build();
+    }
+
+    /**
+     * Lista todos os usuários como DTOs (sem expor senhas).
+     */
+    @Transactional(readOnly = true)
+    public List<UsuarioResponseDTO> listarTodosDTO() {
+        return listarTodos().stream()
+                .map(this::entityToDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Busca um usuário por ID e retorna como DTO (sem expor senha).
+     */
+    @Transactional(readOnly = true)
+    public UsuarioResponseDTO buscarPorIdDTO(Long id) {
+        Usuario usuario = buscarPorId(id);
+        return entityToDTO(usuario);
     }
 }

@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import {
-  LoginRequest, LoginResponse, AlterarSenhaRequest, ApiMessageResponse
+  LoginRequest, LoginResponse, AlterarSenhaRequest, ApiMessageResponse,
+  PerfilResponse, AtualizarPerfilRequest
 } from '../models/mm.models';
 
 @Injectable({ providedIn: 'root' })
@@ -77,6 +78,14 @@ export class MmAuthService {
 
   alterarSenha(request: AlterarSenhaRequest): Observable<ApiMessageResponse> {
     return this.http.put<ApiMessageResponse>('/auth/alterar-senha', request);
+  }
+
+  getPerfil(): Observable<PerfilResponse> {
+    return this.http.get<PerfilResponse>('/auth/me');
+  }
+
+  atualizarPerfil(request: AtualizarPerfilRequest): Observable<PerfilResponse> {
+    return this.http.put<PerfilResponse>('/auth/me', request);
   }
 
   // ===== Private =====

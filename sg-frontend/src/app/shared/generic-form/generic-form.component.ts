@@ -42,6 +42,7 @@ export class GenericFormComponent implements OnInit {
   saving = false;
   error = '';
   uploading: Record<string, boolean> = {};
+  showPassword: Record<string, boolean> = {};
   
   // Erros de validação por campo
   fieldErrors: Record<string, string> = {};
@@ -310,6 +311,10 @@ export class GenericFormComponent implements OnInit {
     } else {
       this.router.navigate([this.baseRoute]);
     }
+  }
+
+  togglePasswordVisibility(fieldName: string): void {
+    this.showPassword[fieldName] = !this.showPassword[fieldName];
   }
 
   getFieldErrorKeys(): string[] {

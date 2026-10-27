@@ -72,8 +72,21 @@
                   [placeholder]="field.placeholder || ''"
                   [class.is-invalid]="isFieldInvalid(field.name)"></textarea>
 
-        <!-- Input padrão (text, email, password, date, number, etc) -->
-        <input *ngIf="field.type !== 'select' && field.type !== 'textarea' && field.type !== 'image'"
+        <!-- Input com toggle para password -->
+        <div *ngIf="field.type === 'password'" class="input-group">
+          <input [type]="showPassword[field.name] ? 'text' : 'password'"
+                 class="form-control"
+                 [formControlName]="field.name"
+                 [placeholder]="field.placeholder || ''"
+                 [class.is-invalid]="isFieldInvalid(field.name)">
+          <button class="btn btn-outline-secondary" type="button"
+                  (click)="togglePasswordVisibility(field.name)">
+            <i [class]="showPassword[field.name] ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+          </button>
+        </div>
+
+        <!-- Input padrão (text, email, date, number, etc) — exceto password -->
+        <input *ngIf="field.type !== 'select' && field.type !== 'textarea' && field.type !== 'image' && field.type !== 'password'"
                [type]="field.type" 
                class="form-control"
                [formControlName]="field.name"

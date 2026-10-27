@@ -16,6 +16,7 @@ import { EscalaGerenciarComponent } from './features/escala-gerenciar/escala-ger
 import { EscalaPublicaConfirmacaoComponent } from './features/escala-publico/confirmacao/confirmacao.component';
 import { EscalaPublicaResultadoComponent } from './features/escala-publico/resultado/resultado.component';
 import { EscalaPublicaMinistroComponent } from './features/escala-publico/ministro/ministro.component';
+import { PerfilComponent } from './features/perfil/perfil.component';
 import { UploadUrlPipe } from './shared/pipes/upload-url.pipe';
 
 @NgModule({
@@ -31,6 +32,7 @@ import { UploadUrlPipe } from './shared/pipes/upload-url.pipe';
     EscalaPublicaConfirmacaoComponent,
     EscalaPublicaResultadoComponent,
     EscalaPublicaMinistroComponent,
+    PerfilComponent,
     UploadUrlPipe
   ],
   imports: [

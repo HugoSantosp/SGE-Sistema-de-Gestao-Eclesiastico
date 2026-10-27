@@ -11,6 +11,7 @@ import { EscalaGerenciarComponent } from './features/escala-gerenciar/escala-ger
 import { EscalaPublicaConfirmacaoComponent } from './features/escala-publico/confirmacao/confirmacao.component';
 import { EscalaPublicaResultadoComponent } from './features/escala-publico/resultado/resultado.component';
 import { EscalaPublicaMinistroComponent } from './features/escala-publico/ministro/ministro.component';
+import { PerfilComponent } from './features/perfil/perfil.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -25,6 +26,7 @@ const routes: Routes = [
     canActivate: [MmAuthGuard],
     children: [
       { path: '', redirectTo: 'ministerios', pathMatch: 'full' },
+      { path: 'perfil', component: PerfilComponent },
       { path: 'ministerios', component: MinisteriosComponent },
       { path: 'ministerios/:id/gerenciar', component: MinisterioLiderComponent },
       { path: 'escalas', component: EscalasComponent },

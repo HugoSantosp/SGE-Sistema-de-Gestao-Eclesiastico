@@ -20,6 +20,7 @@ import { EscalaGerenciarComponent } from './features/escala-gerenciar/escala-ger
 import { EscalaPublicaConfirmacaoComponent } from './features/escala-publico/confirmacao/confirmacao.component';
 import { EscalaPublicaResultadoComponent } from './features/escala-publico/resultado/resultado.component';
 import { EscalaPublicaMinistroComponent } from './features/escala-publico/ministro/ministro.component';
+import { PerfilComponent } from './features/perfil/perfil.component';
 
 /**
  * Módulo principal para o App Mobile (Capacitor) do MeuMinisterio.
@@ -40,7 +41,8 @@ import { EscalaPublicaMinistroComponent } from './features/escala-publico/minist
     EscalaGerenciarComponent,
     EscalaPublicaConfirmacaoComponent,
     EscalaPublicaResultadoComponent,
-    EscalaPublicaMinistroComponent
+    EscalaPublicaMinistroComponent,
+    PerfilComponent
   ],
   imports: [
     BrowserModule,

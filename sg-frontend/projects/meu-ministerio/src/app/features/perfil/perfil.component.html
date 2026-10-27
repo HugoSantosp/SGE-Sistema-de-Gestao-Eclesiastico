@@ -1,0 +1,284 @@
+<div class="mm-shell">
+  <!-- Header -->
+  <div class="mm-header">
+    <div class="brand">
+      <button class="btn-voltar" (click)="router.navigate(['/ministerios'])">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <div>
+        <div class="brand-name">Meu Perfil</div>
+        <div class="brand-sub">Gerencie suas informações pessoais</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+    <p>Carregando perfil...</p>
+  </div>
+
+  <!-- Erro Geral -->
+  <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Sucesso -->
+  <div *ngIf="sucesso" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle me-2"></i>
+    Perfil atualizado com sucesso!
+    <button type="button" class="btn-close" (click)="sucesso = false" aria-label="Close"></button>
+  </div>
+
+  <!-- Conteúdo -->
+  <div *ngIf="perfil && !loading" class="perfil-content">
+    <!-- Card Avatar -->
+    <div class="mm-card perfil-avatar-card">
+      <div class="avatar-section">
+        <div class="avatar-wrapper">
+          <img [src]="fotoPreview || (foto ? '/uploads/' + foto : '/assets/avatar-default.png')" 
+               alt="Foto de perfil"
+               class="avatar-img">
+          <div *ngIf="editando" class="avatar-badge">
+            <label for="foto-input" class="avatar-upload-btn">
+              <i class="bi bi-camera-fill"></i>
+            </label>
+            <input type="file" 
+                   id="foto-input" 
+                   accept="image/*"
+                   (change)="onFotoSelected($event)"
+                   style="display: none;">
+          </div>
+        </div>
+        <div class="avatar-info">
+          <h2 class="user-name">{{ perfil.nome }}</h2>
+          <span class="user-badge badge badge-orange">{{ perfil.nivel }}</span>
+          <button *ngIf="fotoPreview && editando" 
+                  type="button" 
+                  class="btn btn-sm btn-outline-danger mt-2"
+                  (click)="removerFoto()">
+            <i class="bi bi-trash me-1"></i> Remover foto
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card de Dados -->
+    <div class="mm-card">
+      <!-- Modo Visualização -->
+      <div *ngIf="!editando" class="dados-visualizacao">
+        <h3 class="section-title">
+          <i class="bi bi-person-lines-fill me-2"></i>
+          Informações Pessoais
+        </h3>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <label><i class="bi bi-person me-1"></i> Nome</label>
+            <p>{{ perfil.nome }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label><i class="bi bi-envelope me-1"></i> Email</label>
+            <p>{{ perfil.email }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label><i class="bi bi-card-text me-1"></i> Documento/CPF</label>
+            <p class="text-muted">{{ perfil.documento || 'Não informado' }}</p>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-primary" (click)="iniciarEdicao()">
+            <i class="bi bi-pencil-square me-1"></i> Editar Perfil
+          </button>
+          <button class="btn btn-outline-secondary" (click)="abrirAlterarSenha()">
+            <i class="bi bi-shield-lock me-1"></i> Alterar Senha
+          </button>
+        </div>
+      </div>
+
+      <!-- Modo Edição -->
+      <div *ngIf="editando" class="dados-edicao">
+        <h3 class="section-title">
+          <i class="bi bi-pencil-square me-2"></i>
+          Editar Informações
+        </h3>
+        
+        <div class="mb-3">
+          <label for="nome" class="form-label">
+            <i class="bi bi-person me-1"></i> Nome *
+          </label>
+          <input type="text" 
+                 id="nome"
+                 class="form-control"
+                 [(ngModel)]="nome"
+                 placeholder="Digite seu nome completo"
+                 [disabled]="salvando">
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">
+            <i class="bi bi-envelope me-1"></i> Email *
+          </label>
+          <input type="email" 
+                 id="email"
+                 class="form-control"
+                 [(ngModel)]="email"
+                 placeholder="seu@email.com"
+                 [disabled]="salvando">
+        </div>
+
+        <div class="readonly-info">
+          <div class="info-row">
+            <span class="info-label">
+              <i class="bi bi-card-text me-1"></i> Documento/CPF
+            </span>
+            <span class="info-value">{{ perfil.documento || 'Não informado' }}</span>
+          </div>
+          <small class="text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            Campos bloqueados não podem ser alterados aqui
+          </small>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-success" 
+                  (click)="salvar()"
+                  [disabled]="salvando">
+            <i class="bi bi-check-circle me-1"></i>
+            {{ salvando ? 'Salvando...' : 'Salvar Alterações' }}
+          </button>
+          <button class="btn btn-outline-secondary" 
+                  (click)="cancelarEdicao()"
+                  [disabled]="salvando">
+            <i class="bi bi-x-circle me-1"></i>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Alterar Senha -->
+  <div *ngIf="showAlterarSenha" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-shield-lock me-2"></i>
+            Alterar Senha
+          </h5>
+          <button type="button" class="btn-close" (click)="fecharAlterarSenha()" [disabled]="salvandoSenha"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Erro -->
+          <div *ngIf="errorSenha" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            {{ errorSenha }}
+            <button type="button" class="btn-close" (click)="errorSenha = ''"></button>
+          </div>
+
+          <!-- Sucesso -->
+          <div *ngIf="sucessoSenha" class="alert alert-success">
+            <i class="bi bi-check-circle me-2"></i>
+            Senha alterada com sucesso!
+          </div>
+
+          <div class="mb-3">
+            <label for="senhaAtual" class="form-label">
+              <i class="bi bi-lock me-1"></i> Senha Atual *
+            </label>
+            <div class="input-group">
+              <input [type]="showSenhaAtual ? 'text' : 'password'"
+                     id="senhaAtual"
+                     class="form-control"
+                     [(ngModel)]="senhaAtual"
+                     placeholder="Digite sua senha atual"
+                     [disabled]="salvandoSenha">
+              <button type="button" 
+                      class="btn btn-outline-secondary"
+                      (click)="toggleSenhaAtual()">
+                <i [class]="showSenhaAtual ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="novaSenha" class="form-label">
+              <i class="bi bi-key me-1"></i> Nova Senha *
+            </label>
+            <div class="input-group">
+              <input [type]="showNovaSenha ? 'text' : 'password'"
+                     id="novaSenha"
+                     class="form-control"
+                     [(ngModel)]="novaSenha"
+                     placeholder="Mínimo 3 caracteres"
+                     [disabled]="salvandoSenha">
+              <button type="button" 
+                      class="btn btn-outline-secondary"
+                      (click)="toggleNovaSenha()">
+                <i [class]="showNovaSenha ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="confirmacaoSenha" class="form-label">
+              <i class="bi bi-check2-square me-1"></i> Confirmar Nova Senha *
+            </label>
+            <div class="input-group">
+              <input [type]="showConfirmacao ? 'text' : 'password'"
+                     id="confirmacaoSenha"
+                     class="form-control"
+                     [(ngModel)]="confirmacaoSenha"
+                     placeholder="Digite novamente"
+                     [disabled]="salvandoSenha">
+              <button type="button" 
+                      class="btn btn-outline-secondary"
+                      (click)="toggleConfirmacao()">
+                <i [class]="showConfirmacao ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" 
+                  (click)="fecharAlterarSenha()"
+                  [disabled]="salvandoSenha">
+            Cancelar
+          </button>
+          <button class="btn btn-primary" 
+                  (click)="alterarSenha()"
+                  [disabled]="salvandoSenha">
+            <i class="bi bi-check-circle me-1"></i>
+            {{ salvandoSenha ? 'Alterando...' : 'Alterar Senha' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom nav -->
+<nav class="mm-bottom-nav">
+  <a routerLink="/ministerios">
+    <i class="bi bi-grid"></i> Ministérios
+  </a>
+  <a routerLink="/escalas">
+    <i class="bi bi-calendar-check"></i> Escalas
+  </a>
+  <a routerLink="/perfil" routerLinkActive="active">
+    <i class="bi bi-person"></i> Perfil
+  </a>
+  <a href="javascript:void(0)" (click)="sair()">
+    <i class="bi bi-box-arrow-right"></i> Sair
+  </a>
+</nav>

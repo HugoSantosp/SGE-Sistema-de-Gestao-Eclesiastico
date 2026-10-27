@@ -1,0 +1,344 @@
+// ===== Header =====
+.btn-voltar {
+  background: var(--bg-secondary);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+
+  &:hover {
+    background: var(--orange-light);
+    color: var(--orange);
+  }
+}
+
+// ===== Loading =====
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
+  
+  p {
+    margin-top: 16px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+}
+
+// ===== Card Avatar =====
+.perfil-avatar-card {
+  margin-bottom: 16px;
+  padding: 24px;
+}
+
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+
+  .avatar-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 20px;
+    object-fit: cover;
+    border: 3px solid var(--border-color);
+    background: var(--bg-secondary);
+  }
+
+  .avatar-badge {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    
+    .avatar-upload-btn {
+      width: 36px;
+      height: 36px;
+      background: var(--orange);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--orange-hover);
+        transform: scale(1.1);
+      }
+
+      i {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
+
+.avatar-info {
+  flex: 1;
+
+  .user-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+  }
+
+  .user-badge {
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+}
+
+// ===== Informações =====
+.section-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--bg-secondary);
+
+  i {
+    color: var(--orange);
+  }
+}
+
+.info-grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.info-item {
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+
+    i {
+      color: var(--orange);
+    }
+  }
+
+  p {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin: 0;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+  }
+}
+
+// ===== Modo Edição =====
+.readonly-info {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .info-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+
+      i {
+        color: var(--orange);
+      }
+    }
+
+    .info-value {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+  }
+
+  small {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+}
+
+// ===== Botões de Ação =====
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+
+  .btn {
+    flex: 1;
+    padding: 12px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.2s;
+
+    i {
+      font-size: 0.95rem;
+    }
+
+    &.btn-primary {
+      background: var(--orange);
+      border-color: var(--orange);
+
+      &:hover:not(:disabled) {
+        background: var(--orange-hover);
+        border-color: var(--orange-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+      }
+    }
+
+    &.btn-outline-secondary {
+      border: 2px solid var(--border-color);
+      
+      &:hover:not(:disabled) {
+        background: var(--bg-secondary);
+        border-color: var(--text-muted);
+      }
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ===== Modal Customizado =====
+.modal {
+  &.show {
+    display: block;
+  }
+
+  .modal-content {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .modal-header {
+    border-bottom: 2px solid var(--bg-secondary);
+    padding: 20px 24px;
+
+    .modal-title {
+      font-weight: 700;
+      color: var(--text-primary);
+
+      i {
+        color: var(--orange);
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 24px;
+
+    .form-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+
+      i {
+        color: var(--orange);
+      }
+    }
+
+    .form-control {
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      transition: all 0.2s;
+
+      &:focus {
+        border-color: var(--orange);
+        box-shadow: 0 0 0 4px var(--orange-glow);
+      }
+    }
+
+    .input-group {
+      .btn {
+        border: 2px solid var(--border-color);
+        border-left: none;
+
+        &:hover {
+          background: var(--bg-secondary);
+          border-color: var(--text-muted);
+        }
+      }
+    }
+  }
+
+  .modal-footer {
+    border-top: 2px solid var(--bg-secondary);
+    padding: 16px 24px;
+
+    .btn {
+      padding: 10px 24px;
+      font-weight: 600;
+      border-radius: 8px;
+
+      &.btn-primary {
+        background: var(--orange);
+        border-color: var(--orange);
+
+        &:hover:not(:disabled) {
+          background: var(--orange-hover);
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+}
+
+// ===== Responsividade =====
+@media (max-width: 600px) {
+  .avatar-section {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .avatar-info {
+    width: 100%;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+    }
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}

@@ -40,6 +40,11 @@ import { MmAuthService } from '../auth/mm-auth.service';
             <ion-icon name="calendar-outline"></ion-icon>
             <ion-label>Escalas</ion-label>
           </ion-tab-button>
+
+          <ion-tab-button (click)="navigate('perfil')">
+            <ion-icon name="person-outline"></ion-icon>
+            <ion-label>Perfil</ion-label>
+          </ion-tab-button>
         </ion-tab-bar>
       </ion-tabs>
     </ion-app>

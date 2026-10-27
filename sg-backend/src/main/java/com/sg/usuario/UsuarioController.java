@@ -1,7 +1,10 @@
 package com.sg.usuario;
 
+import com.sg.usuario.dto.UsuarioRequestDTO;
+import com.sg.usuario.dto.UsuarioResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,27 +25,31 @@ public class UsuarioController {
 
     @GetMapping
     @Operation(summary = "Listar usuários")
-    public ResponseEntity<List<Usuario>> listar() {
-        return ResponseEntity.ok(usuarioService.listarTodos());
+    public ResponseEntity<List<UsuarioResponseDTO>> listar() {
+        return ResponseEntity.ok(usuarioService.listarTodosDTO());
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar usuário por ID")
-    public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(usuarioService.buscarPorId(id));
+    public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.buscarPorIdDTO(id));
     }
 
     @PostMapping
     @Operation(summary = "Criar novo usuário")
-    public ResponseEntity<Usuario> criar(@RequestBody Usuario usuario) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.salvar(usuario));
+    public ResponseEntity<UsuarioResponseDTO> criar(@RequestBody @Valid UsuarioRequestDTO dto) {
+        Usuario usuario = usuarioService.dtoToEntity(dto);
+        Usuario saved = usuarioService.salvar(usuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.entityToDTO(saved));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar usuário")
-    public ResponseEntity<Usuario> atualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
+    public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid UsuarioRequestDTO dto) {
+        Usuario usuario = usuarioService.dtoToEntity(dto);
         usuario.setId(id);
-        return ResponseEntity.ok(usuarioService.salvar(usuario));
+        Usuario updated = usuarioService.salvar(usuario);
+        return ResponseEntity.ok(usuarioService.entityToDTO(updated));
     }
 
     @DeleteMapping("/{id}")
