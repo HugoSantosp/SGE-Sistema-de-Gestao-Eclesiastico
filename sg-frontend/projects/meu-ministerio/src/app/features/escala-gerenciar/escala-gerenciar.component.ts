@@ -21,8 +21,13 @@ export class EscalaGerenciarComponent implements OnInit {
   salvando = false;
   aviso = '';
 
+  // Edição de título
+  editandoTitulo = false;
+  novoTitulo = '';
+  editandoTituloLoading = false;
+
   /** Rótulo da opção que revela o campo de texto livre */
-  readonly OUTRO = 'Outro…';
+  readonly OUTRO = 'Outro...';
 
   instrumentos: string[] = [];
 
@@ -278,6 +283,60 @@ export class EscalaGerenciarComponent implements OnInit {
       navigator.clipboard.writeText(this.resultadoLink);
       this.aviso = 'Link copiado!';
     }
+  }
+
+  // ===== Edição de Título =====
+
+  iniciarEdicaoTitulo(): void {
+    this.novoTitulo = this.escala?.titulo || '';
+    this.editandoTitulo = true;
+  }
+
+  cancelarEdicaoTitulo(): void {
+    this.editandoTitulo = false;
+    this.novoTitulo = '';
+  }
+
+  salvarTitulo(): void {
+    if (!this.escalaId || !this.novoTitulo.trim()) {
+      this.error = 'Informe um título válido';
+      return;
+    }
+    this.editandoTituloLoading = true;
+    this.error = '';
+    this.api.atualizarEscala(this.escalaId, this.novoTitulo).subscribe({
+      next: (escalaNova) => {
+        this.editandoTituloLoading = false;
+        if (this.escala) {
+          this.escala.titulo = escalaNova.titulo;
+        }
+        this.editandoTitulo = false;
+        this.aviso = 'Título atualizado com sucesso!';
+      },
+      error: () => {
+        this.editandoTituloLoading = false;
+        this.error = 'Erro ao atualizar o título.';
+      }
+    });
+  }
+
+  deletarEscala(): void {
+    if (!this.escalaId) return;
+    if (!confirm('Tem certeza que deseja deletar esta escala? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+    this.salvando = true;
+    this.error = '';
+    this.api.deletarEscala(this.escalaId).subscribe({
+      next: () => {
+        this.salvando = false;
+        this.router.navigate(['/escalas']);
+      },
+      error: () => {
+        this.salvando = false;
+        this.error = 'Erro ao deletar a escala.';
+      }
+    });
   }
 
   voltar(): void {

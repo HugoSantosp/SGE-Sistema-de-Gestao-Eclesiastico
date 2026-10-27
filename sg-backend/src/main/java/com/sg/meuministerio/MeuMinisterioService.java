@@ -246,8 +246,10 @@ public class MeuMinisterioService {
         List<Escala> escalas;
 
         if (isAcessoAmpliado(usuario)) {
+            // Pastores/líderes administrativos veem TODAS as escalas
             escalas = escalaRepository.findAll();
         } else {
+            // Membros padrão: buscar escalas dos ministérios e filtrar por status
             Long membroId = membroDoUsuario(usuario).map(Membro::getId).orElse(null);
             if (membroId == null) return List.of();
             var ministerioIds = ministerioMembroRepository.findByMembroId(membroId).stream()
@@ -255,6 +257,11 @@ public class MeuMinisterioService {
                     .toList();
             if (ministerioIds.isEmpty()) return List.of();
             escalas = escalaRepository.findByMinisterioIdIn(ministerioIds);
+            
+            // Filtrar: apenas escalas abertas para membros padrão (não líderes)
+            escalas = escalas.stream()
+                    .filter(e -> e.isAberta() || isLiderDoMinisterio(usuario, e.getMinisterioId()))
+                    .toList();
         }
 
         // Busca em lote os nomes dos ministérios envolvidos
@@ -283,7 +290,17 @@ public class MeuMinisterioService {
     @Transactional(readOnly = true)
     public List<EscalaResponseDTO> listarEscalasDoMinisterio(Long ministerioId, Usuario usuario) {
         validarMembro(usuario, ministerioId);
-        return escalaRepository.findByMinisterioId(ministerioId).stream()
+        
+        List<Escala> escalas = escalaRepository.findByMinisterioId(ministerioId);
+        
+        // Se não é líder do ministério, mostrar apenas escalas abertas
+        if (!isLiderDoMinisterio(usuario, ministerioId)) {
+            escalas = escalas.stream()
+                    .filter(Escala::isAberta)
+                    .toList();
+        }
+        
+        return escalas.stream()
                 .map(e -> EscalaResponseDTO.fromEntity(e, e.getDatas().size(), e.getConfirmacoes().size()))
                 .toList();
     }
@@ -346,6 +363,28 @@ public class MeuMinisterioService {
     public String gerarLinkResultado(Long escalaId, Usuario usuario) {
         validarLiderDaEscala(usuario, escalaId);
         return escalaService.gerarLinkResultado(escalaId);
+    }
+
+    /** Atualiza o título de uma escala (líder do ministério/pastor). */
+    @Transactional
+    public EscalaResponseDTO atualizarEscala(Long escalaId, String novoTitulo, Usuario usuario) {
+        validarLiderDaEscala(usuario, escalaId);
+        Escala escala = escalaRepository.findById(escalaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Escala", escalaId));
+        escala.setTitulo(novoTitulo);
+        escalaRepository.save(escala);
+        return EscalaResponseDTO.fromEntity(
+                escala,
+                escala.getDatas().size(),
+                escala.getConfirmacoes().size()
+        );
+    }
+
+    /** Deleta uma escala (líder do ministério/pastor). */
+    @Transactional
+    public void deletarEscala(Long escalaId, Usuario usuario) {
+        validarLiderDaEscala(usuario, escalaId);
+        escalaRepository.deleteById(escalaId);
     }
 
     // ===== CONFIRMAÇÃO LOGADA (sem token) =====
@@ -418,6 +457,21 @@ public class MeuMinisterioService {
         if (membroId == null) return Map.of();
         return ministerioMembroRepository.findByMembroId(membroId).stream()
                 .collect(Collectors.toMap(v -> v.getMinisterio().getId(), MinisterioMembro::getPapel));
+    }
+
+    /**
+     * Verifica se o usuário é líder do ministério específico.
+     * Pastores são considerados líderes de todos os ministérios.
+     */
+    private boolean isLiderDoMinisterio(Usuario usuario, Long ministerioId) {
+        if (ministerioId == null) return false;
+        if (isAcessoAmpliado(usuario)) return true;  // Pastores são líderes em tudo
+        
+        Long membroId = membroDoUsuario(usuario).map(Membro::getId).orElse(null);
+        if (membroId == null) return false;
+        
+        return ministerioMembroRepository.existsByMinisterioIdAndMembroIdAndPapel(
+                ministerioId, membroId, PapelMinisterio.LIDER);
     }
 
     /** Lança exceção se o usuário não for líder do ministério (nem pastor). */

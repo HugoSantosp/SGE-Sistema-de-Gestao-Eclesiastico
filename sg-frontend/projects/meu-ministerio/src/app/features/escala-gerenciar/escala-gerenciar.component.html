@@ -41,6 +41,44 @@
       <span>{{ error }}</span>
     </div>
 
+    <!-- Seção de edição do título -->
+    <div class="mm-card">
+      <div *ngIf="!editandoTitulo" class="d-flex justify-content-between align-items-center gap-3">
+        <div class="flex-grow-1">
+          <div class="mm-card-title">{{ escala.titulo }}</div>
+          <div class="mm-card-sub">
+            <i class="bi bi-calendar me-1"></i>
+            Criada em {{ escala.createdAt | date:'d/M/yyyy' }}
+          </div>
+        </div>
+        <div class="d-flex gap-2 flex-shrink-0">
+          <button class="btn btn-sm btn-outline-primary" (click)="iniciarEdicaoTitulo()">
+            <i class="bi bi-pencil-square me-1"></i> Editar
+          </button>
+          <button class="btn btn-sm btn-outline-danger" (click)="deletarEscala()" [disabled]="salvando">
+            <i class="bi bi-trash me-1"></i> Deletar
+          </button>
+        </div>
+      </div>
+      <div *ngIf="editandoTitulo" class="row g-2">
+        <div class="col-12">
+          <label class="form-label">Novo título *</label>
+          <input class="form-control" type="text" [(ngModel)]="novoTitulo" 
+                 [disabled]="editandoTituloLoading" placeholder="Digite o novo título">
+        </div>
+        <div class="col-12 d-flex gap-2">
+          <button class="btn btn-sm btn-primary" (click)="salvarTitulo()" 
+                  [disabled]="editandoTituloLoading">
+            <i class="bi bi-check-circle me-1"></i> {{ editandoTituloLoading ? 'Salvando...' : 'Salvar' }}
+          </button>
+          <button class="btn btn-sm btn-outline-secondary" (click)="cancelarEdicaoTitulo()" 
+                  [disabled]="editandoTituloLoading">
+            <i class="bi bi-x-circle me-1"></i> Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Status da escala -->
     <div class="mm-card">
       <div class="d-flex align-items-center justify-content-between">

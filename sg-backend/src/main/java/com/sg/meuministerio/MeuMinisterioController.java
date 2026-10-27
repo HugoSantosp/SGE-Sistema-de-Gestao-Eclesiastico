@@ -10,6 +10,7 @@ import com.sg.meuministerio.dto.AdicionarMembroRequestDTO;
 import com.sg.meuministerio.dto.AlterarPapelRequestDTO;
 import com.sg.meuministerio.dto.ConfirmarEscalaRequestDTO;
 import com.sg.meuministerio.dto.CriarEscalaRequestDTO;
+import com.sg.meuministerio.dto.EscalaUpdateRequestDTO;
 import com.sg.meuministerio.dto.MembroMinisterioDTO;
 import com.sg.meuministerio.dto.MinisterioDoUsuarioDTO;
 import com.sg.shared.exceptions.BusinessException;
@@ -198,6 +199,25 @@ public class MeuMinisterioController {
             Authentication authentication) {
         String token = meuMinisterioService.gerarLinkResultado(escalaId, usuarioLogado(authentication));
         return ResponseEntity.ok(Map.of("resultadoToken", token));
+    }
+
+    @PutMapping("/escalas/{escalaId}")
+    @Operation(summary = "Editar título da escala (líder/pastor)")
+    public ResponseEntity<EscalaResponseDTO> atualizarEscala(
+            @PathVariable Long escalaId,
+            @RequestBody @Valid EscalaUpdateRequestDTO dto,
+            Authentication authentication) {
+        return ResponseEntity.ok(meuMinisterioService.atualizarEscala(
+                escalaId, dto.titulo(), usuarioLogado(authentication)));
+    }
+
+    @DeleteMapping("/escalas/{escalaId}")
+    @Operation(summary = "Deletar escala (líder/pastor)")
+    public ResponseEntity<Void> deletarEscala(
+            @PathVariable Long escalaId,
+            Authentication authentication) {
+        meuMinisterioService.deletarEscala(escalaId, usuarioLogado(authentication));
+        return ResponseEntity.noContent().build();
     }
 
     // ===== CONFIRMAÇÃO DE DISPONIBILIDADE (logada) =====

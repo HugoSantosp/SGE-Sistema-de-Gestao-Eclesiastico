@@ -65,6 +65,14 @@ export class MmApiService {
     return this.http.post<EscalaResponse>(`${this.baseUrl}/ministerios/${ministerioId}/escalas`, { titulo });
   }
 
+  atualizarEscala(escalaId: number, titulo: string): Observable<EscalaResponse> {
+    return this.http.put<EscalaResponse>(`${this.baseUrl}/escalas/${escalaId}`, { titulo });
+  }
+
+  deletarEscala(escalaId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/escalas/${escalaId}`);
+  }
+
   adicionarData(escalaId: number, data: EscalaDataDTO): Observable<EscalaDataDTO> {
     return this.http.post<EscalaDataDTO>(`${this.baseUrl}/escalas/${escalaId}/datas`, data);
   }
