@@ -163,18 +163,64 @@ export class PerfilComponent implements OnInit {
     if (this.fotoUrl) {
       // Se já começa com http, retorna direto
       if (this.fotoUrl.startsWith('http')) return this.fotoUrl;
+      
+      // ✅ IMPORTANTE: Se a URL já contém token (Signed URL), preservar ela completa!
+      if (this.fotoUrl.includes('?token=') && this.fotoUrl.includes('&expires=')) {
+        // URL assinada do backend - apenas adicionar domínio se necessário
+        let backendUrl = getBackendUrl();
+        
+        // FALLBACK: Se não tiver backendUrl configurado, usa localhost:8080 (desenvolvimento)
+        if (!backendUrl || backendUrl.trim() === '') {
+          backendUrl = 'http://localhost:8080';
+        }
+        
+        const cleanBackendUrl = backendUrl.replace(/\/$/, '');
+        
+        // Se já começa com /api/, só adicionar domínio
+        if (this.fotoUrl.startsWith('/api/')) {
+          return cleanBackendUrl + this.fotoUrl;
+        }
+        
+        // Caso contrário, normalizar o path antes de adicionar domínio
+        let path = this.fotoUrl;
+        if (path.startsWith('/uploads/')) {
+          path = '/api' + path;
+        } else if (path.startsWith('uploads/')) {
+          path = '/api/' + path;
+        }
+        return cleanBackendUrl + path;
+      }
+      
+      // URL sem assinatura (backwards compatibility)
+      let path = this.fotoUrl;
+      
+      // Fix: /uploads//uploads/ → /uploads/
+      path = path.replace(/\/uploads\/+uploads\//g, '/uploads/');
+      
+      // Fix: uploads//uploads/ → uploads/
+      path = path.replace(/^uploads\/+uploads\//g, 'uploads/');
+      
       // Converte /uploads/ para /api/uploads/
-      let path = this.fotoUrl.startsWith('/') ? this.fotoUrl : '/' + this.fotoUrl;
-      if (path.startsWith('/uploads/') && !path.startsWith('/api/uploads/')) {
-        path = '/api' + path;
+      if (path.startsWith('/uploads/')) {
+        path = '/api' + path;  // /uploads/2026/ → /api/uploads/2026/
+      } else if (path.startsWith('uploads/')) {
+        path = '/api/' + path;  // uploads/2026/ → /api/uploads/2026/
+      } else if (!path.startsWith('/api/')) {
+        // Se não começa com /api/ ou /uploads/, adiciona /api/
+        path = path.startsWith('/') ? '/api' + path : '/api/' + path;
       }
+      
       // Usa a URL do backend via variável de ambiente
-      const backendUrl = getBackendUrl();
-      if (backendUrl) {
-        return backendUrl + path;
+      let backendUrl = getBackendUrl();
+      
+      // FALLBACK: Se não tiver backendUrl configurado, usa localhost:8080 (desenvolvimento)
+      if (!backendUrl || backendUrl.trim() === '') {
+        backendUrl = 'http://localhost:8080';
       }
-      // Fallback para dev local com proxy
-      return path;
+      
+      // Remove trailing slash do backendUrl se existir
+      const cleanBackendUrl = backendUrl.replace(/\/$/, '');
+      return cleanBackendUrl + path;  // http://localhost:8080/api/uploads/2026/...
     }
     return '';
   }

@@ -68,6 +68,10 @@ const routes: Routes = [
         loadChildren: () => import('./features/configuracoes/configuracoes.module').then(m => m.ConfiguracoesModule)
       },
       {
+        path: 'perfil',
+        loadChildren: () => import('./features/auth/perfil/perfil.module').then(m => m.PerfilModule)
+      },
+      {
         path: 'usuarios',
         loadChildren: () => import('./features/usuarios/usuarios.module').then(m => m.UsuariosModule),
         canActivate: [RoleGuard],

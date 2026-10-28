@@ -209,6 +209,7 @@ export class MobileLayoutComponent {
   showMore = false;
 
   extraMenuItems = [
+    { route: 'perfil', label: 'Meu Perfil', icon: 'person-circle-outline' },
     { route: 'bispos', label: 'Bispos', icon: 'people-outline' },
     { route: 'presbiteros', label: 'Presbíteros', icon: 'people-outline' },
     { route: 'tesoureiros', label: 'Tesoureiros', icon: 'wallet-outline' },

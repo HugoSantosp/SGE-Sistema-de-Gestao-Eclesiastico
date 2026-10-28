@@ -35,9 +35,11 @@ spring:
         format_sql: false
 
 app:
+  signed-url:
+    secret: ${APP_SIGNED_URL_SECRET}
   upload:
     dir: ${UPLOAD_DIR:uploads}
-    max-size: ${MAX_FILE_SIZE:5242880}  # 5MB
+    max-size: ${MAX_FILE_SIZE:15728640}  # 15MB
     allowed-types: image/jpeg,image/png,image/gif,image/webp,application/pdf
   name: ${APP_NAME:SGE - Sistema de Gerenciamento Eclesiástico}
   base-url: ${APP_BASE_URL:https://icertag.com.br}

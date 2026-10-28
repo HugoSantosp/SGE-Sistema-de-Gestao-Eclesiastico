@@ -34,6 +34,16 @@ springdoc:
 app:
   upload:
     dir: uploads
+  signed-url:
+    # Habilita validação de URLs assinadas (Signed URLs) para arquivos estáticos
+    enabled: true
+    # Chave secreta para geração de tokens HMAC-SHA256
+    # IMPORTANTE: Altere este valor em produção! Use uma chave longa e aleatória.
+    # Pode ser sobrescrito via variável de ambiente: APP_SIGNED_URL_SECRET
+    secret: ${APP_SIGNED_URL_SECRET:change-this-secret-in-production-use-long-random-key}
+    # Tempo de expiração das URLs assinadas (em horas)
+    # Padrão: 24 horas (1 dia)
+    expiration-hours: 24
 
 jwt:
   # Obrigatório: defina via env JWT_SECRET em qualquer ambiente (sem valor padrão inseguro).

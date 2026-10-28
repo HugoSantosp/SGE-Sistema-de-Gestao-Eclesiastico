@@ -216,10 +216,10 @@ export class GenericFormComponent implements OnInit {
   }
 
   private validateFile(file: File, fieldName: string): boolean {
-    // Tamanho máximo: 5MB
-    const maxSize = 5 * 1024 * 1024;
+    // Tamanho máximo: 15MB
+    const maxSize = 15 * 1024 * 1024;
     if (file.size > maxSize) {
-      this.toastService.error('Arquivo muito grande. Tamanho máximo: 5MB');
+      this.toastService.error('Arquivo muito grande. Tamanho máximo: 15MB');
       return false;
     }
 

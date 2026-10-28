@@ -5,6 +5,7 @@ import com.sg.shared.exceptions.BusinessException;
 import com.sg.shared.exceptions.ResourceNotFoundException;
 import com.sg.shared.config.EmailService;
 import com.sg.shared.exceptions.InvalidCredentialsException;
+import com.sg.shared.services.SignedUrlService;
 import com.sg.usuario.Usuario;
 import com.sg.usuario.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,17 +23,20 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenRepository tokenRepository;
     private final EmailService emailService;
+    private final SignedUrlService signedUrlService;
 
     public AuthService(UsuarioRepository usuarioRepository,
                        JwtService jwtService,
                        PasswordEncoder passwordEncoder,
                        PasswordResetTokenRepository tokenRepository,
-                       EmailService emailService) {
+                       EmailService emailService,
+                       SignedUrlService signedUrlService) {
         this.usuarioRepository = usuarioRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
+        this.signedUrlService = signedUrlService;
     }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
@@ -99,12 +103,17 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado: " + email));
 
+        // Gera URL assinada para a foto (se existir)
+        String fotoUrl = usuario.getFoto() != null && !usuario.getFoto().isBlank()
+                ? signedUrlService.generateSignedUrl(usuario.getFoto())
+                : null;
+
         return new PerfilResponseDTO(
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getDocumento(),
-                usuario.getFoto(),
+                fotoUrl,
                 usuario.getNivel().name(),
                 usuario.getIdPessoa()
         );
@@ -129,12 +138,17 @@ public class AuthService {
 
         usuario = usuarioRepository.save(usuario);
 
+        // Gera URL assinada para a foto (se existir)
+        String fotoUrl = usuario.getFoto() != null && !usuario.getFoto().isBlank()
+                ? signedUrlService.generateSignedUrl(usuario.getFoto())
+                : null;
+
         return new PerfilResponseDTO(
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getDocumento(),
-                usuario.getFoto(),
+                fotoUrl,
                 usuario.getNivel().name(),
                 usuario.getIdPessoa()
         );

@@ -40,7 +40,7 @@
     <div class="mm-card perfil-avatar-card">
       <div class="avatar-section">
         <div class="avatar-wrapper">
-          <img [src]="fotoPreview || (foto ? '/uploads/' + foto : '/assets/avatar-default.png')" 
+          <img [src]="getFotoSrc()" 
                alt="Foto de perfil"
                class="avatar-img">
           <div *ngIf="editando" class="avatar-badge">

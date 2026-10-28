@@ -84,9 +84,9 @@ export class PerfilComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      // Validar tamanho (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.error = 'Imagem muito grande. Máximo: 5MB';
+      // Validar tamanho (15MB)
+      if (file.size > 15 * 1024 * 1024) {
+        this.error = 'Imagem muito grande. Máximo: 15MB';
         return;
       }
       // Validar tipo
@@ -225,5 +225,61 @@ export class PerfilComponent implements OnInit {
 
   sair(): void {
     this.authService.logout();
+  }
+
+  getFotoSrc(): string {
+    if (this.fotoPreview) return this.fotoPreview;
+    if (this.foto) {
+      // Se já começa com http, retorna direto
+      if (this.foto.startsWith('http')) return this.foto;
+      
+      // ✅ IMPORTANTE: Se a URL já contém token (Signed URL), preservar ela completa!
+      if (this.foto.includes('?token=') && this.foto.includes('&expires=')) {
+        // URL assinada do backend - apenas adicionar domínio se necessário
+        const backendUrl = 'http://localhost:8080';
+        const cleanBackendUrl = backendUrl.replace(/\/$/, '');
+        
+        // Se já começa com /api/, só adicionar domínio
+        if (this.foto.startsWith('/api/')) {
+          return cleanBackendUrl + this.foto;
+        }
+        
+        // Caso contrário, normalizar o path antes de adicionar domínio
+        let path = this.foto;
+        if (path.startsWith('/uploads/')) {
+          path = '/api' + path;
+        } else if (path.startsWith('uploads/')) {
+          path = '/api/' + path;
+        }
+        return cleanBackendUrl + path;
+      }
+      
+      // URL sem assinatura (backwards compatibility)
+      let path = this.foto;
+      
+      // Fix: /uploads//uploads/ → /uploads/
+      path = path.replace(/\/uploads\/+uploads\//g, '/uploads/');
+      
+      // Fix: uploads//uploads/ → uploads/
+      path = path.replace(/^uploads\/+uploads\//g, 'uploads/');
+      
+      // Converte /uploads/ para /api/uploads/
+      if (path.startsWith('/uploads/')) {
+        path = '/api' + path;  // /uploads/2026/ → /api/uploads/2026/
+      } else if (path.startsWith('uploads/')) {
+        path = '/api/' + path;  // uploads/2026/ → /api/uploads/2026/
+      } else if (!path.startsWith('/api/')) {
+        // Se não começa com /api/ ou /uploads/, adiciona /api/
+        path = path.startsWith('/') ? '/api' + path : '/api/' + path;
+      }
+      
+      // SEMPRE usa localhost:8080 para desenvolvimento (app mobile)
+      const backendUrl = 'http://localhost:8080';
+      
+      // Remove trailing slash do backendUrl se existir
+      const cleanBackendUrl = backendUrl.replace(/\/$/, '');
+      return cleanBackendUrl + path;  // http://localhost:8080/api/uploads/2026/...
+    }
+    return '/assets/avatar-default.png';
   }
 }
