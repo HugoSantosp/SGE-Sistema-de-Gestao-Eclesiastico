@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MmAuthService } from '../../core/auth/mm-auth.service';
 import { PerfilResponse, AtualizarPerfilRequest } from '../../core/models/mm.models';
+import { getBackendUrl } from '../../core/config/backend-config';
 
 @Component({
   selector: 'app-perfil',
@@ -236,7 +237,7 @@ export class PerfilComponent implements OnInit {
       // ✅ IMPORTANTE: Se a URL já contém token (Signed URL), preservar ela completa!
       if (this.foto.includes('?token=') && this.foto.includes('&expires=')) {
         // URL assinada do backend - apenas adicionar domínio se necessário
-        const backendUrl = 'http://localhost:8080';
+        const backendUrl = getBackendUrl();
         const cleanBackendUrl = backendUrl.replace(/\/$/, '');
         
         // Se já começa com /api/, só adicionar domínio
@@ -273,12 +274,10 @@ export class PerfilComponent implements OnInit {
         path = path.startsWith('/') ? '/api' + path : '/api/' + path;
       }
       
-      // SEMPRE usa localhost:8080 para desenvolvimento (app mobile)
-      const backendUrl = 'http://localhost:8080';
-      
-      // Remove trailing slash do backendUrl se existir
+      // Usa a URL do backend para o ambiente atual (configuração de runtime ou environment).
+      const backendUrl = getBackendUrl();
       const cleanBackendUrl = backendUrl.replace(/\/$/, '');
-      return cleanBackendUrl + path;  // http://localhost:8080/api/uploads/2026/...
+      return cleanBackendUrl ? cleanBackendUrl + path : path;
     }
     return '/assets/avatar-default.png';
   }
