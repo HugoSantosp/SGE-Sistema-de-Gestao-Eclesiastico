@@ -18,9 +18,25 @@ export class MuralPageComponent implements OnInit {
     this.http.get(getApiUrl('/api/public/info')).subscribe({
       next: (data: any) => { this.churchInfo = { ...this.churchInfo, ...data }; }
     });
+    this.carregarProfissionais();
+  }
+
+  private carregarProfissionais(): void {
     this.http.get<any[]>(getApiUrl('/api/public/profissionais')).subscribe({
       next: (data) => { this.profissionais = data; },
-      complete: () => { this.loading = false; }
+      error: () => { this.loading = false; this.fotoReloading = false; },
+      complete: () => { this.loading = false; this.fotoReloading = false; }
     });
+  }
+
+  // URLs assinadas expiram: se uma imagem falhar, busca os dados de novo (novas URLs), no máximo 2 vezes
+  private fotoRetries = 0;
+  private fotoReloading = false;
+
+  onFotoError(): void {
+    if (this.fotoReloading || this.fotoRetries >= 2) return;
+    this.fotoRetries++;
+    this.fotoReloading = true;
+    this.carregarProfissionais();
   }
 }

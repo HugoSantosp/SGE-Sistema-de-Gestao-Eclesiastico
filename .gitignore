@@ -34,6 +34,10 @@ sg-frontend/.angular/
 # Uploads
 sg-backend/uploads/
 
+# Local secrets and generated logs
+CHAVE_SECRETA_SIGNED_URL.txt
+sg-backend/LOG_DIR_IS_UNDEFINED/
+
 # Docker
 .docker/
 

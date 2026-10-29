@@ -18,12 +18,12 @@
                  (click)="fileInput.click()">
               <i class="bi bi-camera fs-2" style="color:#aaa;"></i>
             </div>
-            <img *ngIf="form.foto" [src]="form.foto | uploadUrl"
+            <img *ngIf="form.foto" [src]="fotoPreview || (form.foto | uploadUrl)"
                  style="width:100px;height:100px;border-radius:12px;object-fit:cover;border:2px solid #ddd;cursor:pointer;"
                  (click)="fileInput.click()">
             <button *ngIf="form.foto" type="button" class="btn btn-sm position-absolute"
                     style="top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#dc3545;color:#fff;border:none;font-size:0.7rem;display:flex;align-items:center;justify-content:center;"
-                    (click)="form.foto=''; $event.stopPropagation()">
+                    (click)="form.foto=''; fotoPreview=''; $event.stopPropagation()">
               <i class="bi bi-x"></i>
             </button>
             <input #fileInput type="file" accept="image/*" style="display:none" (change)="onFotoSelected($event)">

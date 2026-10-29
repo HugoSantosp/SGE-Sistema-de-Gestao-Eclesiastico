@@ -31,6 +31,7 @@ public class Igreja {
     private String obs;
 
     @Column(length = 150)
+    @Convert(converter = com.sg.shared.util.FotoPathConverter.class)
     private String foto;
 
     @Column(nullable = false, length = 5)

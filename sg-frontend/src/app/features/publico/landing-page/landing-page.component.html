@@ -41,7 +41,7 @@
         </p>
         <div class="d-flex gap-4 mt-4">
           <div class="text-center">
-            <div class="fs-1 fw-bold" style="color:#f97316;">10+</div>
+            <div class="fs-1 fw-bold" style="color:#f97316;">86</div>
             <div class="small" style="color:#4a5568;">Anos de Ministério</div>
           </div>
           <div class="text-center">
@@ -49,7 +49,7 @@
             <div class="small" style="color:#4a5568;">Membros</div>
           </div>
           <div class="text-center">
-            <div class="fs-1 fw-bold" style="color:#f97316;">3</div>
+            <div class="fs-1 fw-bold" style="color:#f97316;">2</div>
             <div class="small" style="color:#4a5568;">Cultos por Semana</div>
           </div>
         </div>
@@ -90,7 +90,7 @@
             <div *ngIf="!pastor.foto" class="avatar-placeholder">
               {{ pastor.nome?.charAt(0) || 'P' }}
             </div>
-            <img *ngIf="pastor.foto" [src]="pastor.foto | uploadUrl" [alt]="pastor.nome" class="pastor-img">
+            <img *ngIf="pastor.foto" [src]="pastor.foto | uploadUrl" [alt]="pastor.nome" (error)="onFotoError()" class="pastor-img">
           </div>
           <h5 class="fw-bold mb-1" style="color:#1a1a2e;">{{ pastor.nome }}</h5>
           <span class="badge mb-2 px-3 py-1" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">
@@ -248,7 +248,7 @@
         <div class="text-center p-4 rounded-4" style="background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
           <div class="fs-2 mb-3" style="color:#f97316;"><i class="bi bi-clock"></i></div>
           <h6 class="fw-bold" style="color:#1a1a2e;">Horários</h6>
-          <p class="small mb-0" style="color:#4a5568;">Dom 09h | Qua 19h30</p>
+          <p class="small mb-0" style="color:#4a5568;">1º Dom Mês 09:30h | Dom 18:30h | Qua 19:30h</p>
         </div>
       </div>
     </div>

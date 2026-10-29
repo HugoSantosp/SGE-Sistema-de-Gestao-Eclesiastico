@@ -42,6 +42,8 @@ export class GenericFormComponent implements OnInit {
   saving = false;
   error = '';
   uploading: Record<string, boolean> = {};
+  /** URL assinada (temporária) usada só na pré-visualização após upload; o valor salvo é o caminho permanente */
+  previewUrls: Record<string, string> = {};
   showPassword: Record<string, boolean> = {};
   
   // Erros de validação por campo
@@ -205,6 +207,7 @@ export class GenericFormComponent implements OnInit {
       next: (res) => {
         this.formGroup.get(fieldName)?.setValue(res.url);
         this.form[fieldName] = res.url;
+        this.previewUrls[fieldName] = res.signedUrl || '';
         this.uploading[fieldName] = false;
         this.toastService.success('Imagem enviada com sucesso!');
       },
@@ -234,13 +237,14 @@ export class GenericFormComponent implements OnInit {
   }
 
   removeImage(fieldName: string): void {
+    delete this.previewUrls[fieldName];
     this.formGroup.get(fieldName)?.setValue('');
     this.form[fieldName] = '';
   }
 
   onImageError(fieldName: string): void {
-    this.formGroup.get(fieldName)?.setValue('');
-    this.form[fieldName] = '';
+    // Não limpa o valor: a URL assinada pode ter apenas expirado e apagar o campo removeria a foto ao salvar
+    delete this.previewUrls[fieldName];
   }
 
   save(): void {

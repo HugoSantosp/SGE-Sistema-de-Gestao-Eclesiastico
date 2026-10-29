@@ -13,6 +13,7 @@ import com.sg.eventos.EventoService;
 import com.sg.celulas.CelulaService;
 import com.sg.profissionais.ProfissionalService;
 import com.sg.ministerios.MinisterioService;
+import com.sg.shared.services.SignedUrlService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -36,11 +37,13 @@ public class PublicController {
     private final CelulaService celulaService;
     private final ProfissionalService profissionalService;
     private final MinisterioService ministerioService;
+    private final SignedUrlService signedUrlService;
 
     public PublicController(ConfiguracaoRepository configuracaoRepository, UsuarioRepository usuarioRepository,
                             BispoRepository bispoRepository, PresbiteroRepository presbiteroRepository,
                             EventoService eventoService, CelulaService celulaService,
-                            ProfissionalService profissionalService, MinisterioService ministerioService) {
+                            ProfissionalService profissionalService, MinisterioService ministerioService,
+                            SignedUrlService signedUrlService) {
         this.configuracaoRepository = configuracaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.bispoRepository = bispoRepository;
@@ -49,6 +52,12 @@ public class PublicController {
         this.celulaService = celulaService;
         this.profissionalService = profissionalService;
         this.ministerioService = ministerioService;
+        this.signedUrlService = signedUrlService;
+    }
+
+    /** Assina a foto (URL temporária) somente para exibição; o banco guarda o caminho permanente. */
+    private String fotoAssinada(String foto) {
+        return foto == null || foto.isBlank() ? "" : signedUrlService.signStoredPath(foto);
     }
 
     @GetMapping("/info")
@@ -56,11 +65,11 @@ public class PublicController {
     public ResponseEntity<?> info() {
         return ResponseEntity.ok(Map.of(
                 "nome", configValor("nome_igreja", "ICERT - Agência do Reino de Deus"),
-                "endereco", configValor("endereco_igreja", "São João de Meriti, RJ"),
-                "telefone", configValor("telefone_igreja", ""),
+                "endereco", configValor("endereco_igreja", "R. Doná Jove, 53 - Tomazinho, São João de Meriti - RJ"),
+                "telefone", configValor("telefone_igreja", "02126561367"),
                 "email", configValor("email_igreja", "contato@icertag.com.br"),
                 "horarios", List.of(
-                        Map.of("dia", "Domingo", "horario", "09:00"),
+                        Map.of("dia", "Domingo", "horario", "18:00"),
                         Map.of("dia", "Quarta-feira", "horario", "19:30")
                 )
         ));
@@ -85,7 +94,7 @@ public class PublicController {
         pastores.forEach(u -> result.add(Map.of(
                         "nome", u.getNome(),
                         "email", u.getEmail() != null ? u.getEmail() : "",
-                        "foto", u.getFoto() != null ? u.getFoto() : "",
+                        "foto", fotoAssinada(u.getFoto()),
                         "cargo", u.getNivel() == NivelAcesso.PASTOR_PRESIDENTE ? "Pastor Presidente" : "Pastor Auxiliar"
                 )));
 
@@ -93,7 +102,7 @@ public class PublicController {
         bispoRepository.findAll().forEach(b -> result.add(Map.of(
                 "nome", b.getNome(),
                 "email", b.getEmail() != null ? b.getEmail() : "",
-                "foto", b.getFoto() != null ? b.getFoto() : "",
+                "foto", fotoAssinada(b.getFoto()),
                 "cargo", "Bispo"
         )));
 
@@ -101,7 +110,7 @@ public class PublicController {
         presbiteroRepository.findAll().forEach(p -> result.add(Map.of(
                 "nome", p.getNome(),
                 "email", p.getEmail() != null ? p.getEmail() : "",
-                "foto", p.getFoto() != null ? p.getFoto() : "",
+                "foto", fotoAssinada(p.getFoto()),
                 "cargo", "Presbítero"
         )));
 
@@ -142,7 +151,7 @@ public class PublicController {
                 "diaSemana", c.getDiaSemana() != null ? c.getDiaSemana() : "",
                 "horario", c.getHorario() != null ? c.getHorario().toString() : "",
                 "descricao", c.getDescricao() != null ? c.getDescricao() : "",
-                "foto", c.getFoto() != null ? c.getFoto() : ""
+                "foto", fotoAssinada(c.getFoto())
         )).toList();
         return ResponseEntity.ok(result);
     }
@@ -155,7 +164,7 @@ public class PublicController {
                 "especialidade", p.getEspecialidade() != null ? p.getEspecialidade() : "",
                 "telefone", p.getTelefone() != null ? p.getTelefone() : "",
                 "email", p.getEmail() != null ? p.getEmail() : "",
-                "foto", p.getFoto() != null ? p.getFoto() : "",
+                "foto", fotoAssinada(p.getFoto()),
                 "descricao", p.getDescricao() != null ? p.getDescricao() : ""
         )).toList();
         return ResponseEntity.ok(result);
@@ -167,7 +176,7 @@ public class PublicController {
         var result = ministerioService.listarTodos().stream().map(m -> Map.<String, Object>of(
                 "id", m.getId(), "nome", m.getNome(),
                 "descricao", m.getDescricao() != null ? m.getDescricao() : "",
-                "foto", m.getFoto() != null ? m.getFoto() : ""
+                "foto", fotoAssinada(m.getFoto())
         )).toList();
         return ResponseEntity.ok(result);
     }

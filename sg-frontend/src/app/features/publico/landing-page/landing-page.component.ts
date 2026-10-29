@@ -42,11 +42,27 @@ export class LandingPageComponent implements OnInit {
       next: (data: any) => { this.churchInfo = { ...this.churchInfo, ...data }; }
     });
 
-    this.http.get<any[]>(getApiUrl('/api/public/pastores')).subscribe({
-      next: (data) => { this.pastores = data; }
-    });
+    this.carregarPastores();
 
     this.loadEvents();
+  }
+
+  private carregarPastores(): void {
+    this.http.get<any[]>(getApiUrl('/api/public/pastores')).subscribe({
+      next: (data) => { this.pastores = data; this.fotoReloading = false; },
+      error: () => { this.fotoReloading = false; }
+    });
+  }
+
+  // URLs assinadas expiram: se uma imagem falhar, busca os dados de novo (novas URLs), no máximo 2 vezes
+  private fotoRetries = 0;
+  private fotoReloading = false;
+
+  onFotoError(): void {
+    if (this.fotoReloading || this.fotoRetries >= 2) return;
+    this.fotoRetries++;
+    this.fotoReloading = true;
+    this.carregarPastores();
   }
 
   private loadEvents(): void {

@@ -1,6 +1,7 @@
 package com.sg.shared.config;
 
 import com.sg.shared.services.FileStorageService;
+import com.sg.shared.services.SignedUrlService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,11 @@ public class FileUploadController {
 
     private final FileStorageService fileStorageService;
 
-    public FileUploadController(FileStorageService fileStorageService) {
+    private final SignedUrlService signedUrlService;
+
+    public FileUploadController(FileStorageService fileStorageService, SignedUrlService signedUrlService) {
         this.fileStorageService = fileStorageService;
+        this.signedUrlService = signedUrlService;
     }
 
     @PostMapping
@@ -32,6 +36,8 @@ public class FileUploadController {
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
         try {
             FileStorageService.UploadResult result = fileStorageService.store(file);
+            // "url" é o caminho permanente (o que deve ser salvo); "signedUrl" serve apenas para pré-visualização
+            result.setSignedUrl(signedUrlService.signStoredPath(result.getUrl()));
             return ResponseEntity.ok(result);
         } catch (FileStorageService.ValidationException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

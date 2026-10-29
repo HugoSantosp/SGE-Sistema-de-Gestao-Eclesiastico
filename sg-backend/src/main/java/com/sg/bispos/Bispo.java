@@ -34,6 +34,7 @@ public class Bispo {
     private String endereco;
 
     @Column(length = 150)
+    @Convert(converter = com.sg.shared.util.FotoPathConverter.class)
     private String foto;
 
     @Column(name = "data_cad")

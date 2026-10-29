@@ -61,6 +61,7 @@ public class FileStorageService {
     public static class UploadResult {
         private String filename;
         private String url;
+        private String signedUrl;
         private String thumbnailUrl;
         private long size;
         private String contentType;
@@ -71,6 +72,8 @@ public class FileStorageService {
         public void setFilename(String filename) { this.filename = filename; }
         public String getUrl() { return url; }
         public void setUrl(String url) { this.url = url; }
+        public String getSignedUrl() { return signedUrl; }
+        public void setSignedUrl(String signedUrl) { this.signedUrl = signedUrl; }
         public String getThumbnailUrl() { return thumbnailUrl; }
         public void setThumbnailUrl(String thumbnailUrl) { this.thumbnailUrl = thumbnailUrl; }
         public long getSize() { return size; }

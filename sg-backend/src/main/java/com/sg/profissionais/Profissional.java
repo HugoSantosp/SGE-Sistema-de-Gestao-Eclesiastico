@@ -30,6 +30,7 @@ public class Profissional {
     private String email;
 
     @Column(length = 150)
+    @Convert(converter = com.sg.shared.util.FotoPathConverter.class)
     private String foto;
 
     @Column(columnDefinition = "TEXT")

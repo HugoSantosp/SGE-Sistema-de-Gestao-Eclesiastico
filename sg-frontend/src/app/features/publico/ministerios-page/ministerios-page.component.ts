@@ -18,10 +18,26 @@ export class MinisteriosPageComponent implements OnInit {
     this.http.get(getApiUrl('/api/public/info')).subscribe({
       next: (data: any) => { this.churchInfo = { ...this.churchInfo, ...data }; }
     });
+    this.carregarMinisterios();
+  }
+
+  private carregarMinisterios(): void {
     this.http.get<any>(getApiUrl('/api/public/ministerios')).subscribe({
       next: (data) => { this.ministerios = data; },
-      complete: () => { this.loading = false; }
+      error: () => { this.loading = false; this.fotoReloading = false; },
+      complete: () => { this.loading = false; this.fotoReloading = false; }
     });
+  }
+
+  // URLs assinadas expiram: se uma imagem falhar, busca os dados de novo (novas URLs), no máximo 2 vezes
+  private fotoRetries = 0;
+  private fotoReloading = false;
+
+  onFotoError(): void {
+    if (this.fotoReloading || this.fotoRetries >= 2) return;
+    this.fotoRetries++;
+    this.fotoReloading = true;
+    this.carregarMinisterios();
   }
 
   scrollTo(section: string): void {

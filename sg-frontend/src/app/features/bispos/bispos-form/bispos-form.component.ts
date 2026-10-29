@@ -12,6 +12,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 export class BisposFormComponent implements OnInit {
   isEdit = false; loading = false; saving = false; error = '';
   uploadingFoto = false;
+  fotoPreview = '';
   form: any = { nome: '', email: '', documento: '', telefone: '', endereco: '', foto: '' };
 
   constructor(
@@ -40,7 +41,7 @@ export class BisposFormComponent implements OnInit {
     const headers = new HttpHeaders({ 'Authorization': `Bearer ${this.authService.getToken()}` });
 
     this.http.post<any>('/api/upload', formData, { headers }).subscribe({
-      next: (res) => { this.form.foto = res.url; this.uploadingFoto = false; },
+      next: (res) => { this.form.foto = res.url; this.fotoPreview = res.signedUrl || ''; this.uploadingFoto = false; },
       error: () => { this.error = 'Erro ao enviar foto'; this.uploadingFoto = false; }
     });
   }

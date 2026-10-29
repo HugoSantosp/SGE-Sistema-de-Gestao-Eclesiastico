@@ -17,7 +17,7 @@
         <div class="profissional-card text-center p-4">
           <div class="prof-avatar mx-auto mb-3">
             <div *ngIf="!p.foto" class="avatar-placeholder-sm">{{ p.nome?.charAt(0) || 'P' }}</div>
-            <img *ngIf="p.foto" [src]="p.foto | uploadUrl" [alt]="p.nome" class="prof-img">
+            <img *ngIf="p.foto" [src]="p.foto | uploadUrl" [alt]="p.nome" (error)="onFotoError()" class="prof-img">
           </div>
           <h5 class="fw-bold mb-1" style="color:#1a1a2e;">{{ p.nome }}</h5>
           <span class="badge mb-2 px-3 py-1" style="background:rgba(249,115,22,0.1);color:#f97316;border:1px solid rgba(249,115,22,0.2);">{{ p.especialidade }}</span>

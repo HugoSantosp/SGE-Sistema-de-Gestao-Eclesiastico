@@ -44,6 +44,7 @@ public class Usuario implements UserDetails {
     private Long idPessoa;
 
     @Column(length = 150)
+    @Convert(converter = com.sg.shared.util.FotoPathConverter.class)
     private String foto;
 
     @Column(name = "senha_temporaria", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")

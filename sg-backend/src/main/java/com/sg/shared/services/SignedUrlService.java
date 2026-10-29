@@ -71,6 +71,22 @@ public class SignedUrlService {
     }
 
     /**
+     * Converte a referência de foto guardada no banco em URL assinada para exibição.
+     * Valores vazios, URLs externas e caminhos suspeitos são devolvidos sem assinatura;
+     * URLs já assinadas são renovadas (nova expiração).
+     */
+    public String signStoredPath(String storedValue) {
+        if (storedValue == null || storedValue.isBlank()) {
+            return storedValue;
+        }
+        String path = com.sg.shared.util.FotoPaths.toStoredPath(storedValue);
+        if (!com.sg.shared.util.FotoPaths.isSignable(path)) {
+            return storedValue;
+        }
+        return generateSignedUrl(path);
+    }
+
+    /**
      * Valida se uma URL assinada é válida.
      * 
      * @param filePath Caminho relativo do arquivo

@@ -37,5 +37,6 @@ public class Celula {
     private String descricao;
 
     @Column(length = 255)
+    @Convert(converter = com.sg.shared.util.FotoPathConverter.class)
     private String foto;
 }

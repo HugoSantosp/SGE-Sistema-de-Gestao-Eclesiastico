@@ -28,7 +28,7 @@
               <i class="bi bi-camera fs-2" style="color:var(--text-muted);"></i>
             </div>
             <img *ngIf="formGroup.get(field.name)?.value"
-                 [src]="formGroup.get(field.name)?.value | uploadUrl"
+                 [src]="previewUrls[field.name] || (formGroup.get(field.name)?.value | uploadUrl)"
                  class="photo-preview"
                  style="width:100px;height:100px;border-radius:12px;object-fit:cover;border:2px solid var(--border-color);cursor:pointer;"
                  (click)="triggerUpload(field.name)"
