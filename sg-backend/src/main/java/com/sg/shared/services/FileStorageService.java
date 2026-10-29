@@ -34,7 +34,7 @@ public class FileStorageService {
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
 
-    @Value("${app.upload.max-size:5242880}") // 5MB padrão
+    @Value("${app.upload.max-size:15728640}") // 15MB padrão
     private long maxSize;
 
     @Value("${app.upload.allowed-types:image/jpeg,image/png,image/gif,image/webp,application/pdf}")

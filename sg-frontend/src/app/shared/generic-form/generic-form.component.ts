@@ -211,8 +211,11 @@ export class GenericFormComponent implements OnInit {
         this.uploading[fieldName] = false;
         this.toastService.success('Imagem enviada com sucesso!');
       },
-      error: () => {
-        this.toastService.error('Erro ao fazer upload da imagem');
+      error: (err) => {
+        const msg = err?.status === 413
+          ? 'Arquivo muito grande. Tamanho máximo permitido: 15 MB'
+          : (err?.error?.error || 'Erro ao fazer upload da imagem');
+        this.toastService.error(msg);
         this.uploading[fieldName] = false;
       }
     });

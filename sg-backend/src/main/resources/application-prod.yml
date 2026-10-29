@@ -13,6 +13,10 @@ server:
 spring:
   application:
     name: sge-backend
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 16MB
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}

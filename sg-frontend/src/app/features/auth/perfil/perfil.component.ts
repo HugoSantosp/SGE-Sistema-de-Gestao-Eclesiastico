@@ -125,6 +125,17 @@ export class PerfilComponent implements OnInit {
         if (uploadResult.ok) {
           const data = await uploadResult.json();
           this.fotoUrl = data.url;
+        } else {
+          let msg = 'Erro ao fazer upload da foto';
+          if (uploadResult.status === 413) {
+            msg = 'Arquivo muito grande. Tamanho máximo permitido: 15 MB';
+          } else {
+            try { msg = (await uploadResult.json())?.error || msg; } catch { /* mantém mensagem padrão */ }
+          }
+          this.error = msg;
+          this.uploading = false;
+          this.loading = false;
+          return;
         }
         this.uploading = false;
       }

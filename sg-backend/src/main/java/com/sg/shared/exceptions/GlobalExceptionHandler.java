@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -61,6 +62,13 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.CONFLICT,
                 "O registro viola uma restrição do banco de dados (coluna obrigatória, duplicidade ou foreign key). "
                         + "Detalhe: " + detail);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, Object>> handleMaxUploadSize(MaxUploadSizeExceededException ex) {
+        log.warn("Upload recusado: tamanho máximo excedido");
+        return buildResponse(HttpStatus.PAYLOAD_TOO_LARGE,
+                "Arquivo muito grande. Tamanho máximo permitido: 15 MB");
     }
 
     @ExceptionHandler(Exception.class)

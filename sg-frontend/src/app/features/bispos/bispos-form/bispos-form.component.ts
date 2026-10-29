@@ -42,7 +42,12 @@ export class BisposFormComponent implements OnInit {
 
     this.http.post<any>('/api/upload', formData, { headers }).subscribe({
       next: (res) => { this.form.foto = res.url; this.fotoPreview = res.signedUrl || ''; this.uploadingFoto = false; },
-      error: () => { this.error = 'Erro ao enviar foto'; this.uploadingFoto = false; }
+      error: (err) => {
+        this.error = err?.status === 413
+          ? 'Arquivo muito grande. Tamanho máximo permitido: 15 MB'
+          : (err?.error?.error || 'Erro ao enviar foto');
+        this.uploadingFoto = false;
+      }
     });
   }
 

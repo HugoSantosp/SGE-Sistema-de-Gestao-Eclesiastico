@@ -4,6 +4,12 @@
 # =============================================
 
 spring:
+
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 16MB
+
   datasource:
     # Banco de desenvolvimento. Se sua senha do Postgres for diferente, ajuste aqui.
     url: jdbc:postgresql://localhost:5432/sge-dev
