@@ -171,6 +171,11 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "/assets"
+              },
+              {
+                "glob": "manifest.webmanifest",
+                "input": "projects/meu-ministerio/src",
+                "output": "/"
               }
             ],
             "styles": [
