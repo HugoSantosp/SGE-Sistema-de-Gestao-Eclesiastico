@@ -125,6 +125,7 @@ export interface DesignacaoResponse {
   nomeIntegrante: string;
   instrumento: string;
   ordem: number;
+  fotoIntegrante?: string;
 }
 
 export interface MusicaDTO {

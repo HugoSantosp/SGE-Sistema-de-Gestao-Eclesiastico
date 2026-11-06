@@ -10,4 +10,5 @@ public interface MembroRepository extends JpaRepository<Membro, Long> {
     long countBySituacao(com.sg.shared.enums.StatusMembro situacao);
     List<Membro> findByNomeContainingIgnoreCase(String nome);
     java.util.Optional<Membro> findByDocumento(String documento);
+    java.util.List<Membro> findByDocumentoIgnoreCase(String documento);
 }

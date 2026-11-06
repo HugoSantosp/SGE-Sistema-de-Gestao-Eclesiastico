@@ -42,7 +42,8 @@
         <div class="avatar-wrapper">
           <img [src]="getFotoSrc()" 
                alt="Foto de perfil"
-               class="avatar-img">
+               class="avatar-img"
+               (error)="onFotoError()">
           <div *ngIf="editando" class="avatar-badge">
             <label for="foto-input" class="avatar-upload-btn">
               <i class="bi bi-camera-fill"></i>

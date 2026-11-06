@@ -88,6 +88,12 @@ export class MmAuthService {
     return this.http.put<PerfilResponse>('/auth/me', request);
   }
 
+  uploadFoto(file: File): Observable<{ url: string; signedUrl?: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ url: string; signedUrl?: string }>('/api/upload', formData);
+  }
+
   // ===== Private =====
 
   private storeUser(response: LoginResponse): void {

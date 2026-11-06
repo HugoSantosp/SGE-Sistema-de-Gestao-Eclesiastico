@@ -32,7 +32,7 @@ public record EscalaDetalhadaResponseDTO(
                         c.getDatas().stream().map(EscalaData::getId).toList())
         ).toList();
 
-        return fromEntity(escala, datas, designacoesPorData, musicasPorData, confirmacoesDTO);
+        return fromEntity(escala, datas, designacoesPorData, musicasPorData, confirmacoesDTO, Map.of());
     }
 
     /**
@@ -45,7 +45,22 @@ public record EscalaDetalhadaResponseDTO(
             Map<Long, List<EscalaDesignacao>> designacoesPorData,
             Map<Long, List<EscalaMusica>> musicasPorData
     ) {
-        return fromEntity(escala, datas, designacoesPorData, musicasPorData, List.of());
+        return fromEntity(escala, datas, designacoesPorData, musicasPorData, List.of(), Map.of());
+    }
+
+    /**
+     * Versão pública com as fotos dos integrantes já assinadas.
+     *
+     * @param fotosPorConfirmacao confirmaçãoId → URL assinada da foto (vazio quando não há foto)
+     */
+    public static EscalaDetalhadaResponseDTO fromEntityPublica(
+            Escala escala,
+            List<EscalaData> datas,
+            Map<Long, List<EscalaDesignacao>> designacoesPorData,
+            Map<Long, List<EscalaMusica>> musicasPorData,
+            Map<Long, String> fotosPorConfirmacao
+    ) {
+        return fromEntity(escala, datas, designacoesPorData, musicasPorData, List.of(), fotosPorConfirmacao);
     }
 
     private static EscalaDetalhadaResponseDTO fromEntity(
@@ -53,12 +68,14 @@ public record EscalaDetalhadaResponseDTO(
             List<EscalaData> datas,
             Map<Long, List<EscalaDesignacao>> designacoesPorData,
             Map<Long, List<EscalaMusica>> musicasPorData,
-            List<EscalaConfirmacaoResponseDTO> confirmacoesDTO
+            List<EscalaConfirmacaoResponseDTO> confirmacoesDTO,
+            Map<Long, String> fotosPorConfirmacao
     ) {
         var datasDTO = datas.stream().map(d -> DataDetalhadaDTO.fromEntity(
                 d,
                 designacoesPorData.getOrDefault(d.getId(), List.of()),
-                musicasPorData.getOrDefault(d.getId(), List.of())
+                musicasPorData.getOrDefault(d.getId(), List.of()),
+                fotosPorConfirmacao
         )).toList();
 
         return new EscalaDetalhadaResponseDTO(
@@ -87,7 +104,8 @@ public record EscalaDetalhadaResponseDTO(
         static DataDetalhadaDTO fromEntity(
                 EscalaData d,
                 List<EscalaDesignacao> designacoes,
-                List<EscalaMusica> musicas
+                List<EscalaMusica> musicas,
+                Map<Long, String> fotosPorConfirmacao
         ) {
             return new DataDetalhadaDTO(
                     d.getId(),
@@ -95,7 +113,11 @@ public record EscalaDetalhadaResponseDTO(
                     d.getData().toString(),
                     d.getHorario().toString(),
                     d.getLocal(),
-                    designacoes.stream().map(EscalaDesignacaoResponseDTO::fromEntity).toList(),
+                    designacoes.stream()
+                            .map(des -> EscalaDesignacaoResponseDTO.fromEntity(
+                                    des,
+                                    fotosPorConfirmacao.getOrDefault(des.getConfirmacao().getId(), "")))
+                            .toList(),
                     musicas.stream().map(EscalaMusicaDTO::fromEntity).toList()
             );
         }

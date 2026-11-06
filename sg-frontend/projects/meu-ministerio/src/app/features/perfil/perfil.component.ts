@@ -16,13 +16,13 @@ export class PerfilComponent implements OnInit {
   salvando = false;
   error = '';
   sucesso = false;
-
-  // Dados editáveis
+  fotoFile: File | null = null;
+  fotoPreview: string | null = null;
   nome = '';
   email = '';
   foto: string | null = null;
-  fotoFile: File | null = null;
-  fotoPreview: string | null = null;
+
+  // Dados editáveis
 
   // Trocar senha
   showAlterarSenha = false;
@@ -106,6 +106,11 @@ export class PerfilComponent implements OnInit {
     }
   }
 
+  onFotoError(): void {
+    // A pré-visualização local falhou (ex.: arquivo removido): volta a mostrar a foto salva
+    this.fotoPreview = null;
+  }
+
   removerFoto(): void {
     this.fotoFile = null;
     this.fotoPreview = null;
@@ -132,9 +137,28 @@ export class PerfilComponent implements OnInit {
     this.error = '';
     this.sucesso = false;
 
-    // TODO: Se fotoFile existir, fazer upload primeiro
-    // Por enquanto, vamos apenas atualizar os dados textuais
+    // Se uma foto foi selecionada, faz o upload primeiro e usa a URL retornada
+    if (this.fotoFile) {
+      this.authService.uploadFoto(this.fotoFile).subscribe({
+        next: (res) => {
+          this.foto = res.url;
+          this.fotoFile = null;
+          this.salvarPerfil();
+        },
+        error: (err) => {
+          let msg = err.error?.error || 'Erro ao salvar perfil. Tente novamente.';
+          if (err.status === 413) msg = 'Arquivo muito grande. Tamanho máximo permitido: 15 MB';
+          this.error = msg;
+          this.salvando = false;
+        }
+      });
+      return;
+    }
 
+    this.salvarPerfil();
+  }
+
+  private salvarPerfil(): void {
     const request: AtualizarPerfilRequest = {
       nome: this.nome.trim(),
       email: this.email.trim(),
@@ -144,6 +168,8 @@ export class PerfilComponent implements OnInit {
     this.authService.atualizarPerfil(request).subscribe({
       next: (data) => {
         this.perfil = data;
+        this.foto = data.foto;
+        this.fotoPreview = null;
         this.editando = false;
         this.salvando = false;
         this.sucesso = true;

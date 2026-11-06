@@ -81,18 +81,24 @@ public class UsuarioService implements UserDetailsService {
     public Usuario salvar(Usuario usuario) {
         // Detecta se é uma atualização (já tem ID no banco)
         boolean isNew = usuario.getId() == null;
+        boolean senhaInformada = usuario.getSenha() != null && !usuario.getSenha().isBlank();
         NivelAcesso nivelAnterior = null;
         if (!isNew) {
-            nivelAnterior = usuarioRepository.findById(usuario.getId())
-                    .map(Usuario::getNivel)
-                    .orElse(null);
+            Usuario usuarioExistente = usuarioRepository.findById(usuario.getId()).orElse(null);
+            if (usuarioExistente != null) {
+                nivelAnterior = usuarioExistente.getNivel();
+                usuario.setSenhaTemporaria(usuarioExistente.isSenhaTemporaria());
+                if (!senhaInformada) {
+                    usuario.setSenha(usuarioExistente.getSenha());
+                }
+            }
         }
 
         if (isNew) {
             // Novo usuário: sempre define senha temporária
             usuario.setSenha(passwordEncoder.encode(SENHA_TEMPORARIA));
             usuario.setSenhaTemporaria(true);
-        } else if (usuario.getSenha() != null && !usuario.getSenha().trim().isEmpty()) {
+        } else if (senhaInformada) {
             // Atualização: SOMENTE codifica a senha se foi informada uma nova (texto puro)
             usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
             // Se era temporária, marca como não-temporária

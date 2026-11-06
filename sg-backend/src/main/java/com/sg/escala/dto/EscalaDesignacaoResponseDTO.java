@@ -7,15 +7,21 @@ public record EscalaDesignacaoResponseDTO(
         Long confirmacaoId,
         String nomeIntegrante,
         String instrumento,
-        Integer ordem
+        Integer ordem,
+        String fotoIntegrante
 ) {
-    public static EscalaDesignacaoResponseDTO fromEntity(EscalaDesignacao d) {
+    /**
+     * @param fotoIntegrante URL assinada da foto do integrante (vazia quando não há foto).
+     *                       A assinatura é feita pelo serviço, nunca pelo DTO.
+     */
+    public static EscalaDesignacaoResponseDTO fromEntity(EscalaDesignacao d, String fotoIntegrante) {
         return new EscalaDesignacaoResponseDTO(
                 d.getId(),
                 d.getConfirmacao().getId(),
                 d.getConfirmacao().getNome(),
                 d.getInstrumento(),
-                d.getOrdem()
+                d.getOrdem(),
+                fotoIntegrante != null ? fotoIntegrante : ""
         );
     }
 }

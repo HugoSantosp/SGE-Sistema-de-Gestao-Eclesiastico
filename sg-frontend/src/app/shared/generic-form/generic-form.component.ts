@@ -73,6 +73,14 @@ export class GenericFormComponent implements OnInit {
       const id = this.route.snapshot.params['id'];
       this.http.get<any>(`${this.apiUrl}/${id}`).subscribe({
         next: (d) => { 
+          // Campos de senha nunca podem ser preenchidos com o hash da edição:
+          // ao salvar, uma senha em branco mantém a anterior no backend.
+          const isEdit = this.isEdit;
+          this.fields.forEach(f => {
+            if (f.type === 'password' && isEdit) {
+              d[f.name] = '';
+            }
+          });
           this.formGroup.patchValue(d);
           this.form = d;
           this.loading = false; 
@@ -267,6 +275,16 @@ export class GenericFormComponent implements OnInit {
 
     // Atualiza o objeto form com os valores do formulário
     this.form = { ...this.form, ...this.formGroup.value };
+
+    // Em edição, senha em branco significa "manter a atual": o campo não é enviado,
+    // para o backend não re-criptografar um hash nem invalidar a senha do usuário.
+    if (this.isEdit) {
+      this.fields.forEach(f => {
+        if (f.type === 'password' && !String(this.form[f.name] ?? '').trim()) {
+          delete this.form[f.name];
+        }
+      });
+    }
 
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${this.authService.getToken()}`,

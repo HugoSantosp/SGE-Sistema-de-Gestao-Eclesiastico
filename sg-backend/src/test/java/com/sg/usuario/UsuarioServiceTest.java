@@ -234,17 +234,28 @@ class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Não deve recodificar senha se já estiver em formato BCrypt")
+    @DisplayName("Deve manter senha BCrypt e estado temporário sem nova senha")
     void naoDeveRecodificarSenhaBCrypt() {
-        usuario.setSenha("$2a$10$hashExistenteValido1234567890123456789012345678901234567890");
+        usuario.setSenha(null);
 
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
-        when(tesoureiroRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        String senhaCodificada = "$2a$10$hashExistenteValido1234567890123456789012345678901234567890";
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(Usuario.builder()
+                .id(1L)
+                .senha(senhaCodificada)
+                .nivel(NivelAcesso.TESOUREIRO)
+                .senhaTemporaria(true)
+                .build()));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tesoureiroRepository.findByEmail(anyString())).thenReturn(Optional.of(tesoureiro));
         when(tesoureiroRepository.save(any(Tesoureiro.class))).thenReturn(tesoureiro);
 
         usuarioService.salvar(usuario);
 
         verify(passwordEncoder, never()).encode(anyString());
+        verify(usuarioRepository, times(2)).save(usuarioCaptor.capture());
+        Usuario usuarioSalvo = usuarioCaptor.getAllValues().get(1);
+        assertEquals(senhaCodificada, usuarioSalvo.getSenha());
+        assertTrue(usuarioSalvo.isSenhaTemporaria());
     }
 
     // ===== salvar (atualizar com mudança de role) =====
