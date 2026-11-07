@@ -145,8 +145,14 @@
              [class.empty]="day === null"
              [class.has-event]="hasEvent(day)"
              [class.today]="isToday(day)"
-             [class.selected]="selectedDay === day">
-          <div *ngIf="day !== null" class="day-content" (click)="showDayEvents(day)">
+             [class.selected]="selectedDay === day"
+             [attr.role]="day !== null ? 'button' : null"
+             [attr.tabindex]="day !== null ? 0 : null"
+             [attr.aria-label]="day !== null ? day + ' de ' + monthNames[currentMonth - 1] : null"
+             (click)="onDayClick(day)"
+             (keydown.enter)="onDayClick(day)"
+             (keydown.space)="onDayClick(day); $event.preventDefault()">
+          <div *ngIf="day !== null" class="day-content">
             <span class="day-number">{{ day }}</span>
             <div *ngIf="hasEvent(day)" class="event-dot">
               <i class="bi bi-circle-fill"></i>
@@ -156,27 +162,56 @@
       </div>
     </div>
 
-    <!-- Selected Day Events -->
-    <div *ngIf="selectedDay !== null" class="day-events-panel mt-4">
-      <div class="day-events-header">
-        <strong><i class="bi bi-calendar-event me-2"></i>Eventos do dia {{ selectedDay }}/{{ currentMonth }}/{{ currentYear }}</strong>
-        <button class="btn-close-white" (click)="hideDayEvents()">&times;</button>
-      </div>
-      <div *ngIf="selectedDayEvents.length === 0" class="text-center py-4" style="color:#a0aec0;">
-        <i class="bi bi-emoji-neutral fs-3 mb-2 d-block"></i>
-        <p class="small mb-0">Nenhum evento neste dia</p>
-      </div>
-      <div *ngFor="let evento of selectedDayEvents" class="evento-card mt-3">
-        <div class="evento-date">
-          <span class="evento-month">{{ getMonthName(evento.data) }}</span>
-          <span class="evento-day">{{ getDay(evento.data) }}</span>
+    <!-- Modal de eventos do dia -->
+    <div *ngIf="showDayModal"
+         class="event-modal-overlay"
+         (click)="closeDayEvents()"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="event-modal-title">
+      <div class="event-modal" (click)="$event.stopPropagation()">
+        <div class="event-modal-header">
+          <div class="event-modal-heading">
+            <i class="bi bi-calendar-event"></i>
+            <div>
+              <h3 id="event-modal-title" class="event-modal-title">Eventos do dia</h3>
+              <p class="event-modal-date">{{ getSelectedDateLabel() }}</p>
+            </div>
+          </div>
+          <button type="button" class="event-modal-close"
+                  aria-label="Fechar"
+                  (click)="closeDayEvents()">
+            <i class="bi bi-x-lg"></i>
+          </button>
         </div>
-        <div class="evento-body">
-          <h5 class="fw-bold mb-2" style="color:#1a1a2e;">{{ evento.titulo }}</h5>
-          <p class="small mb-2" style="color:#4a5568;" *ngIf="evento.descricao">{{ evento.descricao }}</p>
-          <div class="d-flex gap-3 small" style="color:#4a5568;">
-            <span *ngIf="evento.hora"><i class="bi bi-clock me-1"></i>{{ evento.hora }}</span>
-            <span *ngIf="evento.local"><i class="bi bi-geo-alt me-1"></i>{{ evento.local }}</span>
+
+        <div class="event-modal-body">
+          <div *ngIf="!eventsLoaded" class="event-modal-empty">
+            <div class="spinner"></div>
+            <p class="small mb-0 mt-2">Carregando eventos...</p>
+          </div>
+
+          <div *ngIf="eventsLoaded && eventsLoadError" class="event-modal-empty">
+            <i class="bi bi-exclamation-circle"></i>
+            <p class="small mb-0">Não foi possível carregar os eventos. Tente novamente mais tarde.</p>
+          </div>
+
+          <div *ngIf="eventsLoaded && !eventsLoadError && selectedDayEvents.length === 0" class="event-modal-empty">
+            <i class="bi bi-emoji-neutral"></i>
+            <p class="small mb-0">Nenhum evento neste dia</p>
+          </div>
+
+          <div *ngFor="let evento of selectedDayEvents" class="event-modal-item">
+            <div class="event-modal-item-time" *ngIf="evento.hora">
+              <i class="bi bi-clock"></i>
+              <span>{{ evento.hora }}</span>
+            </div>
+            <h4 class="event-modal-item-title">{{ evento.titulo }}</h4>
+            <p class="event-modal-item-desc" *ngIf="evento.descricao">{{ evento.descricao }}</p>
+            <div class="event-modal-item-meta" *ngIf="evento.local">
+              <i class="bi bi-geo-alt"></i>
+              <span>{{ evento.local }}</span>
+            </div>
           </div>
         </div>
       </div>

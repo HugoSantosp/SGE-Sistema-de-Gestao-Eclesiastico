@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { getApiUrl } from '../../../core/config/backend-config';
 
@@ -7,7 +7,7 @@ import { getApiUrl } from '../../../core/config/backend-config';
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.scss']
 })
-export class LandingPageComponent implements OnInit {
+export class LandingPageComponent implements OnInit, OnDestroy {
   churchInfo: any = {
     nome: 'ICERT - Agência do Reino de Deus',
     endereco: 'São João de Meriti, RJ',
@@ -30,6 +30,13 @@ export class LandingPageComponent implements OnInit {
   dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   selectedDay: number | null = null;
   selectedDayEvents: any[] = [];
+  /** Eventos agrupados por dia (YYYY-MM-DD), recalculados uma vez por carga. */
+  private eventsByDay: Record<string, any[]> = {};
+  /** Evita exibir "nenhum evento" antes de os dados do mês chegarem. */
+  eventsLoaded = false;
+  eventsLoadError = false;
+  showDayModal = false;
+  private bodyOverflowBeforeModal: string | null = null;
 
   constructor(private http: HttpClient) {
     const now = new Date();
@@ -67,12 +74,22 @@ export class LandingPageComponent implements OnInit {
 
   private loadEvents(): void {
     this.loading = true;
-   this.http.get<any[]>(
-  getApiUrl(`/api/public/eventos?mes=${this.currentMonth}&ano=${this.currentYear}`)
-  ).subscribe({
+    this.eventsLoaded = false;
+    this.eventsLoadError = false;
+    this.http.get<any[]>(
+      getApiUrl(`/api/public/eventos?mes=${this.currentMonth}&ano=${this.currentYear}`)
+    ).subscribe({
       next: (data) => {
-        this.eventos = data;
+        this.eventos = data || [];
+        this.eventsLoaded = true;
         this.buildCalendar();
+      },
+      error: () => {
+        this.eventos = [];
+        this.eventsLoaded = true;
+        this.eventsLoadError = true;
+        this.buildCalendar();
+        this.loading = false;
       },
       complete: () => { this.loading = false; }
     });
@@ -90,29 +107,62 @@ export class LandingPageComponent implements OnInit {
       this.calendarDays.push(day);
     }
 
-    if (this.selectedDay !== null) {
-      this.showDayEvents(this.selectedDay);
+    this.buildEventsIndex();
+
+    // Mantém o modal coerente se os dados do mês chegarem depois do clique.
+    if (this.selectedDay !== null && this.showDayModal) {
+      this.selectedDayEvents = this.getEventsForDay(this.selectedDay);
     }
+  }
+
+  /** Agrupa os eventos por dia uma única vez por carga, em vez de filtrar no template. */
+  private buildEventsIndex(): void {
+    const index: Record<string, any[]> = {};
+    for (const evento of this.eventos) {
+      if (!evento?.data) continue;
+      (index[evento.data] ||= []).push(evento);
+    }
+    this.eventsByDay = index;
   }
 
   getEventsForDay(day: number | null): any[] {
     if (!day) return [];
     const dayStr = `${this.currentYear}-${String(this.currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return this.eventos.filter(e => e.data === dayStr);
+    return this.eventsByDay[dayStr] || [];
   }
 
   hasEvent(day: number | null): boolean {
     return this.getEventsForDay(day).length > 0;
   }
 
-  showDayEvents(day: number): void {
-    this.selectedDay = day;
-    this.selectedDayEvents = this.getEventsForDay(day);
+  /** Clique em qualquer ponto da célula (não só no número/bolinha) abre o modal. */
+  onDayClick(day: number | null): void {
+    if (day === null) return;
+    this.openDayEvents(day);
   }
 
-  hideDayEvents(): void {
+  openDayEvents(day: number): void {
+    this.selectedDay = day;
+    this.selectedDayEvents = this.getEventsForDay(day);
+    if (!this.showDayModal) {
+      this.bodyOverflowBeforeModal = document.body.style.overflow;
+    }
+    this.showDayModal = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeDayEvents(): void {
+    this.showDayModal = false;
     this.selectedDay = null;
     this.selectedDayEvents = [];
+    this.restoreBodyOverflow();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.showDayModal) {
+      this.closeDayEvents();
+    }
   }
 
   previousMonth(): void {
@@ -124,6 +174,8 @@ export class LandingPageComponent implements OnInit {
     }
     this.selectedDay = null;
     this.selectedDayEvents = [];
+    this.showDayModal = false;
+    this.restoreBodyOverflow();
     this.loadEvents();
   }
 
@@ -136,6 +188,8 @@ export class LandingPageComponent implements OnInit {
     }
     this.selectedDay = null;
     this.selectedDayEvents = [];
+    this.showDayModal = false;
+    this.restoreBodyOverflow();
     this.loadEvents();
   }
 
@@ -147,15 +201,24 @@ export class LandingPageComponent implements OnInit {
            this.currentYear === today.getFullYear();
   }
 
-  getMonthName(dateStr: string): string {
-    const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    const d = new Date(dateStr + 'T12:00:00');
-    return months[d.getMonth()];
+  /** Data por extenso do dia selecionado, usada no cabeçalho do modal. */
+  getSelectedDateLabel(): string {
+    if (this.selectedDay === null) return '';
+    const dias = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira',
+                  'quinta-feira', 'sexta-feira', 'sábado'];
+    const d = new Date(this.currentYear, this.currentMonth - 1, this.selectedDay);
+    return `${dias[d.getDay()]}, ${this.selectedDay} de ${this.monthNames[this.currentMonth - 1]} de ${this.currentYear}`;
   }
 
-  getDay(dateStr: string): string {
-    const d = new Date(dateStr + 'T12:00:00');
-    return String(d.getDate()).padStart(2, '0');
+  ngOnDestroy(): void {
+    this.restoreBodyOverflow();
+  }
+
+  private restoreBodyOverflow(): void {
+    if (this.bodyOverflowBeforeModal !== null) {
+      document.body.style.overflow = this.bodyOverflowBeforeModal;
+      this.bodyOverflowBeforeModal = null;
+    }
   }
 
   scrollTo(section: string): void {

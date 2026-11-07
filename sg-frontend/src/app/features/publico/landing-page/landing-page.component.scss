@@ -205,55 +205,6 @@
   object-fit: cover;
 }
 
-/* Evento Cards */
-.evento-card {
-  display: flex;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-
-.evento-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
-  border-color: rgba(249, 115, 22, 0.3);
-}
-
-.evento-date {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 90px;
-  background: rgba(249, 115, 22, 0.06);
-  border-right: 1px solid #e2e8f0;
-  padding: 20px 12px;
-}
-
-.evento-month {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #f97316;
-  letter-spacing: 0.05em;
-}
-
-.evento-day {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #1a1a2e;
-  line-height: 1;
-  margin-top: 4px;
-}
-
-.evento-body {
-  flex: 1;
-  padding: 20px;
-}
-
 /* Schedule Card */
 .schedule-card {
   box-shadow: 0 4px 16px rgba(0,0,0,0.06);
@@ -376,6 +327,11 @@
   box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.25);
 }
 
+.calendar-cell:focus-visible {
+  outline: 2px solid #f97316;
+  outline-offset: 2px;
+}
+
 .calendar-cell.has-event .day-number {
   font-weight: 700;
   color: #1a1a2e;
@@ -385,7 +341,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
+  width: 100%;
+  height: 100%;
 }
 
 .day-number {
@@ -400,50 +359,161 @@
   line-height: 1;
 }
 
-/* Day Events Panel */
-.day-events-panel {
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 20px;
-  animation: fadeSlideIn 0.3s ease;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-}
-
-@keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.day-events-header {
+/* ===== Modal de eventos do dia ===== */
+.event-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+  animation: modalFadeIn 0.18s ease-out;
+}
+
+.event-modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: modalSlideIn 0.22s ease-out;
+}
+
+.event-modal-header {
+  display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  color: #1a1a2e;
-  padding-bottom: 12px;
+  gap: 16px;
+  padding: 20px 22px;
   border-bottom: 1px solid #e2e8f0;
+  background: rgba(249, 115, 22, 0.05);
 }
 
-.day-events-header .btn-close-white {
-  font-size: 0.8rem;
-  opacity: 0.5;
-  cursor: pointer;
-  background: none;
-  border: none;
+.event-modal-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #f97316;
+  font-size: 1.35rem;
+}
+
+.event-modal-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
   color: #1a1a2e;
 }
 
-.day-events-header .btn-close-white:hover {
-  opacity: 1;
+.event-modal-date {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: #4a5568;
+  text-transform: capitalize;
+}
+
+.event-modal-close {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #4a5568;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.event-modal-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1a1a2e;
+}
+
+.event-modal-body {
+  padding: 18px 22px 22px;
+  overflow-y: auto;
+}
+
+.event-modal-empty {
+  text-align: center;
+  padding: 28px 0;
+  color: #a0aec0;
+}
+
+.event-modal-empty i {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.event-modal-item {
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #f97316;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.event-modal-item + .event-modal-item {
+  margin-top: 12px;
+}
+
+.event-modal-item-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #f97316;
+  margin-bottom: 6px;
+}
+
+.event-modal-item-title {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.event-modal-item-desc {
+  margin: 0 0 8px;
+  font-size: 0.88rem;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.event-modal-item-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #4a5568;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 576px) {
+  .event-modal-overlay { padding: 12px; }
+  .event-modal { max-height: 90vh; border-radius: 14px; }
+  .event-modal-header { padding: 16px; }
+  .event-modal-body { padding: 14px 16px 18px; }
 }
 
 /* ===== Section Titles ===== */
