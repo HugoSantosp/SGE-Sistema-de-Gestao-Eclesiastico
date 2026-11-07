@@ -18,8 +18,7 @@ import { ToastService } from '../../services/toast.service';
     <div class="toast-container" *ngIf="toasts.length > 0">
       <div *ngFor="let toast of toasts" 
            class="toast-item"
-           [class]="'toast-' + toast.type"
-           [@slideIn]>
+           [class]="'toast-' + toast.type">
         <div class="toast-icon">
           <i class="bi" [ngClass]="{
             'bi-check-circle-fill': toast.type === 'success',

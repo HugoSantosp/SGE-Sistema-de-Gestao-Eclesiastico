@@ -24,10 +24,10 @@ public class ConfiguracaoController {
         return ResponseEntity.ok(configuracaoService.listarTodas());
     }
 
-    @GetMapping("/{nome}")
-    @Operation(summary = "Buscar configuração por nome")
-    public ResponseEntity<Configuracao> buscarPorNome(@PathVariable String nome) {
-        return ResponseEntity.ok(configuracaoService.buscarPorNome(nome));
+    @GetMapping("/{idOuNome}")
+    @Operation(summary = "Buscar configuração por ID (numérico) ou por nome")
+    public ResponseEntity<Configuracao> buscar(@PathVariable String idOuNome) {
+        return ResponseEntity.ok(configuracaoService.buscarPorIdOuNome(idOuNome));
     }
 
     @PostMapping

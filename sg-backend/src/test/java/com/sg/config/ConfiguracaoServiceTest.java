@@ -49,6 +49,26 @@ class ConfiguracaoServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> configuracaoService.buscarPorNome("inexistente"));
     }
 
+    @Test @DisplayName("Deve buscar configuração por ID quando o valor é numérico")
+    void deveBuscarPorIdQuandoNumerico() {
+        when(configuracaoRepository.findById(1L)).thenReturn(Optional.of(config));
+        assertEquals("Igreja Sede", configuracaoService.buscarPorIdOuNome("1").getValor());
+        verify(configuracaoRepository, never()).findByNome(any());
+    }
+
+    @Test @DisplayName("Deve buscar por nome quando o valor não é numérico")
+    void deveBuscarPorNomeQuandoNaoNumerico() {
+        when(configuracaoRepository.findByNome("nome_igreja")).thenReturn(Optional.of(config));
+        assertEquals("Igreja Sede", configuracaoService.buscarPorIdOuNome("nome_igreja").getValor());
+        verify(configuracaoRepository, never()).findById(any());
+    }
+
+    @Test @DisplayName("Deve lançar exceção ao buscar por ID inexistente")
+    void deveLancarExcecaoAoBuscarPorIdInexistente() {
+        when(configuracaoRepository.findById(99L)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> configuracaoService.buscarPorIdOuNome("99"));
+    }
+
     @Test @DisplayName("Deve salvar configuração")
     void deveSalvar() {
         when(configuracaoRepository.save(any(Configuracao.class))).thenAnswer(i -> i.getArgument(0));
