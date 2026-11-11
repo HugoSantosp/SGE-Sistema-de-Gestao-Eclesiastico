@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,18 +24,21 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @GetMapping
     @Operation(summary = "Listar usuários")
     public ResponseEntity<List<UsuarioResponseDTO>> listar() {
         return ResponseEntity.ok(usuarioService.listarTodosDTO());
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @GetMapping("/{id}")
     @Operation(summary = "Buscar usuário por ID")
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.buscarPorIdDTO(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PostMapping
     @Operation(summary = "Criar novo usuário")
     public ResponseEntity<UsuarioResponseDTO> criar(@RequestBody @Valid UsuarioRequestDTO dto) {
@@ -43,6 +47,7 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.entityToDTO(saved));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar usuário")
     public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid UsuarioRequestDTO dto) {
@@ -52,6 +57,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.entityToDTO(updated));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar usuário")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
@@ -59,6 +65,7 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PostMapping("/{id}/resetar-senha")
     @Operation(summary = "Resetar senha para temporária",
                description = "Redefine a senha do usuário para '12345678' e marca como senha temporária (obriga troca no próximo login)")

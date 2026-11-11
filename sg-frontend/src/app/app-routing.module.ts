@@ -31,75 +31,109 @@ const routes: Routes = [
         loadChildren: () => import('./features/auth/perfil/perfil.module').then(m => m.PerfilModule)
       },
       {
+        path: 'sem-acesso',
+        loadComponent: () => import('./features/sem-acesso/sem-acesso.component').then(m => m.SemAcessoComponent)
+      },
+      {
         path: 'dashboard',
         loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule)
       },
       {
         path: 'membros',
-        loadChildren: () => import('./features/membros/membros.module').then(m => m.MembrosModule)
+        loadChildren: () => import('./features/membros/membros.module').then(m => m.MembrosModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] }
       },
       {
         path: 'bispos',
-        loadChildren: () => import('./features/bispos/bispos.module').then(m => m.BisposModule)
+        loadChildren: () => import('./features/bispos/bispos.module').then(m => m.BisposModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] }
       },
       {
         path: 'presbiteros',
-        loadChildren: () => import('./features/presbiteros/presbiteros.module').then(m => m.PresbiterosModule)
+        loadChildren: () => import('./features/presbiteros/presbiteros.module').then(m => m.PresbiterosModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] }
       },
       {
         path: 'tesoureiros',
-        loadChildren: () => import('./features/tesoureiros/tesoureiros.module').then(m => m.TesoureirosModule)
+        loadChildren: () => import('./features/tesoureiros/tesoureiros.module').then(m => m.TesoureirosModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] }
       },
       {
         path: 'secretarios',
-        loadChildren: () => import('./features/secretarios/secretarios.module').then(m => m.SecretariosModule)
+        loadChildren: () => import('./features/secretarios/secretarios.module').then(m => m.SecretariosModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] }
       },
       {
         path: 'cargos',
-        loadChildren: () => import('./features/cargos/cargos.module').then(m => m.CargosModule)
+        loadChildren: () => import('./features/cargos/cargos.module').then(m => m.CargosModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] }
       },
       {
         path: 'fornecedores',
-        loadChildren: () => import('./features/fornecedores/fornecedores.module').then(m => m.FornecedoresModule)
+        loadChildren: () => import('./features/fornecedores/fornecedores.module').then(m => m.FornecedoresModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] }
       },
       {
         path: 'financeiro',
-        loadChildren: () => import('./features/financeiro/financeiro.module').then(m => m.FinanceiroModule)
+        loadChildren: () => import('./features/financeiro/financeiro.module').then(m => m.FinanceiroModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] }
       },
       {
         path: 'tarefas',
-        loadChildren: () => import('./features/tarefas/tarefas.module').then(m => m.TarefasModule)
+        loadChildren: () => import('./features/tarefas/tarefas.module').then(m => m.TarefasModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] }
       },
       {
         path: 'notificacoes',
-        loadChildren: () => import('./features/notificacoes/notificacoes.module').then(m => m.NotificacoesModule)
+        loadChildren: () => import('./features/notificacoes/notificacoes.module').then(m => m.NotificacoesModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO', 'SECRETARIO'] }
       },
       {
         path: 'configuracoes',
-        loadChildren: () => import('./features/configuracoes/configuracoes.module').then(m => m.ConfiguracoesModule)
+        loadChildren: () => import('./features/configuracoes/configuracoes.module').then(m => m.ConfiguracoesModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] }
       },
       {
         path: 'usuarios',
         loadChildren: () => import('./features/usuarios/usuarios.module').then(m => m.UsuariosModule),
         canActivate: [RoleGuard],
-        data: { roles: ['PASTOR_PRESIDENTE'] }
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] }
       },
       // Admin CRUD routes (under /admin/ prefix to avoid conflict with public pages)
       {
         path: 'admin/ministerios',
-        loadChildren: () => import('./features/ministerios/ministerios.module').then(m => m.MinisteriosModule)
+        loadChildren: () => import('./features/ministerios/ministerios.module').then(m => m.MinisteriosModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO', 'SECRETARIO'] }
       },
       {
         path: 'admin/celulas',
-        loadChildren: () => import('./features/celulas/celulas.module').then(m => m.CelulasModule)
+        loadChildren: () => import('./features/celulas/celulas.module').then(m => m.CelulasModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] }
       },
       {
         path: 'admin/profissionais',
-        loadChildren: () => import('./features/profissionais/profissionais.module').then(m => m.ProfissionaisModule)
+        loadChildren: () => import('./features/profissionais/profissionais.module').then(m => m.ProfissionaisModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] }
       },
       {
         path: 'eventos',
-        loadChildren: () => import('./features/eventos/eventos.module').then(m => m.EventosModule)
+        loadChildren: () => import('./features/eventos/eventos.module').then(m => m.EventosModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO', 'SECRETARIO'] }
       },
       // NOTA: as Escalas de Louvor foram movidas para o app MeuMinistério
       // (icertag.com.br/SGE-MeuMinisterio) — o líder do ministério cria e

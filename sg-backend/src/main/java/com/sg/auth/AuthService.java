@@ -133,7 +133,8 @@ public class AuthService {
         usuario.setEmail(request.email());
 
         if (request.foto() != null) {
-            usuario.setFoto(request.foto());
+            // String vazia = remoção explícita; null = não alterar a foto atual
+            usuario.setFoto(request.foto().isBlank() ? null : request.foto());
         }
 
         usuario = usuarioRepository.save(usuario);

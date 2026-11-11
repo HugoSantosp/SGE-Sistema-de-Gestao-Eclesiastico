@@ -96,13 +96,13 @@ public class SecurityConfig {
                                 "/api-docs/**",
                                 "/webjars/**"
                         ).permitAll()
-                        // Actuator - apenas health público, outros requerem ADMIN
+                        // Actuator - apenas health público, outros requerem Presidente
                         .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/actuator/**").hasRole("ADMIN")
+                        .requestMatchers("/actuator/**").hasRole("PASTOR_PRESIDENTE")
                         // Arquivos estáticos (uploads)
                         .requestMatchers("/api/uploads/**").permitAll()
                         // Endpoints de admin
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasAnyRole("PASTOR_PRESIDENTE", "PASTOR_AUXILIAR")
                         // Qualquer outro endpoint requer autenticação
                         .anyRequest().authenticated()
                 )

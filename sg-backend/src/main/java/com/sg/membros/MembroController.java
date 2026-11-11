@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -21,18 +22,21 @@ public class MembroController {
         this.membroService = membroService;
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO','MEMBRO')")
     @GetMapping
     @Operation(summary = "Listar membros")
     public ResponseEntity<List<Membro>> listar() {
         return ResponseEntity.ok(membroService.listarTodos());
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO','MEMBRO')")
     @GetMapping("/{id}")
     @Operation(summary = "Buscar membro por ID")
     public ResponseEntity<Membro> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(membroService.buscarPorId(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO','MEMBRO')")
     @GetMapping("/estatisticas")
     @Operation(summary = "Obter estatísticas de membros")
     public ResponseEntity<Map<String, Long>> estatisticas() {
@@ -43,18 +47,21 @@ public class MembroController {
         ));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO')")
     @PostMapping
     @Operation(summary = "Criar novo membro")
     public ResponseEntity<Membro> criar(@RequestBody @Valid MembroRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(membroService.salvar(toEntity(dto)));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO')")
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar membro")
     public ResponseEntity<Membro> atualizar(@PathVariable Long id, @RequestBody @Valid MembroRequestDTO dto) {
         return ResponseEntity.ok(membroService.atualizar(id, toEntity(dto)));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO')")
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar membro")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {

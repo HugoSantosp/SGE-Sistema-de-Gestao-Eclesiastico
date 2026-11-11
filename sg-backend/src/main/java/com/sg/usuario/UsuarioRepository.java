@@ -29,5 +29,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     boolean existsByEmail(String email);
 
+    /** Existe algum usuário com este documento? */
+    boolean existsByDocumento(String documento);
+
+    /** Existe outro usuário (id diferente) com este documento? */
+    boolean existsByDocumentoAndIdNot(String documento, Long id);
+
     List<Usuario> findByNivelIn(List<NivelAcesso> niveis);
 }

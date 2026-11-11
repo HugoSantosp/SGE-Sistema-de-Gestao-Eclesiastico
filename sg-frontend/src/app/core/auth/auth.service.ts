@@ -76,6 +76,8 @@ export class AuthService {
       case 'PASTOR_AUXILIAR': return '/dashboard/pastor';
       case 'TESOUREIRO': return '/dashboard/tesoureiro';
       case 'SECRETARIO': return '/dashboard/secretario';
+      // MEMBRO não usa o admin: só o app Meu Ministério.
+      case 'MEMBRO': return '/sem-acesso';
       default: return '/dashboard';
     }
   }

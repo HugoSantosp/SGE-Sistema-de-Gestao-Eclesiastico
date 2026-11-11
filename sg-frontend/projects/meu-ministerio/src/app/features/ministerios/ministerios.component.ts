@@ -16,6 +16,8 @@ export class MinisteriosComponent implements OnInit {
   error = '';
   userName = '';
   isPastor = false;
+  /** Membro sem vínculo a nenhum ministério: não acessa nada além do aviso. */
+  semVinculo = false;
 
   /** Helper de template para rótulos de papel */
   papelLabel = papelMinisterioLabel;
@@ -42,6 +44,7 @@ export class MinisteriosComponent implements OnInit {
         // Pastores têm acesso ampliado: gerenciam qualquer ministério.
         // Membros só gerenciam onde possuem papel LIDER.
         this.liderados = this.isPastor ? lista : lista.filter(m => m.papel === 'LIDER');
+        this.semVinculo = !this.isPastor && lista.length === 0;
         this.loading = false;
       },
       error: () => {

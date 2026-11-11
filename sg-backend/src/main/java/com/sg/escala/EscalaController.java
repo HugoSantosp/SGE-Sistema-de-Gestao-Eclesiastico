@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,24 +25,28 @@ public class EscalaController {
 
     // ===== ESCALAS =====
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO','MEMBRO')")
     @GetMapping
     @Operation(summary = "Listar todas as escalas")
     public ResponseEntity<List<EscalaResponseDTO>> listar() {
         return ResponseEntity.ok(escalaService.listar());
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO','MEMBRO')")
     @GetMapping("/{id}")
     @Operation(summary = "Buscar escala por ID (completa: datas + confirmações + designações + músicas)")
     public ResponseEntity<EscalaDetalhadaResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(escalaService.buscarPorId(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PostMapping
     @Operation(summary = "Criar nova escala")
     public ResponseEntity<EscalaResponseDTO> criar(@RequestBody @Valid EscalaRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(escalaService.criar(dto));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PatchMapping("/{id}/toggle")
     @Operation(summary = "Abrir/fechar escala para confirmações")
     public ResponseEntity<Void> toggleEscala(@PathVariable Long id) {
@@ -49,6 +54,7 @@ public class EscalaController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar escala")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
@@ -56,6 +62,7 @@ public class EscalaController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PostMapping("/{id}/gerar-link")
     @Operation(summary = "Gerar (ou obter) link público do resultado da escala")
     public ResponseEntity<Map<String, String>> gerarLinkResultado(@PathVariable Long id) {
@@ -65,6 +72,7 @@ public class EscalaController {
 
     // ===== DATAS =====
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PostMapping("/{escalaId}/datas")
     @Operation(summary = "Adicionar data a uma escala")
     public ResponseEntity<EscalaDataDTO> adicionarData(
@@ -74,6 +82,7 @@ public class EscalaController {
                 .body(escalaService.adicionarData(escalaId, dto));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @DeleteMapping("/{escalaId}/datas/{dataId}")
     @Operation(summary = "Remover data de uma escala")
     public ResponseEntity<Void> removerData(
@@ -85,6 +94,7 @@ public class EscalaController {
 
     // ===== DESIGNAÇÕES (montagem) =====
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO','MEMBRO')")
     @GetMapping("/{escalaId}/datas/{dataId}/designacoes")
     @Operation(summary = "Listar designações de uma data")
     public ResponseEntity<List<EscalaDesignacaoResponseDTO>> listarDesignacoes(
@@ -93,6 +103,7 @@ public class EscalaController {
         return ResponseEntity.ok(escalaService.listarDesignacoes(dataId));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PostMapping("/{escalaId}/datas/{dataId}/designacoes")
     @Operation(summary = "Salvar designações (montagem) para uma data")
     public ResponseEntity<Void> salvarDesignacoes(
@@ -105,6 +116,7 @@ public class EscalaController {
 
     // ===== MÚSICAS (repertório) =====
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO','MEMBRO')")
     @GetMapping("/{escalaId}/datas/{dataId}/musicas")
     @Operation(summary = "Listar músicas de uma data")
     public ResponseEntity<List<EscalaMusicaDTO>> listarMusicas(
@@ -113,6 +125,7 @@ public class EscalaController {
         return ResponseEntity.ok(escalaService.listarMusicas(dataId));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PostMapping("/{escalaId}/datas/{dataId}/musicas")
     @Operation(summary = "Salvar músicas (repertório) para uma data")
     public ResponseEntity<Void> salvarMusicas(
@@ -125,6 +138,7 @@ public class EscalaController {
 
     // ===== INSTRUMENTOS =====
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO','MEMBRO')")
     @GetMapping("/instrumentos")
     @Operation(summary = "Listar instrumentos disponíveis para designação")
     public ResponseEntity<List<String>> listarInstrumentos() {

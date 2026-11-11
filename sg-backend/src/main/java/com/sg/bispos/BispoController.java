@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,18 +23,21 @@ public class BispoController {
         this.bispoService = bispoService;
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @GetMapping
     @Operation(summary = "Listar todos os bispos")
     public ResponseEntity<List<Bispo>> listar() {
         return ResponseEntity.ok(bispoService.listarTodos());
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @GetMapping("/{id}")
     @Operation(summary = "Buscar bispo por ID")
     public ResponseEntity<Bispo> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(bispoService.buscarPorId(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PostMapping
     @Operation(summary = "Criar novo bispo")
     public ResponseEntity<Bispo> criar(@RequestBody @Valid BispoRequestDTO dto) {
@@ -41,6 +45,7 @@ public class BispoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(bispoService.salvar(bispo));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar bispo")
     public ResponseEntity<Bispo> atualizar(@PathVariable Long id, @RequestBody @Valid BispoRequestDTO dto) {
@@ -48,6 +53,7 @@ public class BispoController {
         return ResponseEntity.ok(bispoService.atualizar(id, bispo));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar bispo")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {

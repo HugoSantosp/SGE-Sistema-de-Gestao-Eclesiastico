@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -20,30 +21,35 @@ public class TesoureiroController {
         this.tesoureiroService = tesoureiroService;
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @GetMapping
     @Operation(summary = "Listar tesoureiros")
     public ResponseEntity<List<Tesoureiro>> listar() {
         return ResponseEntity.ok(tesoureiroService.listarTodos());
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @GetMapping("/{id}")
     @Operation(summary = "Buscar tesoureiro por ID")
     public ResponseEntity<Tesoureiro> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(tesoureiroService.buscarPorId(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PostMapping
     @Operation(summary = "Criar novo tesoureiro")
     public ResponseEntity<Tesoureiro> criar(@RequestBody @Valid TesoureiroRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(tesoureiroService.salvar(toEntity(dto)));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar tesoureiro")
     public ResponseEntity<Tesoureiro> atualizar(@PathVariable Long id, @RequestBody @Valid TesoureiroRequestDTO dto) {
         return ResponseEntity.ok(tesoureiroService.atualizar(id, toEntity(dto)));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar tesoureiro")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {

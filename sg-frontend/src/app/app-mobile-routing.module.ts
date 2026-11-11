@@ -75,7 +75,7 @@ const routes: Routes = [
         path: 'usuarios',
         loadChildren: () => import('./features/usuarios/usuarios.module').then(m => m.UsuariosModule),
         canActivate: [RoleGuard],
-        data: { roles: ['PASTOR_PRESIDENTE'] }
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] }
       },
       // Admin CRUD routes
       {

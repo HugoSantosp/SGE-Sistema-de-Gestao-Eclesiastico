@@ -27,14 +27,14 @@ const routes: Routes = [
       title: 'Usuários', api: '/api/usuarios', icon: 'bi-people-fill',
       columns: ['nome', 'email', 'nivel', 'senhaTemporaria'],
       extraActions,
-      roles: ['PASTOR_PRESIDENTE']
+      roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR']
     }
   },
   {
     path: 'novo',
     component: GenericFormComponent,
     canActivate: [RoleGuard],
-    data: { title: 'Usuário', api: '/api/usuarios', roles: ['PASTOR_PRESIDENTE'], fields: [
+    data: { title: 'Usuário', api: '/api/usuarios', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'], fields: [
       { name: 'nome', label: 'Nome', type: 'text', required: true },
       { name: 'email', label: 'Email', type: 'email', required: true },
       { name: 'documento', label: 'Documento (CPF/RG — vincula o login ao cadastro de membro)', type: 'text', required: true },
@@ -52,7 +52,7 @@ const routes: Routes = [
     path: 'editar/:id',
     component: GenericFormComponent,
     canActivate: [RoleGuard],
-    data: { title: 'Usuário', api: '/api/usuarios', isEdit: true, roles: ['PASTOR_PRESIDENTE'], fields: [
+    data: { title: 'Usuário', api: '/api/usuarios', isEdit: true, roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'], fields: [
       { name: 'nome', label: 'Nome', type: 'text', required: true },
       { name: 'email', label: 'Email', type: 'email', required: true },
       { name: 'senha', label: 'Senha (deixe vazio para manter)', type: 'password' },

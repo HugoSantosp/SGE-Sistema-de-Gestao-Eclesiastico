@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -69,6 +70,14 @@ public class GlobalExceptionHandler {
         log.warn("Upload recusado: tamanho máximo excedido");
         return buildResponse(HttpStatus.PAYLOAD_TOO_LARGE,
                 "Arquivo muito grande. Tamanho máximo permitido: 15 MB");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
+        // Sem este handler o 403 do @PreAuthorize caía no handler genérico e virava 500.
+        log.warn("Acesso negado: {}", ex.getMessage());
+        return buildResponse(HttpStatus.FORBIDDEN,
+                "Acesso negado para o seu perfil de usuário.");
     }
 
     @ExceptionHandler(Exception.class)

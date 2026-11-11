@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,24 +20,28 @@ public class MinisterioController {
         this.ministerioService = ministerioService;
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO')")
     @GetMapping
     @Operation(summary = "Listar ministérios")
     public ResponseEntity<List<Ministerio>> listar() {
         return ResponseEntity.ok(ministerioService.listarTodos());
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO')")
     @GetMapping("/{id}")
     @Operation(summary = "Buscar ministério por ID")
     public ResponseEntity<Ministerio> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(ministerioService.buscarPorId(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO')")
     @PostMapping
     @Operation(summary = "Criar novo ministério")
     public ResponseEntity<Ministerio> criar(@RequestBody Ministerio ministerio) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ministerioService.salvar(ministerio));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO')")
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar ministério")
     public ResponseEntity<Ministerio> atualizar(@PathVariable Long id, @RequestBody Ministerio ministerio) {
@@ -44,6 +49,7 @@ public class MinisterioController {
         return ResponseEntity.ok(ministerioService.salvar(ministerio));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO')")
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar ministério")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {

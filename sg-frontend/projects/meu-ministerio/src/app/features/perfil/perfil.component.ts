@@ -18,6 +18,8 @@ export class PerfilComponent implements OnInit {
   sucesso = false;
   fotoFile: File | null = null;
   fotoPreview: string | null = null;
+  /** Marca que o usuário pediu para remover a foto salva (enviado como string vazia). */
+  fotoRemovida = false;
   nome = '';
   email = '';
   foto: string | null = null;
@@ -77,6 +79,7 @@ export class PerfilComponent implements OnInit {
     }
     this.fotoFile = null;
     this.fotoPreview = null;
+    this.fotoRemovida = false;
     this.editando = false;
     this.error = '';
   }
@@ -96,6 +99,7 @@ export class PerfilComponent implements OnInit {
         return;
       }
       this.fotoFile = file;
+      this.fotoRemovida = false;
       // Preview
       const reader = new FileReader();
       reader.onload = (e: any) => {
@@ -115,6 +119,7 @@ export class PerfilComponent implements OnInit {
     this.fotoFile = null;
     this.fotoPreview = null;
     this.foto = null;
+    this.fotoRemovida = true;
   }
 
   salvar(): void {
@@ -162,7 +167,8 @@ export class PerfilComponent implements OnInit {
     const request: AtualizarPerfilRequest = {
       nome: this.nome.trim(),
       email: this.email.trim(),
-      foto: this.foto
+      // String vazia = remoção explícita; undefined = não alterar a foto atual
+      foto: this.fotoRemovida ? '' : (this.foto ?? undefined)
     };
 
     this.authService.atualizarPerfil(request).subscribe({

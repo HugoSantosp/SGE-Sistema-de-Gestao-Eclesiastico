@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -20,18 +21,21 @@ public class PresbiteroController {
         this.presbiteroService = presbiteroService;
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @GetMapping
     @Operation(summary = "Listar presbíteros")
     public ResponseEntity<List<Presbitero>> listar() {
         return ResponseEntity.ok(presbiteroService.listarTodos());
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @GetMapping("/{id}")
     @Operation(summary = "Buscar presbítero por ID")
     public ResponseEntity<Presbitero> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(presbiteroService.buscarPorId(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PostMapping
     @Operation(summary = "Criar novo presbítero")
     public ResponseEntity<Presbitero> criar(@RequestBody @Valid PresbiteroRequestDTO dto) {
@@ -39,12 +43,14 @@ public class PresbiteroController {
         return ResponseEntity.status(HttpStatus.CREATED).body(presbiteroService.salvar(presbitero));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar presbítero")
     public ResponseEntity<Presbitero> atualizar(@PathVariable Long id, @RequestBody @Valid PresbiteroRequestDTO dto) {
         return ResponseEntity.ok(presbiteroService.atualizar(id, toEntity(dto)));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar presbítero")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {

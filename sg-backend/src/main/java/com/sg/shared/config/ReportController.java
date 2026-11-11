@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -54,6 +55,7 @@ public class ReportController {
         this.escalaRepository = escalaRepository;
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO')")
     @GetMapping("/members/pdf")
     @Operation(summary = "Gerar relatório de membros em PDF")
     public ResponseEntity<byte[]> generateMembersPdf() {
@@ -73,6 +75,7 @@ public class ReportController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO')")
     @GetMapping("/members/excel")
     @Operation(summary = "Gerar relatório de membros em Excel")
     public ResponseEntity<byte[]> generateMembersExcel() {
@@ -104,6 +107,7 @@ public class ReportController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO')")
     @GetMapping("/finance/pdf")
     @Operation(summary = "Gerar relatório financeiro em PDF")
     public ResponseEntity<byte[]> generateFinancePdf() {
@@ -125,6 +129,7 @@ public class ReportController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO')")
     @GetMapping("/schedule/pdf")
     @Operation(summary = "Gerar relatório de escalas em PDF")
     public ResponseEntity<byte[]> generateSchedulePdf() {
@@ -145,6 +150,7 @@ public class ReportController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO')")
     @GetMapping("/schedule/excel")
     @Operation(summary = "Gerar relatório de escalas em Excel")
     public ResponseEntity<byte[]> generateScheduleExcel() {
@@ -175,6 +181,7 @@ public class ReportController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO')")
     @GetMapping("/available")
     @Operation(summary = "Listar relatórios disponíveis")
     public ResponseEntity<List<Map<String, String>>> getAvailableReports() {

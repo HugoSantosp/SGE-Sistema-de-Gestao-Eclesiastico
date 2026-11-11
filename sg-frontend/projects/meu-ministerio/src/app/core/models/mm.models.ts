@@ -35,7 +35,8 @@ export interface PerfilResponse {
 export interface AtualizarPerfilRequest {
   nome: string;
   email: string;
-  foto: string | null;
+  /** '' remove a foto; undefined mantém a atual. */
+  foto?: string | null;
 }
 
 // ===== MeuMinisterio =====

@@ -58,7 +58,7 @@
         <div class="avatar-info">
           <h2 class="user-name">{{ perfil.nome }}</h2>
           <span class="user-badge badge badge-orange">{{ perfil.nivel }}</span>
-          <button *ngIf="fotoPreview && editando" 
+          <button *ngIf="editando && (fotoPreview || foto)"
                   type="button" 
                   class="btn btn-sm btn-outline-danger mt-2"
                   (click)="removerFoto()">

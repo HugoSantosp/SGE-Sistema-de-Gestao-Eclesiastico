@@ -11,6 +11,7 @@ import com.sg.secretarios.Secretario;
 import com.sg.secretarios.SecretarioRepository;
 import com.sg.shared.enums.NivelAcesso;
 import com.sg.shared.enums.StatusMembro;
+import com.sg.shared.exceptions.BusinessException;
 import com.sg.shared.exceptions.ResourceNotFoundException;
 import com.sg.tesoureiros.Tesoureiro;
 import com.sg.tesoureiros.TesoureiroRepository;
@@ -77,10 +78,36 @@ public class UsuarioService implements UserDetailsService {
 
     private static final String SENHA_TEMPORARIA = "12345678";
 
+    /**
+     * Impede dois usuários com o mesmo documento.
+     *
+     * A comparação ignora pontuação (123.456.789-00 == 12345678900), porque o mesmo
+     * CPF digitado de formas diferentes passaria pela checagem. Documento vazio não
+     * é validado: o campo é opcional.
+     */
+    private void validarDocumentoUnico(Usuario usuario) {
+        String documento = normalizarDocumento(usuario.getDocumento());
+        if (documento.isEmpty()) {
+            return;
+        }
+        boolean duplicado = usuario.getId() == null
+                ? usuarioRepository.existsByDocumento(documento)
+                : usuarioRepository.existsByDocumentoAndIdNot(documento, usuario.getId());
+        if (duplicado) {
+            throw new BusinessException("Já existe um usuário cadastrado com este documento.");
+        }
+        usuario.setDocumento(documento);
+    }
+
+    private String normalizarDocumento(String documento) {
+        return documento == null ? "" : documento.replaceAll("[^0-9A-Za-z]", "");
+    }
+
     @Transactional
     public Usuario salvar(Usuario usuario) {
         // Detecta se é uma atualização (já tem ID no banco)
         boolean isNew = usuario.getId() == null;
+        validarDocumentoUnico(usuario);
         boolean senhaInformada = usuario.getSenha() != null && !usuario.getSenha().isBlank();
         NivelAcesso nivelAnterior = null;
         if (!isNew) {

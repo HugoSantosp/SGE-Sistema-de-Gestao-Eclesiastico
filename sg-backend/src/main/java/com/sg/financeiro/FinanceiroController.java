@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -22,30 +23,35 @@ public class FinanceiroController {
     }
 
     // ------ CONTAS A PAGAR ------
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @GetMapping("/contas-pagar")
     @Operation(summary = "Listar contas a pagar")
     public ResponseEntity<List<ContaPagar>> listarContasPagar() {
         return ResponseEntity.ok(financeiroService.listarContasPagar());
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @GetMapping("/contas-pagar/{id}")
     @Operation(summary = "Buscar conta a pagar por ID")
     public ResponseEntity<ContaPagar> buscarContaPagar(@PathVariable Long id) {
         return ResponseEntity.ok(financeiroService.buscarContaPagar(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
     @PostMapping("/contas-pagar")
     @Operation(summary = "Criar conta a pagar")
     public ResponseEntity<ContaPagar> criarContaPagar(@RequestBody @Valid ContaPagarRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(financeiroService.salvarContaPagar(toEntity(dto)));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
     @PatchMapping("/contas-pagar/{id}/baixar")
     @Operation(summary = "Baixar conta a pagar")
     public ResponseEntity<ContaPagar> baixarContaPagar(@PathVariable Long id) {
         return ResponseEntity.ok(financeiroService.baixarContaPagar(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
     @DeleteMapping("/contas-pagar/{id}")
     @Operation(summary = "Deletar conta a pagar")
     public ResponseEntity<Void> deletarContaPagar(@PathVariable Long id) {
@@ -54,30 +60,35 @@ public class FinanceiroController {
     }
 
     // ------ CONTAS A RECEBER ------
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @GetMapping("/contas-receber")
     @Operation(summary = "Listar contas a receber")
     public ResponseEntity<List<ContaReceber>> listarContasReceber() {
         return ResponseEntity.ok(financeiroService.listarContasReceber());
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @GetMapping("/contas-receber/{id}")
     @Operation(summary = "Buscar conta a receber por ID")
     public ResponseEntity<ContaReceber> buscarContaReceber(@PathVariable Long id) {
         return ResponseEntity.ok(financeiroService.buscarContaReceber(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
     @PostMapping("/contas-receber")
     @Operation(summary = "Criar conta a receber")
     public ResponseEntity<ContaReceber> criarContaReceber(@RequestBody @Valid ContaReceberRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(financeiroService.salvarContaReceber(toEntity(dto)));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
     @PatchMapping("/contas-receber/{id}/receber")
     @Operation(summary = "Receber conta")
     public ResponseEntity<ContaReceber> receberConta(@PathVariable Long id) {
         return ResponseEntity.ok(financeiroService.receberConta(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
     @DeleteMapping("/contas-receber/{id}")
     @Operation(summary = "Deletar conta a receber")
     public ResponseEntity<Void> deletarContaReceber(@PathVariable Long id) {

@@ -28,29 +28,29 @@ export class SidebarComponent implements OnInit {
   menuItems: MenuItem[] = [];
 
   private allMenuItems: MenuItem[] = [
-    { label: 'Dashboard', icon: 'bi-grid', route: '/dashboard' },
-    { label: 'Meu Perfil', icon: 'bi-person-circle', route: '/perfil' },
+    { label: 'Dashboard', icon: 'bi-grid', route: '/dashboard', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO', 'SECRETARIO'] },
+    { label: 'Meu Perfil', icon: 'bi-person-circle', route: '/perfil', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO', 'SECRETARIO'] },
     {
       label: 'Pessoas', icon: 'bi-people', expanded: false,
       roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'],
       children: [
-        { label: 'Bispos', icon: 'bi-person-badge', route: '/bispos', roles: ['PASTOR_PRESIDENTE'] },
+        { label: 'Bispos', icon: 'bi-person-badge', route: '/bispos', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
         { label: 'Presbíteros', icon: 'bi-person-check', route: '/presbiteros', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
         { label: 'Tesoureiros', icon: 'bi-wallet2', route: '/tesoureiros', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
         { label: 'Secretários', icon: 'bi-journal-text', route: '/secretarios', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
         { label: 'Membros', icon: 'bi-person-lines-fill', route: '/membros', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
-        { label: 'Usuários', icon: 'bi-people-fill', route: '/usuarios', roles: ['PASTOR_PRESIDENTE'] },
+        { label: 'Usuários', icon: 'bi-people-fill', route: '/usuarios', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
       ]
     },
     {
       label: 'Cadastros', icon: 'bi-book', expanded: false,
-      roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'],
+      roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'],
       children: [
-        { label: 'Cargos', icon: 'bi-tags', route: '/cargos', roles: ['PASTOR_PRESIDENTE'] },
-        { label: 'Ministérios', icon: 'bi-layers', route: '/admin/ministerios', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
-        { label: 'Células', icon: 'bi-people', route: '/admin/celulas', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
-        { label: 'Mural', icon: 'bi-briefcase', route: '/admin/profissionais', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
-        { label: 'Fornecedores', icon: 'bi-truck', route: '/fornecedores', roles: ['PASTOR_PRESIDENTE', 'TESOUREIRO'] },
+        { label: 'Cargos', icon: 'bi-tags', route: '/cargos', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
+        { label: 'Ministérios', icon: 'bi-layers', route: '/admin/ministerios', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
+        { label: 'Células', icon: 'bi-people', route: '/admin/celulas', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
+        { label: 'Mural', icon: 'bi-briefcase', route: '/admin/profissionais', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
+        { label: 'Fornecedores', icon: 'bi-truck', route: '/fornecedores', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
       ]
     },
     {
@@ -63,8 +63,8 @@ export class SidebarComponent implements OnInit {
     },
     { label: 'Eventos', icon: 'bi-calendar-event', route: '/eventos', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
     { label: 'Tarefas', icon: 'bi-check2-square', route: '/tarefas', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
-    { label: 'Notificações', icon: 'bi-bell', route: '/notificacoes', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
-    { label: 'Configurações', icon: 'bi-gear', route: '/configuracoes', roles: ['PASTOR_PRESIDENTE'] },
+    { label: 'Notificações', icon: 'bi-bell', route: '/notificacoes', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO', 'SECRETARIO'] },
+    { label: 'Configurações', icon: 'bi-gear', route: '/configuracoes', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
   ];
 
   constructor(

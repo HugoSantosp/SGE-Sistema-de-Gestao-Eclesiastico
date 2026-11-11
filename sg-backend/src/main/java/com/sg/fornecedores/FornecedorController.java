@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -20,30 +21,35 @@ public class FornecedorController {
         this.fornecedorService = fornecedorService;
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @GetMapping
     @Operation(summary = "Listar fornecedores")
     public ResponseEntity<List<Fornecedor>> listar() {
         return ResponseEntity.ok(fornecedorService.listarTodos());
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @GetMapping("/{id}")
     @Operation(summary = "Buscar fornecedor por ID")
     public ResponseEntity<Fornecedor> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(fornecedorService.buscarPorId(id));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @PostMapping
     @Operation(summary = "Criar novo fornecedor")
     public ResponseEntity<Fornecedor> criar(@RequestBody @Valid FornecedorRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(fornecedorService.salvar(toEntity(dto)));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar fornecedor")
     public ResponseEntity<Fornecedor> atualizar(@PathVariable Long id, @RequestBody @Valid FornecedorRequestDTO dto) {
         return ResponseEntity.ok(fornecedorService.atualizar(id, toEntity(dto)));
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar fornecedor")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
