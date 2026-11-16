@@ -15,6 +15,13 @@ import {
 export class MinisterioLiderComponent implements OnInit {
   ministerioId: number | null = null;
   ministerioNome = 'Ministério';
+  /** Foto do ministério; null cai no fallback com a inicial do nome. */
+  ministerioFoto: string | null = null;
+
+  /** Inicial exibida quando o ministério não tem foto. */
+  get inicialMinisterio(): string {
+    return (this.ministerioNome || '?').trim().charAt(0).toUpperCase();
+  }
   loading = true;
   error = '';
 
@@ -67,6 +74,7 @@ export class MinisterioLiderComponent implements OnInit {
         if (m) {
           this.ministerioNome = m.nome;
           this.meuPapel = m.papel;
+          this.ministerioFoto = m.foto;
         }
       },
       error: () => {}

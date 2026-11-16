@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 import {
   MinisterioDoUsuario, EscalaResponse, EscalaDetalhada,
   ConfirmarEscalaRequest, ConfirmacaoResponse, MembroMinisterio,
-  EscalaDataDTO, DesignacaoRequest, MembroSimple, MusicaSimple, MusicaDTO
+  EscalaDataDTO, DesignacaoRequest, MembroSimple, MusicaSimple, MusicaDTO,
+  EscalaConflito
 } from '../models/mm.models';
 
 @Injectable({ providedIn: 'root' })
@@ -51,6 +52,11 @@ export class MmApiService {
 
   buscarEscala(escalaId: number): Observable<EscalaDetalhada> {
     return this.http.get<EscalaDetalhada>(`${this.baseUrl}/escalas/${escalaId}`);
+  }
+
+  /** Datas desta escala que o usuário já confirmou em outro ministério (mesmo dia e horário). */
+  buscarConflitos(escalaId: number): Observable<EscalaConflito[]> {
+    return this.http.get<EscalaConflito[]>(`${this.baseUrl}/escalas/${escalaId}/conflitos`);
   }
 
   // ===== Líder: membros disponíveis (todos os membros da igreja) =====

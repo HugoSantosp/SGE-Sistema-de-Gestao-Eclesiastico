@@ -43,6 +43,7 @@ public class EscalaService {
     private final MembroRepository membroRepository;
     private final UsuarioRepository usuarioRepository;
     private final SignedUrlService signedUrlService;
+    private final EscalaConflitoService escalaConflitoService;
 
     public EscalaService(EscalaRepository escalaRepository,
                          EscalaDataRepository escalaDataRepository,
@@ -51,7 +52,8 @@ public class EscalaService {
                          EscalaMusicaRepository musicaRepository,
                          MembroRepository membroRepository,
                          UsuarioRepository usuarioRepository,
-                         SignedUrlService signedUrlService) {
+                         SignedUrlService signedUrlService,
+                         EscalaConflitoService escalaConflitoService) {
         this.escalaRepository = escalaRepository;
         this.escalaDataRepository = escalaDataRepository;
         this.confirmacaoRepository = confirmacaoRepository;
@@ -60,6 +62,7 @@ public class EscalaService {
         this.membroRepository = membroRepository;
         this.usuarioRepository = usuarioRepository;
         this.signedUrlService = signedUrlService;
+        this.escalaConflitoService = escalaConflitoService;
     }
 
     // ===== ESCALAS (CRUD) =====
@@ -269,6 +272,12 @@ public class EscalaService {
         // Tenta vincular a um membro existente (igreja única)
         Membro membro = resolverMembro(dto.nome(), dto.email());
 
+        // Valida o choque de data + horário com outros ministérios antes de gravar
+        var datas = escalaDataRepository.findAllById(dto.dataIds());
+        if (membro != null) {
+            escalaConflitoService.validar(membro.getId(), escala, datas);
+        }
+
         var confirmacao = EscalaConfirmacao.builder()
                 .escala(escala)
                 .membro(membro)
@@ -279,7 +288,6 @@ public class EscalaService {
         confirmacao = confirmacaoRepository.save(confirmacao);
 
         // Vincula as datas selecionadas
-        var datas = escalaDataRepository.findAllById(dto.dataIds());
         confirmacao.setDatas(datas);
         confirmacaoRepository.save(confirmacao);
 

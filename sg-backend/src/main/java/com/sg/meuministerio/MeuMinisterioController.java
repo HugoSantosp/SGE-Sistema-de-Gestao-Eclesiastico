@@ -1,6 +1,7 @@
 package com.sg.meuministerio;
 
 import com.sg.escala.dto.EscalaConfirmacaoResponseDTO;
+import com.sg.escala.dto.EscalaConflitoDTO;
 import com.sg.escala.dto.EscalaDataDTO;
 import com.sg.escala.dto.EscalaDesignacaoRequestDTO;
 import com.sg.escala.dto.EscalaDetalhadaResponseDTO;
@@ -137,6 +138,14 @@ public class MeuMinisterioController {
             @PathVariable Long escalaId,
             Authentication authentication) {
         return ResponseEntity.ok(meuMinisterioService.buscarEscala(escalaId, usuarioLogado(authentication)));
+    }
+
+    @GetMapping("/escalas/{escalaId}/conflitos")
+    @Operation(summary = "Datas já confirmadas em outro ministério no mesmo dia e horário")
+    public ResponseEntity<List<EscalaConflitoDTO>> conflitosDaEscala(
+            @PathVariable Long escalaId,
+            Authentication authentication) {
+        return ResponseEntity.ok(meuMinisterioService.conflitosDaEscala(escalaId, usuarioLogado(authentication)));
     }
 
     // ===== MONTAGEM DA ESCALA (líder/pastor) =====

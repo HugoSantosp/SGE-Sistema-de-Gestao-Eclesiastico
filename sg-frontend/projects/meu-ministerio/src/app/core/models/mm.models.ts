@@ -165,6 +165,17 @@ export interface ConfirmarEscalaRequest {
   dataIds: number[];
 }
 
+/** Data já confirmada em outro ministério no mesmo dia e horário. */
+export interface EscalaConflito {
+  data: string;
+  horario: string;
+  nomeEvento: string;
+  escalaId: number;
+  escalaTitulo: string;
+  ministerioId: number;
+  ministerioNome: string;
+}
+
 export interface AdicionarMembroRequest {
   membroId: number;
   papel: PapelMinisterio;

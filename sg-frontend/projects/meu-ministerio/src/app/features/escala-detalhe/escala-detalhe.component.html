@@ -50,14 +50,26 @@
       <i class="bi bi-calendar-event me-1"></i> {{ escala.datas.length }} data(s)
     </div>
 
+    <div *ngIf="datasBloqueadas.size > 0" class="conflito-resumo">
+      <i class="bi bi-lock-fill"></i>
+      <span>
+        {{ datasBloqueadas.size }}
+        {{ datasBloqueadas.size === 1 ? 'data indisponível' : 'datas indisponíveis' }}
+        por conflito com outro ministério.
+      </span>
+    </div>
+
     <ng-container *ngFor="let d of escala.datas">
       <div class="data-option"
            [class.selected]="selecionadas.has(d.id)"
            [class.disabled]="!escala.aberta"
+           [class.blocked]="datasBloqueadas.has(d.id)"
+           [title]="datasBloqueadas.has(d.id) ? motivo(d.id) : ''"
            (click)="toggleData(d.id)">
         <div class="data-day">
           <span class="day-num">{{ diaNum(d.data) }}</span>
           <span class="day-mon">{{ diaMes(d.data) }}</span>
+          <i *ngIf="datasBloqueadas.has(d.id)" class="bi bi-lock-fill data-lock"></i>
         </div>
         <div class="data-info">
           <div class="data-name">{{ d.nomeEvento }}</div>
@@ -67,8 +79,15 @@
           <div *ngIf="jaConfirmado(d.id)" class="mt-1">
             <span class="badge badge-success"><i class="bi bi-check-circle me-1"></i>Você confirmou</span>
           </div>
+          <div *ngIf="datasBloqueadas.has(d.id)" class="data-block">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>
+              Indisponível — já confirmado em
+              <strong>{{ ministerioDoBloqueio(d.id) }}</strong>
+            </span>
+          </div>
         </div>
-        <div class="check-icon" *ngIf="escala.aberta">
+        <div class="check-icon" *ngIf="escala.aberta && !datasBloqueadas.has(d.id)">
           <i class="bi bi-check-lg"></i>
         </div>
       </div>

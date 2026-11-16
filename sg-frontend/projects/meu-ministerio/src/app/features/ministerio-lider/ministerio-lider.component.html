@@ -128,8 +128,9 @@
     <ng-container *ngIf="!carregandoEscalas">
       <div class="mm-card" *ngFor="let e of escalas" (click)="abrirMontagem(e.id)">
         <div class="d-flex align-items-center gap-3">
-          <div class="mm-escala-icon">
-            <i class="bi bi-music-note-beamed"></i>
+          <div class="mm-escala-icon" [class.tem-foto]="ministerioFoto">
+            <img *ngIf="ministerioFoto" [src]="ministerioFoto | uploadUrl" alt="">
+            <span *ngIf="!ministerioFoto" class="mm-escala-inicial">{{ inicialMinisterio }}</span>
           </div>
           <div class="flex-grow-1">
             <div class="mm-card-title">{{ e.titulo }}</div>

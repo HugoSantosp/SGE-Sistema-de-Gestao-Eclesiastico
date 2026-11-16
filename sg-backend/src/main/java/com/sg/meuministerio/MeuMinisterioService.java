@@ -3,9 +3,11 @@ package com.sg.meuministerio;
 import com.sg.escala.Escala;
 import com.sg.escala.EscalaConfirmacao;
 import com.sg.escala.EscalaConfirmacaoRepository;
+import com.sg.escala.EscalaConflitoService;
 import com.sg.escala.EscalaDataRepository;
 import com.sg.escala.EscalaRepository;
 import com.sg.escala.EscalaService;
+import com.sg.escala.dto.EscalaConflitoDTO;
 import com.sg.escala.dto.EscalaConfirmacaoResponseDTO;
 import com.sg.escala.dto.EscalaDataDTO;
 import com.sg.escala.dto.EscalaDesignacaoRequestDTO;
@@ -60,6 +62,7 @@ public class MeuMinisterioService {
     private final EscalaDataRepository escalaDataRepository;
     private final EscalaConfirmacaoRepository confirmacaoRepository;
     private final EscalaService escalaService;
+    private final EscalaConflitoService escalaConflitoService;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -72,6 +75,7 @@ public class MeuMinisterioService {
                                 EscalaDataRepository escalaDataRepository,
                                 EscalaConfirmacaoRepository confirmacaoRepository,
                                 EscalaService escalaService,
+                                EscalaConflitoService escalaConflitoService,
                                 UsuarioRepository usuarioRepository,
                                 PasswordEncoder passwordEncoder) {
         this.ministerioRepository = ministerioRepository;
@@ -81,6 +85,7 @@ public class MeuMinisterioService {
         this.escalaDataRepository = escalaDataRepository;
         this.confirmacaoRepository = confirmacaoRepository;
         this.escalaService = escalaService;
+        this.escalaConflitoService = escalaConflitoService;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -413,10 +418,30 @@ public class MeuMinisterioService {
                 || datas.stream().anyMatch(d -> !d.getEscala().getId().equals(escala.getId()))) {
             throw new BusinessException("Uma ou mais datas não pertencem a esta escala");
         }
+        // Bloqueia a mesma data + horário em outro ministério
+        escalaConflitoService.validar(membro.getId(), escala, datas);
         confirmacao.setDatas(datas);
         confirmacao = confirmacaoRepository.save(confirmacao);
 
         return EscalaConfirmacaoResponseDTO.fromEntity(confirmacao, dataIds);
+    }
+
+    /**
+     * Datas da escala que o membro logado já confirmou em outro ministério no mesmo
+     * dia e horário. Usado pela tela para desabilitar essas datas antes do clique.
+     */
+    @Transactional(readOnly = true)
+    public List<EscalaConflitoDTO> conflitosDaEscala(Long escalaId, Usuario usuario) {
+        Escala escala = escalaRepository.findById(escalaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Escala", escalaId));
+        validarMembro(usuario, escala.getMinisterioId());
+
+        Optional<Membro> membro = membroDoUsuario(usuario);
+        if (membro.isEmpty()) {
+            return List.of();
+        }
+        var datas = escalaDataRepository.findByEscalaIdOrderByDataAscHorarioAsc(escalaId);
+        return escalaConflitoService.conflitos(membro.get().getId(), escala, datas);
     }
 
     /** Cancela a confirmação do membro logado em uma escala. */

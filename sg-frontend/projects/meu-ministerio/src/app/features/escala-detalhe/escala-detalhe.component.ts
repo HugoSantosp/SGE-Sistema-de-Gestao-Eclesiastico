@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MmApiService } from '../../core/services/mm-api.service';
 import { MmAuthService } from '../../core/auth/mm-auth.service';
-import { EscalaDetalhada } from '../../core/models/mm.models';
+import { EscalaConflito, EscalaDetalhada } from '../../core/models/mm.models';
 
 @Component({
   selector: 'app-escala-detalhe',
@@ -22,6 +22,11 @@ export class EscalaDetalheComponent implements OnInit {
 
   // Confirmação atual do usuário (dataIds já confirmados)
   minhasDataIds: number[] = [];
+
+  // Datas desta escala já confirmadas em outro ministério (mesmo dia e horário)
+  conflitos: EscalaConflito[] = [];
+  datasBloqueadas = new Set<number>();
+  conflitoPorData = new Map<number, EscalaConflito>();
 
   // idPessoa (Membro.id) do usuário logado — obtido via /auth/me
   meuMembroId: number | null = null;
@@ -65,6 +70,7 @@ export class EscalaDetalheComponent implements OnInit {
           }
         }
         this.loading = false;
+        this.carregarConflitos(id);
       },
       error: () => {
         this.error = 'Não foi possível carregar esta escala.';
@@ -73,13 +79,63 @@ export class EscalaDetalheComponent implements OnInit {
     });
   }
 
+  /**
+   * Carrega as datas que o usuário já confirmou em outro ministério no mesmo dia e
+   * horário e as marca como bloqueadas, para ele não descobrir o choque só ao salvar.
+   * Falha em silêncio: o servidor continua bloqueando na confirmação.
+   */
+  carregarConflitos(id: number): void {
+    this.api.buscarConflitos(id).subscribe({
+      next: (lista) => {
+        this.conflitos = lista;
+        this.datasBloqueadas.clear();
+        this.conflitoPorData.clear();
+
+        const porChave = new Map<string, EscalaConflito>();
+        lista.forEach(c => porChave.set(this.chave(c.data, c.horario), c));
+
+        (this.escala?.datas ?? []).forEach(d => {
+          const conflito = porChave.get(this.chave(d.data, d.horario));
+          if (conflito) {
+            this.datasBloqueadas.add(d.id);
+            this.conflitoPorData.set(d.id, conflito);
+            this.selecionadas.delete(d.id);
+          }
+        });
+      },
+      error: () => {
+        this.conflitos = [];
+        this.datasBloqueadas.clear();
+        this.conflitoPorData.clear();
+      }
+    });
+  }
+
   toggleData(dataId: number): void {
     if (!this.escala?.aberta) return;
+    if (this.datasBloqueadas.has(dataId)) {
+      this.error = this.motivo(dataId);
+      return;
+    }
     if (this.selecionadas.has(dataId)) {
       this.selecionadas.delete(dataId);
     } else {
       this.selecionadas.add(dataId);
     }
+  }
+
+  /** Texto do bloqueio de uma data, usado no title e no aviso ao clicar. */
+  motivo(dataId: number): string {
+    const conflito = this.conflitoPorData.get(dataId);
+    if (!conflito) {
+      return 'Data indisponível em outro ministério.';
+    }
+    return `Indisponível — já confirmado em ${conflito.ministerioNome} (${conflito.escalaTitulo}).`;
+  }
+
+  /** Nome do ministério que bloqueia a data (vazio quando não há conflito). */
+  ministerioDoBloqueio(dataId: number): string {
+    return this.conflitoPorData.get(dataId)?.ministerioNome ?? '';
   }
 
   confirmar(): void {
@@ -102,9 +158,14 @@ export class EscalaDetalheComponent implements OnInit {
       },
       error: (err) => {
         this.salvando = false;
-        this.error = err.status === 403
-          ? 'Acesso negado. Você não participa deste ministério.'
-          : 'Erro ao confirmar. Tente novamente.';
+        if (err.status === 403) {
+          this.error = 'Acesso negado. Você não participa deste ministério.';
+        } else if (err.status === 422 && err.error?.message) {
+          // Conflito de data + horário com outro ministério
+          this.error = err.error.message;
+        } else {
+          this.error = 'Erro ao confirmar. Tente novamente.';
+        }
       }
     });
   }
@@ -134,6 +195,14 @@ export class EscalaDetalheComponent implements OnInit {
   }
 
   // ===== Helpers de formatação =====
+
+  /**
+   * Chave de comparação data + horário. O backend envia LocalTime como "HH:mm:ss";
+   * comparamos só "HH:mm" para não depender do formato exato.
+   */
+  private chave(data: string, horario: string): string {
+    return `${(data || '').slice(0, 10)}T${(horario || '').slice(0, 5)}`;
+  }
 
   /**
    * Parseia uma data no formato yyyy-MM-dd manualmente (sem passar por
