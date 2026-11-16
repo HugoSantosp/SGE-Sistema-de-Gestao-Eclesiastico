@@ -10,6 +10,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -255,6 +256,29 @@ class AccessControlMatrixTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"titulo\":\"Teste\",\"data\":\"2026-12-01\"}"))
                 .andExpect(status().isForbidden());
+    }
+
+    // ===== /api-docs e /swagger-ui (HTTP Basic) =====
+
+    @Test
+    @DisplayName("Documentação sem credencial retorna 401")
+    void docsSemCredencialRetorna401() throws Exception {
+        mockMvc.perform(get("/api-docs"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Documentação com credencial retorna 200")
+    void docsComCredencialRetorna200() throws Exception {
+        mockMvc.perform(get("/api-docs").with(httpBasic("docs", "docs-test-pass")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Documentação com senha errada retorna 401")
+    void docsComSenhaErradaRetorna401() throws Exception {
+        mockMvc.perform(get("/api-docs").with(httpBasic("docs", "senha-errada")))
+                .andExpect(status().isUnauthorized());
     }
 
     private String membroJson(String nome, String documento) {

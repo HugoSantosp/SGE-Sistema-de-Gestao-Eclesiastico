@@ -49,6 +49,19 @@ app:
   base-url: ${APP_BASE_URL:https://icertag.com.br}
   # Senha inicial do admin (bootstrap no 1º boot). Vazia em prod = admin não é criado.
   admin-initial-password: ${ADMIN_INITIAL_PASSWORD:}
+  # Documentação OpenAPI. Desligada por padrão em produção; para reativar defina
+  # SPRINGDOC_ENABLED=true e DOCS_PASSWORD. A cadeia HTTP Basic (SwaggerSecurityConfig)
+  # protege /swagger-ui/** e /api-docs/** sempre que app.docs.protected=true.
+  docs:
+    protected: true
+    user: ${DOCS_USER:docs}
+    password: ${DOCS_PASSWORD:}
+
+springdoc:
+  api-docs:
+    enabled: ${SPRINGDOC_ENABLED:false}
+  swagger-ui:
+    enabled: ${SPRINGDOC_ENABLED:false}
 
 jwt:
   secret: ${JWT_SECRET}  # Obrigatório em produção

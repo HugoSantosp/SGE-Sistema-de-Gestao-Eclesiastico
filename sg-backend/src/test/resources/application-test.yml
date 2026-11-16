@@ -13,3 +13,11 @@ spring:
 jwt:
   secret: 58656c6c6f576f726c64546869734973416e4578616d706c654a7774536563726574466f7254657374696e67507572706f736573
   expiration: 3600000
+
+# Ativa a cadeia HTTP Basic que protege /swagger-ui/** e /api-docs/**
+# (SwaggerSecurityConfig) para que os testes possam exercitá-la.
+app:
+  docs:
+    protected: true
+    user: docs
+    password: docs-test-pass

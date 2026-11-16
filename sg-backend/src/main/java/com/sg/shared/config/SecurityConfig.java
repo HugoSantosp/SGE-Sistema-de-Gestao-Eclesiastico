@@ -88,14 +88,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         // Endpoints públicos de escala de louvor (acesso via token)
                         .requestMatchers("/api/publico/escala/**").permitAll()
-                        // Swagger / docs
-                        .requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/api-docs/**",
-                                "/webjars/**"
-                        ).permitAll()
+                        // Swagger / docs: NÃO liberar aqui. Ver SwaggerSecurityConfig —
+                        // quando app.docs.protected=true uma cadeia @Order(1) cobre esses
+                        // caminhos com HTTP Basic. Sem ela, caem em anyRequest().authenticated().
                         // Actuator - apenas health público, outros requerem Presidente
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/actuator/**").hasRole("PASTOR_PRESIDENTE")
