@@ -2,6 +2,13 @@
   <div class="table-header">
     <h5 class="mb-0 fw-semibold">Membros</h5>
     <div class="d-flex gap-2">
+      <select class="form-select form-select-sm" style="width: 165px;"
+              [ngModel]="situacaoFiltro"
+              (ngModelChange)="filtrarPorSituacao($event)">
+        <option value="">Todas as situações</option>
+        <option value="ATIVO">Só ativos</option>
+        <option value="INATIVO">Só inativos</option>
+      </select>
       <input type="text" class="form-control form-control-sm" style="width: 200px;"
              placeholder="Buscar membro..." [(ngModel)]="searchTerm">
       <button class="btn btn-primary btn-sm" (click)="novo()">
@@ -16,7 +23,8 @@
 
   <div *ngIf="!loading && filtered.length === 0" class="empty-state">
     <i class="bi bi-people"></i>
-    <p>Nenhum membro encontrado</p>
+    <p *ngIf="searchTerm || situacaoFiltro; else semRegistros">Nenhum membro encontrado para este filtro</p>
+    <ng-template #semRegistros><p>Nenhum membro encontrado</p></ng-template>
     <button class="btn btn-primary" (click)="novo()">Cadastrar Primeiro Membro</button>
   </div>
 

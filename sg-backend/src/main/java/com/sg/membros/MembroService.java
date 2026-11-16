@@ -18,6 +18,15 @@ public class MembroService {
         return membroRepository.findAll();
     }
 
+    /**
+     * Lista membros filtrando por situação. Quando {@code situacao} é nulo,
+     * devolve todos — mantendo o comportamento anterior de {@code GET /api/membros}.
+     */
+    public List<Membro> listar(com.sg.shared.enums.StatusMembro situacao) {
+        if (situacao == null) return membroRepository.findAll();
+        return membroRepository.findBySituacao(situacao);
+    }
+
     public Membro buscarPorId(Long id) {
         return membroRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Membro", id));

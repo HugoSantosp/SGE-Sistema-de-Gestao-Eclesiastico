@@ -9,7 +9,10 @@ export class MembrosService {
 
   constructor(private http: HttpClient) {}
 
-  listar(): Observable<Membro[]> { return this.http.get<Membro[]>(this.apiUrl); }
+  listar(situacao?: 'ATIVO' | 'INATIVO'): Observable<Membro[]> {
+    const url = situacao ? `${this.apiUrl}?situacao=${situacao}` : this.apiUrl;
+    return this.http.get<Membro[]>(url);
+  }
 
   buscarPorId(id: number): Observable<Membro> { return this.http.get<Membro>(`${this.apiUrl}/${id}`); }
 

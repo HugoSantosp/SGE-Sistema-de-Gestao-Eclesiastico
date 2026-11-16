@@ -10,6 +10,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -186,6 +187,56 @@ class AccessControlMatrixTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    @WithMockUser(roles = "SECRETARIO")
+    @DisplayName("Secretário cadastra membro")
+    void secretarioCadastraMembro() throws Exception {
+        mockMvc.perform(post("/api/membros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(membroJson("Membro Secretaria", "11122233344")))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(roles = "SECRETARIO")
+    @DisplayName("Secretário exclui membro")
+    void secretarioExcluiMembro() throws Exception {
+        mockMvc.perform(delete("/api/membros/999999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "PASTOR_AUXILIAR")
+    @DisplayName("Auxiliar exclui membro")
+    void auxiliarExcluiMembro() throws Exception {
+        mockMvc.perform(delete("/api/membros/999999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "SECRETARIO")
+    @DisplayName("Secretário filtra membros ativos")
+    void secretarioFiltraMembrosAtivos() throws Exception {
+        mockMvc.perform(get("/api/membros").param("situacao", "ATIVO"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles = "MEMBRO")
+    @DisplayName("Membro filtra membros inativos")
+    void membroFiltraMembrosInativos() throws Exception {
+        mockMvc.perform(get("/api/membros").param("situacao", "INATIVO"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles = "SECRETARIO")
+    @DisplayName("Situação inválida retorna 400")
+    void situacaoInvalidaRetorna400() throws Exception {
+        mockMvc.perform(get("/api/membros").param("situacao", "XYZ"))
+                .andExpect(status().isBadRequest());
+    }
+
     // ===== /api/eventos =====
 
     @Test
@@ -204,6 +255,16 @@ class AccessControlMatrixTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"titulo\":\"Teste\",\"data\":\"2026-12-01\"}"))
                 .andExpect(status().isForbidden());
+    }
+
+    private String membroJson(String nome, String documento) {
+        return """
+                {
+                  "nome": "%s",
+                  "documento": "%s",
+                  "situacao": "ATIVO"
+                }
+                """.formatted(nome, documento);
     }
 
     private String contaPagarJson() {

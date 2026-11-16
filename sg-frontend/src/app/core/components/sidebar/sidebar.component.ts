@@ -37,7 +37,7 @@ export class SidebarComponent implements OnInit {
         { label: 'Bispos', icon: 'bi-person-badge', route: '/bispos', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
         { label: 'Presbíteros', icon: 'bi-person-check', route: '/presbiteros', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
         { label: 'Tesoureiros', icon: 'bi-wallet2', route: '/tesoureiros', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
-        { label: 'Secretários', icon: 'bi-journal-text', route: '/secretarios', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
+        { label: 'Secretários', icon: 'bi-journal-text', route: '/secretarios', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
         { label: 'Membros', icon: 'bi-person-lines-fill', route: '/membros', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
         { label: 'Usuários', icon: 'bi-people-fill', route: '/usuarios', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
       ]

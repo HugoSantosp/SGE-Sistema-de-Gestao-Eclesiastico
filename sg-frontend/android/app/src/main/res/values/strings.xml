@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SGE - ICERT</string>
+    <string name="title_activity_main">SGE - ICERT</string>
+    <string name="package_name">com.sge.icert</string>
+    <string name="custom_url_scheme">com.sge.icert</string>
+</resources>

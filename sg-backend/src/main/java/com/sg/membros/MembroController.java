@@ -24,9 +24,10 @@ public class MembroController {
 
     @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO','MEMBRO')")
     @GetMapping
-    @Operation(summary = "Listar membros")
-    public ResponseEntity<List<Membro>> listar() {
-        return ResponseEntity.ok(membroService.listarTodos());
+    @Operation(summary = "Listar membros", description = "Filtro opcional por situação: ATIVO ou INATIVO")
+    public ResponseEntity<List<Membro>> listar(
+            @RequestParam(required = false) com.sg.shared.enums.StatusMembro situacao) {
+        return ResponseEntity.ok(membroService.listar(situacao));
     }
 
     @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO','MEMBRO')")
@@ -61,7 +62,7 @@ public class MembroController {
         return ResponseEntity.ok(membroService.atualizar(id, toEntity(dto)));
     }
 
-    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO')")
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR', 'SECRETARIO')")
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar membro")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {

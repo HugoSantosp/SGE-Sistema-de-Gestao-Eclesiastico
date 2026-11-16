@@ -14,6 +14,7 @@ export class MembrosListComponent implements OnInit {
   ministerios: Ministerio[] = [];
   loading = true;
   searchTerm = '';
+  situacaoFiltro: '' | 'ATIVO' | 'INATIVO' = '';
 
   constructor(
     private service: MembrosService,
@@ -36,20 +37,48 @@ export class MembrosListComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.service.listar().subscribe({
+    this.service.listar(this.situacaoFiltro || undefined).subscribe({
       next: (data) => { this.membros = data; this.loading = false; },
-      error: () => this.loading = false
+      error: () => { this.membros = []; this.loading = false; }
     });
   }
 
+  /** Recarrega a lista no servidor ao trocar o filtro de situação. */
+  filtrarPorSituacao(situacao: '' | 'ATIVO' | 'INATIVO'): void {
+    this.situacaoFiltro = situacao;
+    this.load();
+  }
+
+  /**
+   * Normaliza texto para busca: remove acentos, ignora maiúsculas/minúsculas
+   * e espaços nas pontas. Sem isso, "jose" não encontrava "José".
+   */
+  private normalizar(valor: string | null | undefined): string {
+    if (!valor) return '';
+    return valor
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
   get filtered(): Membro[] {
-    if (!this.searchTerm) return this.membros;
-    const s = this.searchTerm.toLowerCase();
-    return this.membros.filter(m =>
-      m.nome.toLowerCase().includes(s) ||
-      m.documento?.toLowerCase().includes(s) ||
-      m.telefone?.toLowerCase().includes(s)
-    );
+    const termo = this.normalizar(this.searchTerm);
+    if (!termo) return this.membros;
+
+    // Busca também por documento sem máscara (ex.: "123.456" acha "12345678900").
+    const digitos = termo.replace(/\D/g, '');
+
+    return this.membros.filter(m => {
+      const nome = this.normalizar(m.nome);
+      const documento = this.normalizar(m.documento);
+      const telefone = this.normalizar(m.telefone);
+
+      if (nome.includes(termo) || documento.includes(termo) || telefone.includes(termo)) {
+        return true;
+      }
+      return digitos.length > 0 && documento.replace(/\D/g, '').includes(digitos);
+    });
   }
 
   editar(id: number): void { this.router.navigate(['/membros/editar', id]); }

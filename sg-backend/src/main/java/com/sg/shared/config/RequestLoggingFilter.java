@@ -46,7 +46,6 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
                                     FilterChain filterChain) throws ServletException, IOException {
-        
         String correlationId = request.getHeader("X-Correlation-ID");
         if (correlationId == null || correlationId.isEmpty()) {
             correlationId = UUID.randomUUID().toString();
