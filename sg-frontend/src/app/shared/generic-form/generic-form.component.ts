@@ -12,6 +12,12 @@ interface FieldConfig {
   type: string;
   required?: boolean;
   options?: { value: string; label: string }[];
+  /** GET que devolve a lista de opções do select (ex.: '/api/membros?situacao=ATIVO') */
+  optionsApi?: string;
+  /** Campo da resposta usado como texto da opção (padrão: 'nome') */
+  optionLabel?: string;
+  /** Campos limpos quando este select fica vazio */
+  clearOnEmpty?: string[];
   uploadHint?: string;
   validators?: any[];
   placeholder?: string;
@@ -49,6 +55,9 @@ export class GenericFormComponent implements OnInit {
   // Erros de validação por campo
   fieldErrors: Record<string, string> = {};
 
+  /** Valor do select no momento da carga, para distinguir "nunca teve" de "usuário limpou" */
+  private originalSelectValues: Record<string, any> = {};
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -68,6 +77,9 @@ export class GenericFormComponent implements OnInit {
     // Inicializa formulário reativo com validações
     this.initForm();
 
+    // Selects alimentados por API (ex.: líder da célula vindo do cadastro de membros)
+    this.loadDynamicOptions();
+
     if (this.isEdit) {
       this.loading = true;
       const id = this.route.snapshot.params['id'];
@@ -79,6 +91,13 @@ export class GenericFormComponent implements OnInit {
           this.fields.forEach(f => {
             if (f.type === 'password' && isEdit) {
               d[f.name] = '';
+            }
+            // <option> compara string: sem isso o select não fica marcado na edição
+            if (f.type === 'select' && d[f.name] !== null && d[f.name] !== undefined) {
+              d[f.name] = String(d[f.name]);
+            }
+            if (f.type === 'select') {
+              this.originalSelectValues[f.name] = d[f.name] ?? null;
             }
           });
           this.formGroup.patchValue(d);
@@ -102,6 +121,30 @@ export class GenericFormComponent implements OnInit {
     });
 
     this.formGroup = this.fb.group(group);
+  }
+
+  private loadDynamicOptions(): void {
+    this.fields.filter(f => !!f.optionsApi).forEach(field => {
+      this.http.get<any[]>(field.optionsApi!).subscribe({
+        next: (data) => {
+          const labelKey = field.optionLabel || 'nome';
+          field.options = (data || []).map(item => ({
+            value: String(item.id),
+            label: String(item[labelKey] ?? item.id)
+          }));
+          // As opções chegam depois do patchValue da edição: reaplica o valor
+          // para o select não ficar em branco quando o registro já tem líder.
+          const control = this.formGroup.get(field.name);
+          const atual = control?.value;
+          if (control && atual !== null && atual !== undefined && atual !== '') {
+            setTimeout(() => control.setValue(String(atual), { emitEvent: false }), 0);
+          }
+        },
+        error: () => {
+          this.toastService.error(`Erro ao carregar opções de ${field.label}`);
+        }
+      });
+    });
   }
 
   private getValidatorsForField(field: FieldConfig): any[] {
@@ -275,6 +318,21 @@ export class GenericFormComponent implements OnInit {
 
     // Atualiza o objeto form com os valores do formulário
     this.form = { ...this.form, ...this.formGroup.value };
+
+    // Selects alimentados por API usam id numérico: vazio deve virar null, não ""
+    this.fields.forEach(f => {
+      if (f.type === 'select' && f.optionsApi) {
+        if (this.form[f.name] === '') {
+          this.form[f.name] = null;
+        }
+        const originalValue = this.originalSelectValues[f.name];
+        const hadOriginalValue = originalValue !== undefined && originalValue !== null && originalValue !== '';
+        const wasChanged = this.formGroup.get(f.name)?.dirty;
+        if (this.form[f.name] === null && f.clearOnEmpty && (hadOriginalValue || wasChanged)) {
+          f.clearOnEmpty.forEach(k => { this.form[k] = null; });
+        }
+      }
+    });
 
     // Em edição, senha em branco significa "manter a atual": o campo não é enviado,
     // para o backend não re-criptografar um hash nem invalidar a senha do usuário.

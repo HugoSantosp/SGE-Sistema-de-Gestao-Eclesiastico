@@ -175,6 +175,7 @@ export interface Celula {
   id: number;
   nome: string;
   lider: string;
+  liderId: number | null;
   endereco: string;
   diaSemana: string;
   horario: string;

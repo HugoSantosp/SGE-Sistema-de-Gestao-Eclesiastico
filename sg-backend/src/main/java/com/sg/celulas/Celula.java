@@ -25,6 +25,10 @@ public class Celula {
     @Column(length = 100)
     private String lider;
 
+    /** Vínculo com o membro cadastrado que lidera a célula (opcional). */
+    @Column(name = "lider_id")
+    private Long liderId;
+
     @Column(length = 200)
     private String endereco;
 

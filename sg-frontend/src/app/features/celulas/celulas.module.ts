@@ -15,7 +15,7 @@ const routes: Routes = [
     path: 'novo', component: GenericFormComponent,
     data: { title: 'Célula', api: '/api/celulas', fields: [
       { name: 'nome', label: 'Nome', type: 'text', required: true },
-      { name: 'lider', label: 'Líder', type: 'text' },
+      { name: 'liderId', label: 'Líder', type: 'select', optionsApi: '/api/membros?situacao=ATIVO', optionLabel: 'nome', clearOnEmpty: ['lider'] },
       { name: 'endereco', label: 'Endereço', type: 'text' },
       { name: 'diaSemana', label: 'Dia da Semana', type: 'text' },
       { name: 'horario', label: 'Horário', type: 'time' },
@@ -27,7 +27,7 @@ const routes: Routes = [
     path: 'editar/:id', component: GenericFormComponent,
     data: { title: 'Célula', api: '/api/celulas', isEdit: true, fields: [
       { name: 'nome', label: 'Nome', type: 'text', required: true },
-      { name: 'lider', label: 'Líder', type: 'text' },
+      { name: 'liderId', label: 'Líder', type: 'select', optionsApi: '/api/membros?situacao=ATIVO', optionLabel: 'nome', clearOnEmpty: ['lider'] },
       { name: 'endereco', label: 'Endereço', type: 'text' },
       { name: 'diaSemana', label: 'Dia da Semana', type: 'text' },
       { name: 'horario', label: 'Horário', type: 'time' },

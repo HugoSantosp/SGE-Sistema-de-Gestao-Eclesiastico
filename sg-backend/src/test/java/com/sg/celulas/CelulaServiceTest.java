@@ -1,5 +1,8 @@
 package com.sg.celulas;
 
+import com.sg.membros.Membro;
+import com.sg.membros.MembroRepository;
+import com.sg.shared.enums.StatusMembro;
 import com.sg.shared.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +25,7 @@ import static org.mockito.Mockito.*;
 class CelulaServiceTest {
 
     @Mock private CelulaRepository celulaRepository;
+    @Mock private MembroRepository membroRepository;
     @InjectMocks private CelulaService celulaService;
 
     private Celula celula;
@@ -69,5 +73,39 @@ class CelulaServiceTest {
         when(celulaRepository.existsById(1L)).thenReturn(true);
         celulaService.deletar(1L);
         verify(celulaRepository).deleteById(1L);
+    }
+
+    @Test @DisplayName("Sem líder selecionado mantém o texto atual e não consulta membros")
+    void semLiderMantemTextoAtual() {
+        when(celulaRepository.save(any(Celula.class))).thenAnswer(i -> i.getArgument(0));
+
+        Celula salva = celulaService.salvar(celula);
+
+        assertEquals("Pr. João", salva.getLider());
+        assertNull(salva.getLiderId());
+        verifyNoInteractions(membroRepository);
+    }
+
+    @Test @DisplayName("Líder válido sincroniza a coluna de texto com o nome do membro")
+    void liderValidoSincronizaNome() {
+        celula.setLiderId(7L);
+        Membro membro = Membro.builder()
+                .id(7L).nome("Diác. Paulo Santos").situacao(StatusMembro.ATIVO).build();
+        when(membroRepository.findById(7L)).thenReturn(Optional.of(membro));
+        when(celulaRepository.save(any(Celula.class))).thenAnswer(i -> i.getArgument(0));
+
+        Celula salva = celulaService.salvar(celula);
+
+        assertEquals(7L, salva.getLiderId());
+        assertEquals("Diác. Paulo Santos", salva.getLider());
+    }
+
+    @Test @DisplayName("Líder inexistente gera 404 e não salva a célula")
+    void liderInexistenteNaoSalva() {
+        celula.setLiderId(99L);
+        when(membroRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> celulaService.salvar(celula));
+        verify(celulaRepository, never()).save(any(Celula.class));
     }
 }
