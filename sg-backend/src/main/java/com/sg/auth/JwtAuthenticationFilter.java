@@ -55,9 +55,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     var userDetails = usuarioService.loadUserByUsername(email);
 
-                    // Usuário com senha temporária só pode acessar rotas permitidas
-                    if (userDetails instanceof Usuario usuario && usuario.isSenhaTemporaria()) {
-                        if (!isRotaPermitida(path)) {
+                    if (userDetails instanceof Usuario usuario) {
+                        // Token emitido antes de logout ou de troca de senha deixa de valer
+                        if (usuario.getTokenVersion() != null
+                                && usuario.getTokenVersion() != jwtService.extractTokenVersion(token)) {
+                            filterChain.doFilter(request, response);
+                            return;
+                        }
+
+                        // Usuário com senha temporária só pode acessar rotas permitidas
+                        if (usuario.isSenhaTemporaria() && !isRotaPermitida(path)) {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             response.setContentType("application/json");
                             response.getWriter().write(
@@ -81,12 +88,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /** Comparação exata: prefixo liberava qualquer rota iniciada pela string. */
     private boolean isRotaPermitida(String path) {
-        for (String rota : PERMITIDAS_SENHA_TEMP) {
-            if (path.startsWith(rota)) {
-                return true;
-            }
-        }
-        return false;
+        return PERMITIDAS_SENHA_TEMP.contains(path);
     }
 }

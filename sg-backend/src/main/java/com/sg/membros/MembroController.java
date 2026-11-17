@@ -22,7 +22,7 @@ public class MembroController {
         this.membroService = membroService;
     }
 
-    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO','MEMBRO')")
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO')")
     @GetMapping
     @Operation(summary = "Listar membros", description = "Filtro opcional por situação: ATIVO ou INATIVO")
     public ResponseEntity<List<Membro>> listar(
@@ -30,14 +30,14 @@ public class MembroController {
         return ResponseEntity.ok(membroService.listar(situacao));
     }
 
-    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO','MEMBRO')")
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO')")
     @GetMapping("/{id}")
     @Operation(summary = "Buscar membro por ID")
     public ResponseEntity<Membro> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(membroService.buscarPorId(id));
     }
 
-    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO','MEMBRO')")
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','SECRETARIO')")
     @GetMapping("/estatisticas")
     @Operation(summary = "Obter estatísticas de membros")
     public ResponseEntity<Map<String, Long>> estatisticas() {

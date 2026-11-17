@@ -174,10 +174,10 @@ class AccessControlMatrixTest {
 
     @Test
     @WithMockUser(roles = "MEMBRO")
-    @DisplayName("Membro lê membros (Meu Ministério)")
-    void membroLeMembros() throws Exception {
+    @DisplayName("Membro não lê membros (lista traz CPF, telefone e endereço)")
+    void membroNaoLeMembros() throws Exception {
         mockMvc.perform(get("/api/membros"))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
     }
 
     @Test

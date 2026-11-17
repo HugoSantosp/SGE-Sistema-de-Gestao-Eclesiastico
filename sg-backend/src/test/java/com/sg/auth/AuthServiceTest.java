@@ -59,7 +59,7 @@ class AuthServiceTest {
         when(usuarioRepository.findByEmailOrDocumento("joao@email.com", "joao@email.com"))
                 .thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("123456", usuario.getSenha())).thenReturn(true);
-        when(jwtService.generateToken("joao@email.com", "PASTOR_PRESIDENTE"))
+        when(jwtService.generateToken("joao@email.com", "PASTOR_PRESIDENTE", 0L))
                 .thenReturn("token.jwt.aqui");
 
         LoginResponseDTO response = authService.login(loginRequest);
@@ -73,7 +73,7 @@ class AuthServiceTest {
 
         verify(usuarioRepository).findByEmailOrDocumento("joao@email.com", "joao@email.com");
         verify(passwordEncoder).matches("123456", usuario.getSenha());
-        verify(jwtService).generateToken("joao@email.com", "PASTOR_PRESIDENTE");
+        verify(jwtService).generateToken("joao@email.com", "PASTOR_PRESIDENTE", 0L);
     }
 
     @Test
@@ -107,7 +107,7 @@ class AuthServiceTest {
         when(usuarioRepository.findByEmailOrDocumento("12345678900", "12345678900"))
                 .thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("123456", usuario.getSenha())).thenReturn(true);
-        when(jwtService.generateToken("joao@email.com", "PASTOR_PRESIDENTE"))
+        when(jwtService.generateToken("joao@email.com", "PASTOR_PRESIDENTE", 0L))
                 .thenReturn("token.jwt.aqui");
 
         LoginResponseDTO response = authService.login(loginPorCpf);

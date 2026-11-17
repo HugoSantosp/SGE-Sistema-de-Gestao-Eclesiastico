@@ -51,6 +51,14 @@ public class Usuario implements UserDetails {
     @Builder.Default
     private boolean senhaTemporaria = false;
 
+    /**
+     * Versão do token JWT. Incrementada em logout e em troca/redefinição de senha
+     * para revogar tokens emitidos antes do evento.
+     */
+    @Column(name = "token_version", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    @Builder.Default
+    private Long tokenVersion = 0L;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + nivel.name()));

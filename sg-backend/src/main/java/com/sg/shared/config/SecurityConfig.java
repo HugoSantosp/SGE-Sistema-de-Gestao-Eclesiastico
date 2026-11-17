@@ -44,6 +44,13 @@ public class SecurityConfig {
     @Value("${app.cors.allowed-origins:http://localhost:4200}")
     private String allowedOrigins;
 
+    /**
+     * Content-Security-Policy enviada em todas as respostas.
+     * Vazio desativa o header (útil para depurar uma policy restritiva).
+     */
+    @Value("${app.security.csp:default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'}")
+    private String contentSecurityPolicy;
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final MetricsConfig metricsConfig;
 
@@ -71,6 +78,14 @@ public class SecurityConfig {
                     .referrerPolicy(referrer -> referrer
                         .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
                     )
+                    // CSP precisa vir antes de permissionsPolicy: nesta versão do
+                    // Spring Security o permissionsPolicy(...) retorna o próprio
+                    // PermissionsPolicyConfig, encerrando o encadeamento de HeadersConfigurer.
+                    .contentSecurityPolicy(csp -> {
+                        if (contentSecurityPolicy != null && !contentSecurityPolicy.isBlank()) {
+                            csp.policyDirectives(contentSecurityPolicy);
+                        }
+                    })
                     .permissionsPolicy(permissions -> permissions
                         .policy("camera=(), microphone=(), geolocation=()")
                     )

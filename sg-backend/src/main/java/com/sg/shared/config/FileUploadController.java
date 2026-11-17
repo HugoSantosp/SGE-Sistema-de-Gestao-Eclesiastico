@@ -5,6 +5,7 @@ import com.sg.shared.services.SignedUrlService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,6 +48,7 @@ public class FileUploadController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @DeleteMapping("/{filename}")
     @Operation(summary = "Remover um arquivo")
     public ResponseEntity<?> delete(@PathVariable String filename) {
@@ -57,6 +59,7 @@ public class FileUploadController {
         return ResponseEntity.notFound().build();
     }
 
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR')")
     @GetMapping("/stats")
     @Operation(summary = "Obter estatísticas de uso do armazenamento")
     public ResponseEntity<?> getStats() {

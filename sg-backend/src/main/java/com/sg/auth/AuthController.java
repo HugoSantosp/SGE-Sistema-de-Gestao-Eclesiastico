@@ -37,6 +37,14 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "Senha alterada com sucesso"));
     }
 
+    @PostMapping("/logout")
+    @Operation(summary = "Encerrar sessão",
+               description = "Invalida os tokens emitidos antes deste momento para o usuário autenticado")
+    public ResponseEntity<Map<String, String>> logout(Authentication authentication) {
+        authService.logout(authentication.getName());
+        return ResponseEntity.ok(Map.of("message", "Sessão encerrada"));
+    }
+
     @PostMapping("/esqueci-senha")
     @Operation(summary = "Solicitar redefinição de senha",
                description = "Envia um email com link para redefinir a senha (token expira em 30 minutos)")

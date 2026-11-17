@@ -47,7 +47,7 @@ public class AuthService {
             throw new InvalidCredentialsException();
         }
 
-        String token = jwtService.generateToken(usuario.getEmail(), usuario.getNivel().name());
+        String token = jwtService.generateToken(usuario.getEmail(), usuario.getNivel().name(), versaoToken(usuario));
 
         return new LoginResponseDTO(
                 token,
@@ -73,14 +73,18 @@ public class AuthService {
         if (usuario.isSenhaTemporaria()) {
             usuario.setSenhaTemporaria(false);
         }
+        // Invalida tokens emitidos antes da troca de senha
+        usuario.setTokenVersion(versaoToken(usuario) + 1);
         usuarioRepository.save(usuario);
     }
 
     @Transactional
     public void esqueciSenha(EsqueciSenhaRequestDTO request) {
-        // Verifica se o email existe
-        usuarioRepository.findByEmail(request.email())
-                .orElseThrow(() -> new InvalidCredentialsException());
+        // Resposta idêntica para email existente e inexistente: evita enumeração de usuários
+        var usuarioOpt = usuarioRepository.findByEmail(request.email());
+        if (usuarioOpt.isEmpty()) {
+            return;
+        }
 
         // Remove tokens anteriores para este email
         tokenRepository.deleteByEmail(request.email());
@@ -168,9 +172,28 @@ public class AuthService {
                 .orElseThrow(() -> new InvalidCredentialsException());
 
         usuario.setSenha(passwordEncoder.encode(request.novaSenha()));
+        // Invalida tokens emitidos antes da redefinição
+        usuario.setTokenVersion(versaoToken(usuario) + 1);
         usuarioRepository.save(usuario);
 
         resetToken.setUsed(true);
         tokenRepository.save(resetToken);
+    }
+
+    /**
+     * Logout: incrementa a versão do token do usuário, invalidando todos os JWTs
+     * emitidos antes deste momento (todas as sessões/dispositivos).
+     */
+    @Transactional
+    public void logout(String email) {
+        usuarioRepository.findByEmail(email).ifPresent(usuario -> {
+            usuario.setTokenVersion(versaoToken(usuario) + 1);
+            usuarioRepository.save(usuario);
+        });
+    }
+
+    /** Versão atual do token, tratando null como 0 (registros antigos). */
+    private long versaoToken(Usuario usuario) {
+        return usuario.getTokenVersion() == null ? 0L : usuario.getTokenVersion();
     }
 }

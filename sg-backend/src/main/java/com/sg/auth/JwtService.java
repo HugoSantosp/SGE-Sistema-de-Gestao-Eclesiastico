@@ -24,13 +24,37 @@ public class JwtService {
     }
 
     public String generateToken(String email, String nivelAcesso) {
+        return generateToken(email, nivelAcesso, 0L);
+    }
+
+    public String generateToken(String email, String nivelAcesso, long tokenVersion) {
         return Jwts.builder()
                 .subject(email)
                 .claim("nivel", nivelAcesso)
+                .claim("ver", tokenVersion)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    /**
+     * Versão do token gravada no claim {@code ver}. Tokens antigos (sem o claim)
+     * são tratados como versão 0.
+     */
+    public long extractTokenVersion(String token) {
+        Object ver = extractClaims(token).get("ver");
+        if (ver instanceof Number numero) {
+            return numero.longValue();
+        }
+        if (ver instanceof String texto) {
+            try {
+                return Long.parseLong(texto);
+            } catch (NumberFormatException ignored) {
+                return 0L;
+            }
+        }
+        return 0L;
     }
 
     public String extractEmail(String token) {

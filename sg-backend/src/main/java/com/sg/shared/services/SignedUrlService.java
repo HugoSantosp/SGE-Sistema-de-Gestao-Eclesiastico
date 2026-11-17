@@ -41,6 +41,28 @@ public class SignedUrlService {
     @Value("${app.signed-url.expiration-hours:24}")
     private int expirationHours;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.core.env.Environment environment;
+
+    private static final java.util.Set<String> SEGREDOS_PADRAO = java.util.Set.of(
+            "change-this-secret-in-production",
+            "change-this-secret-in-production-use-long-random-key"
+    );
+
+    /**
+     * Falha no boot em produção se o segredo continuar sendo o valor padrão do
+     * repositório: com ele qualquer pessoa forja uma URL assinada válida.
+     */
+    @jakarta.annotation.PostConstruct
+    void validarSegredo() {
+        boolean producao = java.util.Arrays.asList(environment.getActiveProfiles()).contains("prod");
+        if (producao && (secretKey == null || secretKey.isBlank() || SEGREDOS_PADRAO.contains(secretKey))) {
+            throw new IllegalStateException(
+                    "APP_SIGNED_URL_SECRET ausente ou igual ao valor padrão: com ele é possível forjar "
+                            + "URLs assinadas. Defina uma chave longa e aleatória antes de subir em produção.");
+        }
+    }
+
     /**
      * Gera uma URL assinada para um caminho de arquivo.
      * 

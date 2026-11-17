@@ -39,6 +39,14 @@ public class RateLimitConfig implements WebMvcConfigurer {
     private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
 
     /**
+     * Confia em X-Forwarded-For / X-Real-IP somente quando o app está atrás de um
+     * proxy conhecido (ex.: Render). Sem proxy, o header é controlado pelo cliente
+     * e permitiria trocar de bucket a cada requisição.
+     */
+    @org.springframework.beans.factory.annotation.Value("${app.rate-limit.trust-forwarded-for:false}")
+    private boolean trustForwardedFor;
+
+    /**
      * Configuração de limites por tipo de endpoint
      */
     public enum RateLimitType {
@@ -133,16 +141,26 @@ public class RateLimitConfig implements WebMvcConfigurer {
         }
 
         private String getClientIP(HttpServletRequest request) {
+            if (!trustForwardedFor) {
+                return request.getRemoteAddr();
+            }
+
             String xForwardedFor = request.getHeader("X-Forwarded-For");
             if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-                return xForwardedFor.split(",")[0].trim();
+                // Último IP da cadeia é o inserido pelo proxy confiável;
+                // o primeiro é controlado pelo cliente e pode ser forjado.
+                String[] cadeia = xForwardedFor.split(",");
+                String ultimo = cadeia[cadeia.length - 1].trim();
+                if (!ultimo.isEmpty()) {
+                    return ultimo;
+                }
             }
-            
+
             String xRealIP = request.getHeader("X-Real-IP");
             if (xRealIP != null && !xRealIP.isEmpty()) {
-                return xRealIP;
+                return xRealIP.trim();
             }
-            
+
             return request.getRemoteAddr();
         }
     }

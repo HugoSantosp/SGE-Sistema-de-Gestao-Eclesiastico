@@ -34,6 +34,12 @@ springdoc:
 app:
   upload:
     dir: uploads
+  rate-limit:
+    # Só confie em X-Forwarded-For quando houver proxy na frente (ver application-prod.yml)
+    trust-forwarded-for: false
+  security:
+    # Content-Security-Policy (vazio desativa o header)
+    csp: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' http://localhost:8080; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
   signed-url:
     # Habilita validação de URLs assinadas (Signed URLs) para arquivos estáticos
     enabled: true

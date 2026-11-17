@@ -41,6 +41,12 @@ spring:
 app:
   signed-url:
     secret: ${APP_SIGNED_URL_SECRET}
+  rate-limit:
+    # Em produção há proxy (Render) na frente: o IP real vem no X-Forwarded-For
+    trust-forwarded-for: true
+  security:
+    # CSP de produção: API em api.icertag.com.br, fontes do Google para o Inter
+    csp: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.icertag.com.br; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
   upload:
     dir: ${UPLOAD_DIR:uploads}
     max-size: ${MAX_FILE_SIZE:15728640}  # 15MB
