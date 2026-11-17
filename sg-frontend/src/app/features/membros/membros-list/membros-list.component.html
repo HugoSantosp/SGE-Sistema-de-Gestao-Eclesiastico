@@ -10,7 +10,7 @@
         <option value="INATIVO">Só inativos</option>
       </select>
       <input type="text" class="form-control form-control-sm" style="width: 200px;"
-             placeholder="Buscar membro..." [(ngModel)]="searchTerm">
+             placeholder="Buscar membro..." [(ngModel)]="searchTerm" (ngModelChange)="onBuscaChange()">
       <button class="btn btn-primary btn-sm" (click)="novo()">
         <i class="bi bi-plus-lg"></i> Novo Membro
       </button>
@@ -34,16 +34,18 @@
         <th>Nome</th>
         <th>Documento</th>
         <th>Telefone</th>
+        <th>Cargo</th>
         <th>Ministério</th>
         <th>Situação</th>
         <th style="width: 120px;">Ações</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let m of filtered">
+      <tr *ngFor="let m of paginatedItems">
         <td class="fw-medium">{{ m.nome }}</td>
         <td>{{ m.documento || '-' }}</td>
         <td>{{ m.telefone || '-' }}</td>
+        <td>{{ getCargoNome(m.cargoId) }}</td>
         <td>{{ getMinisterioNome(m.ministerioId) }}</td>
         <td><span class="badge" [ngClass]="statusClass(m.situacao)">{{ m.situacao }}</span></td>
         <td>
@@ -57,4 +59,13 @@
       </tr>
     </tbody>
   </table>
+
+  <div class="px-4 pb-4">
+    <app-pagination
+      [totalItems]="filtered.length"
+      [itemsPerPage]="itemsPerPage"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
 </div>

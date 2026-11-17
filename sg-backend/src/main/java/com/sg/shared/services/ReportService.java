@@ -66,10 +66,17 @@ public class ReportService {
 
     // ==================== PDF ====================
 
-    /**
-     * Gera relatório de membros em PDF
-     */
     public byte[] generateMembersPdf(List<Membro> membros) throws IOException {
+        return generateMembersPdf(membros, Map.of());
+    }
+
+    /**
+     * Gera relatório de membros em PDF.
+     *
+     * @param membros      membros a listar
+     * @param cargosPorId  id do cargo -> nome, para resolver o cargo de cada membro
+     */
+    public byte[] generateMembersPdf(List<Membro> membros, Map<Long, String> cargosPorId) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfWriter writer = new PdfWriter(baos);
         PdfDocument pdfDoc = new PdfDocument(writer);
@@ -93,11 +100,11 @@ public class ReportService {
         document.add(date);
 
         // Tabela
-        float[] widths = {3, 4, 3, 3, 2};
+        float[] widths = {3, 2.5f, 2.5f, 2.5f, 3, 2, 1.8f};
         Table table = new Table(UnitValue.createPercentArray(widths)).useAllAvailableWidth();
 
         // Cabeçalho
-        String[] headers = {"Nome", "Telefone", "Documento", "Endereço", "Situação"};
+        String[] headers = {"Nome", "Cargo", "Telefone", "Documento", "Endereço", "Batismo", "Situação"};
         for (String header : headers) {
             Cell cell = new Cell().add(new Paragraph(header).setFont(titleFont).setFontSize(10).setFontColor(WHITE));
             cell.setBackgroundColor(ORANGE).setPadding(6).setTextAlignment(TextAlignment.CENTER);
@@ -108,9 +115,11 @@ public class ReportService {
         if (membros != null) {
             for (Membro membro : membros) {
                 table.addCell(createDataCell(membro.getNome(), bodyFont));
+                table.addCell(createDataCell(nomeCargo(membro.getCargoId(), cargosPorId), bodyFont));
                 table.addCell(createDataCell(membro.getTelefone(), bodyFont));
                 table.addCell(createDataCell(membro.getDocumento(), bodyFont));
                 table.addCell(createDataCell(membro.getEndereco(), bodyFont));
+                table.addCell(createDataCell(formatarData(membro.getDataBatismo()), bodyFont));
                 table.addCell(createDataCell(
                         membro.getSituacao() != null ? membro.getSituacao().name() : "-", bodyFont));
             }
@@ -339,6 +348,17 @@ public class ReportService {
     }
 
     // ==================== HELPERS ====================
+
+    /** Resolve o nome do cargo a partir do mapa id -> nome; "-" quando não há cargo. */
+    private String nomeCargo(Long cargoId, Map<Long, String> cargosPorId) {
+        if (cargoId == null || cargosPorId == null) return "-";
+        return cargosPorId.getOrDefault(cargoId, "-");
+    }
+
+    /** Formata data para dd/MM/yyyy; "-" quando nula. */
+    private String formatarData(LocalDate data) {
+        return data != null ? data.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "-";
+    }
 
     private Cell createDataCell(String content, PdfFont font) {
         Cell cell = new Cell().add(new Paragraph(content != null ? content : "-").setFont(font).setFontSize(10));

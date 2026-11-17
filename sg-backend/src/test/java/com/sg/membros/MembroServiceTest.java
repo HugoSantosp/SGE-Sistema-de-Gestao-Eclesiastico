@@ -1,5 +1,6 @@
 package com.sg.membros;
 
+import com.sg.cargos.CargoService;
 import com.sg.shared.enums.StatusMembro;
 import com.sg.shared.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,9 @@ class MembroServiceTest {
 
     @Mock
     private MembroRepository membroRepository;
+
+    @Mock
+    private CargoService cargoService;
 
     @InjectMocks
     private MembroService membroService;
@@ -140,5 +144,44 @@ class MembroServiceTest {
         membroService.deletar(1L);
 
         verify(membroRepository).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("Deve aceitar membro sem cargo")
+    void deveAceitarMembroSemCargo() {
+        Membro semCargo = Membro.builder().nome("Sem Cargo").situacao(StatusMembro.ATIVO).build();
+
+        when(membroRepository.save(any(Membro.class))).thenAnswer(i -> i.getArgument(0));
+
+        Membro result = membroService.salvar(semCargo);
+
+        assertNull(result.getCargoId());
+        verify(cargoService, never()).buscarPorId(any());
+    }
+
+    @Test
+    @DisplayName("Deve gravar cargo quando o id existe")
+    void deveGravarCargoExistente() {
+        Membro comCargo = Membro.builder().nome("Com Cargo").situacao(StatusMembro.ATIVO).cargoId(7L).build();
+
+        when(cargoService.buscarPorId(7L)).thenReturn(new com.sg.cargos.Cargo());
+        when(membroRepository.save(any(Membro.class))).thenAnswer(i -> i.getArgument(0));
+
+        Membro result = membroService.salvar(comCargo);
+
+        assertEquals(7L, result.getCargoId());
+        verify(cargoService).buscarPorId(7L);
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar cargo inexistente")
+    void deveRejeitarCargoInexistente() {
+        Membro comCargo = Membro.builder().nome("Cargo Fantasma").situacao(StatusMembro.ATIVO).cargoId(99L).build();
+
+        when(cargoService.buscarPorId(99L))
+                .thenThrow(new ResourceNotFoundException("Cargo", 99L));
+
+        assertThrows(ResourceNotFoundException.class, () -> membroService.salvar(comCargo));
+        verify(membroRepository, never()).save(any(Membro.class));
     }
 }

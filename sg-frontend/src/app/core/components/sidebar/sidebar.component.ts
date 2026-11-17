@@ -64,6 +64,7 @@ export class SidebarComponent implements OnInit {
     { label: 'Eventos', icon: 'bi-calendar-event', route: '/eventos', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
     { label: 'Tarefas', icon: 'bi-check2-square', route: '/tarefas', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },
     { label: 'Notificações', icon: 'bi-bell', route: '/notificacoes', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO', 'SECRETARIO'] },
+    { label: 'Relatórios', icon: 'bi-file-earmark-bar-graph', route: '/relatorios', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO', 'SECRETARIO'] },
     { label: 'Configurações', icon: 'bi-gear', route: '/configuracoes', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR'] },
   ];
 

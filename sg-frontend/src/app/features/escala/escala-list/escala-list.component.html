@@ -5,7 +5,7 @@
     </h5>
     <div class="d-flex gap-2">
       <input type="text" class="form-control form-control-sm" style="width: 220px;"
-             placeholder="Buscar escala..." [(ngModel)]="searchTerm">
+             placeholder="Buscar escala..." [(ngModel)]="searchTerm" (ngModelChange)="onBuscaChange()">
       <button class="btn btn-primary btn-sm" (click)="novo()">
         <i class="bi bi-plus-lg"></i> Nova Escala
       </button>
@@ -34,7 +34,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let e of filtered">
+      <tr *ngFor="let e of paginatedItems">
         <td class="fw-medium">{{ e.titulo }}</td>
         <td><span class="badge bg-secondary">{{ e.datasCount }}</span></td>
         <td><span class="badge" [ngClass]="e.confirmacoesCount > 0 ? 'bg-success' : 'bg-secondary'">{{ e.confirmacoesCount }}</span></td>
@@ -78,4 +78,13 @@
       </tr>
     </tbody>
   </table>
+
+  <div class="px-4 pb-4">
+    <app-pagination
+      [totalItems]="filtered.length"
+      [itemsPerPage]="itemsPerPage"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
 </div>

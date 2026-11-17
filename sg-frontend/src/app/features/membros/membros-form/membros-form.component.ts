@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MembrosService } from '../membros.service';
-import { StatusMembro, Ministerio } from '../../../core/models/sge.models';
+import { StatusMembro, Ministerio, Cargo } from '../../../core/models/sge.models';
 
 @Component({
   selector: 'app-membros-form',
@@ -17,7 +17,12 @@ export class MembrosFormComponent implements OnInit {
 
   statusOptions = [StatusMembro.ATIVO, StatusMembro.INATIVO];
   ministerios: Ministerio[] = [];
-  form: any = { nome: '', documento: '', telefone: '', endereco: '', situacao: StatusMembro.ATIVO, ministerioId: null };
+  cargos: Cargo[] = [];
+  form: any = {
+    nome: '', documento: '', telefone: '', endereco: '',
+    situacao: StatusMembro.ATIVO, ministerioId: null,
+    cargoId: null, dataNasc: '', dataBatismo: ''
+  };
 
   constructor(
     private service: MembrosService,
@@ -30,6 +35,11 @@ export class MembrosFormComponent implements OnInit {
     // Load ministries for select
     this.http.get<Ministerio[]>('/api/ministerios').subscribe({
       next: (data) => { this.ministerios = data; }
+    });
+
+    // Cargos eclesiásticos vêm do cadastro de Cargos (opcional no membro)
+    this.http.get<Cargo[]>('/api/cargos').subscribe({
+      next: (data) => { this.cargos = data; }
     });
 
     const id = this.route.snapshot.params['id'];

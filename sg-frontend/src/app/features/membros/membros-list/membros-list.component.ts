@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MembrosService } from '../membros.service';
-import { Membro, Ministerio } from '../../../core/models/sge.models';
+import { Membro, Ministerio, Cargo } from '../../../core/models/sge.models';
 
 @Component({
   selector: 'app-membros-list',
@@ -12,9 +12,14 @@ import { Membro, Ministerio } from '../../../core/models/sge.models';
 export class MembrosListComponent implements OnInit {
   membros: Membro[] = [];
   ministerios: Ministerio[] = [];
+  cargos: Cargo[] = [];
   loading = true;
   searchTerm = '';
   situacaoFiltro: '' | 'ATIVO' | 'INATIVO' = '';
+
+  // Paginação: 10 registros por página
+  currentPage = 1;
+  itemsPerPage = 10;
 
   constructor(
     private service: MembrosService,
@@ -26,6 +31,9 @@ export class MembrosListComponent implements OnInit {
     this.http.get<Ministerio[]>('/api/ministerios').subscribe({
       next: (data) => { this.ministerios = data; }
     });
+    this.http.get<Cargo[]>('/api/cargos').subscribe({
+      next: (data) => { this.cargos = data; }
+    });
     this.load();
   }
 
@@ -33,6 +41,12 @@ export class MembrosListComponent implements OnInit {
     if (!ministerioId) return '-';
     const m = this.ministerios.find(m => m.id === ministerioId);
     return m ? m.nome : '-';
+  }
+
+  getCargoNome(cargoId: number | null | undefined): string {
+    if (!cargoId) return '-';
+    const c = this.cargos.find(c => c.id === cargoId);
+    return c ? c.nome : '-';
   }
 
   load(): void {
@@ -46,7 +60,23 @@ export class MembrosListComponent implements OnInit {
   /** Recarrega a lista no servidor ao trocar o filtro de situação. */
   filtrarPorSituacao(situacao: '' | 'ATIVO' | 'INATIVO'): void {
     this.situacaoFiltro = situacao;
+    this.currentPage = 1;
     this.load();
+  }
+
+  /** Volta para a primeira página ao digitar na busca. */
+  onBuscaChange(): void {
+    this.currentPage = 1;
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
+
+  /** Fatia o resultado filtrado na página atual. */
+  get paginatedItems(): Membro[] {
+    const inicio = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filtered.slice(inicio, inicio + this.itemsPerPage);
   }
 
   /**

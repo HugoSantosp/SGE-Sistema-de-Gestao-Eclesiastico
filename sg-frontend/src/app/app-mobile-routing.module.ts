@@ -64,6 +64,10 @@ const routes: Routes = [
         loadChildren: () => import('./features/notificacoes/notificacoes.module').then(m => m.NotificacoesModule)
       },
       {
+        path: 'relatorios',
+        loadChildren: () => import('./features/relatorios/relatorios.module').then(m => m.RelatoriosModule)
+      },
+      {
         path: 'configuracoes',
         loadChildren: () => import('./features/configuracoes/configuracoes.module').then(m => m.ConfiguracoesModule)
       },

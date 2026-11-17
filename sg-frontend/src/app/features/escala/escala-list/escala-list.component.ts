@@ -13,6 +13,10 @@ export class EscalaListComponent implements OnInit {
   loading = true;
   searchTerm = '';
 
+  // Paginação: 10 registros por página
+  currentPage = 1;
+  itemsPerPage = 10;
+
   constructor(
     private service: EscalaService,
     private router: Router
@@ -37,6 +41,20 @@ export class EscalaListComponent implements OnInit {
       e.titulo.toLowerCase().includes(s) ||
       e.publicToken?.toLowerCase().includes(s)
     );
+  }
+
+  /** Volta para a primeira página ao digitar na busca. */
+  onBuscaChange(): void {
+    this.currentPage = 1;
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
+
+  get paginatedItems(): EscalaResponse[] {
+    const inicio = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filtered.slice(inicio, inicio + this.itemsPerPage);
   }
 
   novo(): void {

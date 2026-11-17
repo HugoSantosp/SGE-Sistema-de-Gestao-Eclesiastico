@@ -11,6 +11,7 @@ public record MembroRequestDTO(
         String foto, LocalDate dataNasc,
         @NotNull StatusMembro situacao,
         Long funcaoId,
+        Long cargoId,
         Long ministerioId,
         LocalDate dataBatismo,
         String obs

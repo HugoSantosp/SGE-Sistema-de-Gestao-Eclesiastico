@@ -13,6 +13,10 @@ export class BisposListComponent implements OnInit {
   loading = true;
   searchTerm = '';
 
+  // Paginação: 10 registros por página
+  currentPage = 1;
+  itemsPerPage = 10;
+
   constructor(private service: BisposService, private router: Router) {}
 
   ngOnInit(): void { this.load(); }
@@ -26,6 +30,20 @@ export class BisposListComponent implements OnInit {
     if (!this.searchTerm) return this.itens;
     const s = this.searchTerm.toLowerCase();
     return this.itens.filter(i => i.nome.toLowerCase().includes(s));
+  }
+
+  /** Volta para a primeira página ao digitar na busca. */
+  onBuscaChange(): void {
+    this.currentPage = 1;
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
+
+  get paginatedItems(): Bispo[] {
+    const inicio = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filtered.slice(inicio, inicio + this.itemsPerPage);
   }
 
   editar(id: number): void { this.router.navigate(['/bispos/editar', id]); }

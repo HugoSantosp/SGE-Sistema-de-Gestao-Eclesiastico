@@ -99,6 +99,12 @@ const routes: Routes = [
         data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO', 'SECRETARIO'] }
       },
       {
+        path: 'relatorios',
+        loadChildren: () => import('./features/relatorios/relatorios.module').then(m => m.RelatoriosModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO', 'SECRETARIO'] }
+      },
+      {
         path: 'configuracoes',
         loadChildren: () => import('./features/configuracoes/configuracoes.module').then(m => m.ConfiguracoesModule),
         canActivate: [RoleGuard],

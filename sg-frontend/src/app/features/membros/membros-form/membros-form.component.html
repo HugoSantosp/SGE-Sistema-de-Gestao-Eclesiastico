@@ -35,8 +35,19 @@
         </select>
       </div>
       <div class="col-md-3">
+        <label class="form-label">Cargo</label>
+        <select class="form-select" [(ngModel)]="form.cargoId" name="cargoId">
+          <option [ngValue]="null">— Sem cargo —</option>
+          <option *ngFor="let c of cargos" [ngValue]="c.id">{{ c.nome }}</option>
+        </select>
+      </div>
+      <div class="col-md-3">
         <label class="form-label">Data de Nascimento</label>
         <input type="date" class="form-control" [(ngModel)]="form.dataNasc" name="dataNasc">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Data de Batismo</label>
+        <input type="date" class="form-control" [(ngModel)]="form.dataBatismo" name="dataBatismo">
       </div>
     </div>
 

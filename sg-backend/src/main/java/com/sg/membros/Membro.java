@@ -48,6 +48,9 @@ public class Membro {
     @Column(name = "funcao_id")
     private Long funcaoId;
 
+    @Column(name = "cargo_id")
+    private Long cargoId;
+
     @Column(name = "ministerio_id")
     private Long ministerioId;
 

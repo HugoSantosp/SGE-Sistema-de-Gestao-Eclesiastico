@@ -2,6 +2,8 @@ package com.sg.shared.config;
 
 import com.sg.membros.Membro;
 import com.sg.membros.MembroRepository;
+import com.sg.cargos.Cargo;
+import com.sg.cargos.CargoRepository;
 import com.sg.financeiro.ContaPagar;
 import com.sg.financeiro.ContaPagarRepository;
 import com.sg.financeiro.ContaReceber;
@@ -38,6 +40,7 @@ public class ReportController {
 
     private final ReportService reportService;
     private final MembroRepository membroRepository;
+    private final CargoRepository cargoRepository;
     private final ContaPagarRepository contaPagarRepository;
     private final ContaReceberRepository contaReceberRepository;
     private final EscalaRepository escalaRepository;
@@ -45,14 +48,22 @@ public class ReportController {
     public ReportController(
             ReportService reportService,
             MembroRepository membroRepository,
+            CargoRepository cargoRepository,
             ContaPagarRepository contaPagarRepository,
             ContaReceberRepository contaReceberRepository,
             EscalaRepository escalaRepository) {
         this.reportService = reportService;
         this.membroRepository = membroRepository;
+        this.cargoRepository = cargoRepository;
         this.contaPagarRepository = contaPagarRepository;
         this.contaReceberRepository = contaReceberRepository;
         this.escalaRepository = escalaRepository;
+    }
+
+    /** Mapa id -> nome dos cargos, usado para exibir o cargo no relatório de membros. */
+    private Map<Long, String> cargosPorId() {
+        return cargoRepository.findAll().stream()
+                .collect(Collectors.toMap(Cargo::getId, Cargo::getNome, (a, b) -> a));
     }
 
     @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO','SECRETARIO')")
@@ -61,7 +72,7 @@ public class ReportController {
     public ResponseEntity<byte[]> generateMembersPdf() {
         try {
             List<Membro> membros = membroRepository.findAll();
-            byte[] pdfBytes = reportService.generateMembersPdf(membros);
+            byte[] pdfBytes = reportService.generateMembersPdf(membros, cargosPorId());
 
             String filename = reportService.generateFilename("membros", "pdf");
 
@@ -82,13 +93,18 @@ public class ReportController {
         try {
             List<Membro> membros = membroRepository.findAll();
 
-            List<String> headers = List.of("Nome", "Telefone", "Documento", "Endereço", "Situação");
+            List<String> headers = List.of("Nome", "Cargo", "Telefone", "Documento", "Endereço", "Data de Batismo", "Situação");
+            Map<Long, String> cargos = cargosPorId();
             List<Map<String, Object>> data = membros.stream().map(m -> {
                 Map<String, Object> row = new HashMap<>();
                 row.put("Nome", m.getNome());
+                row.put("Cargo", m.getCargoId() != null ? cargos.getOrDefault(m.getCargoId(), "-") : "-");
                 row.put("Telefone", m.getTelefone());
                 row.put("Documento", m.getDocumento());
                 row.put("Endereço", m.getEndereco());
+                row.put("Data de Batismo", m.getDataBatismo() != null
+                        ? m.getDataBatismo().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        : "-");
                 row.put("Situação", m.getSituacao() != null ? m.getSituacao().name() : "-");
                 return row;
             }).collect(Collectors.toList());

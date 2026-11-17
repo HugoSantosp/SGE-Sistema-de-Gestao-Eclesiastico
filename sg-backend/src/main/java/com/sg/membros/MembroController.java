@@ -75,6 +75,7 @@ public class MembroController {
                 .nome(dto.nome()).documento(dto.documento()).telefone(dto.telefone())
                 .endereco(dto.endereco()).foto(dto.foto()).dataNasc(dto.dataNasc())
                 .situacao(dto.situacao()).funcaoId(dto.funcaoId())
+                .cargoId(dto.cargoId())
                 .ministerioId(dto.ministerioId())
                 .dataBatismo(dto.dataBatismo()).obs(dto.obs()).build();
     }

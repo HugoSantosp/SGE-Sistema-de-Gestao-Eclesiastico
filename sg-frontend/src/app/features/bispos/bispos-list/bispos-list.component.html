@@ -2,7 +2,7 @@
   <div class="table-header">
     <h5 class="mb-0 fw-semibold">Bispos / Pastor Presidente</h5>
     <div class="d-flex gap-2">
-      <input type="text" class="form-control form-control-sm" style="width: 200px;" placeholder="Buscar..." [(ngModel)]="searchTerm">
+      <input type="text" class="form-control form-control-sm" style="width: 200px;" placeholder="Buscar..." [(ngModel)]="searchTerm" (ngModelChange)="onBuscaChange()">
       <button class="btn btn-primary btn-sm" (click)="novo()"><i class="bi bi-plus-lg"></i> Novo Bispo</button>
     </div>
   </div>
@@ -13,7 +13,7 @@
   <table *ngIf="!loading && filtered.length > 0" class="table">
     <thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th style="width: 120px;">Ações</th></tr></thead>
     <tbody>
-      <tr *ngFor="let i of filtered">
+      <tr *ngFor="let i of paginatedItems">
         <td class="fw-medium">{{ i.nome }}</td>
         <td>{{ i.email }}</td>
         <td>{{ i.telefone || '-' }}</td>
@@ -24,4 +24,13 @@
       </tr>
     </tbody>
   </table>
+
+  <div class="px-4 pb-4">
+    <app-pagination
+      [totalItems]="filtered.length"
+      [itemsPerPage]="itemsPerPage"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
 </div>

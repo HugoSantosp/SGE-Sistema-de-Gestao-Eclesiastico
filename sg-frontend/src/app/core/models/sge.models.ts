@@ -83,6 +83,7 @@ export interface Membro {
   dataNasc: string;
   situacao: StatusMembro;
   funcaoId: number;
+  cargoId: number | null;
   ministerioId: number;
   ministerioNome?: string;
   dataBatismo: string;

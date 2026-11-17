@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MembrosListComponent } from './membros-list/membros-list.component';
 import { MembrosFormComponent } from './membros-form/membros-form.component';
+import { SharedModule } from '../../shared/shared.module';
 
 const routes: Routes = [
   { path: '', component: MembrosListComponent },
@@ -13,6 +14,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [MembrosListComponent, MembrosFormComponent],
-  imports: [CommonModule, RouterModule.forChild(routes), FormsModule, ReactiveFormsModule]
+  imports: [CommonModule, RouterModule.forChild(routes), FormsModule, ReactiveFormsModule, SharedModule]
 })
 export class MembrosModule { }
