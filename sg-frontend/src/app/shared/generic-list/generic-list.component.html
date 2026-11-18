@@ -44,7 +44,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th *ngFor="let col of columns">{{ col.charAt(0).toUpperCase() + col.slice(1) }}</th>
+          <th *ngFor="let col of columns">{{ columnLabel(col) }}</th>
           <th style="width: 140px;">Ações</th>
         </tr>
       </thead>

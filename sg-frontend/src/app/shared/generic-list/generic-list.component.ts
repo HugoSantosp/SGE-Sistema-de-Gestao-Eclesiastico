@@ -14,6 +14,12 @@ export class GenericListComponent implements OnInit {
   apiUrl = '';
   icon = 'bi-list';
   columns: string[] = [];
+  /** Rótulos amigáveis por coluna (padrão: nome da coluna capitalizado) */
+  columnLabels: Record<string, string> = {};
+  /** Tradução de valores por coluna: { tipo: { DIZIMO: 'Dízimo' } } */
+  valueLabels: Record<string, Record<string, string>> = {};
+  /** Colunas exibidas como moeda (R$) */
+  currencyColumns: string[] = [];
   extraActions: { label: string; icon: string; class: string; api: string; method: string; confirm: string }[] = [];
   itens: any[] = [];
   loading = true;
@@ -46,6 +52,9 @@ export class GenericListComponent implements OnInit {
     this.apiUrl = data['api'] || '';
     this.icon = data['icon'] || 'bi-list';
     this.columns = data['columns'] || [];
+    this.columnLabels = data['columnLabels'] || {};
+    this.valueLabels = data['valueLabels'] || {};
+    this.currencyColumns = data['currencyColumns'] || [];
     this.extraActions = data['extraActions'] || [];
     this.filters = data['filters'] || [];
     this.itemsPerPage = data['itemsPerPage'] || 10;
@@ -203,11 +212,24 @@ export class GenericListComponent implements OnInit {
     this.currentPage = 1;
   }
 
+  columnLabel(col: string): string {
+    return this.columnLabels[col] || (col.charAt(0).toUpperCase() + col.slice(1));
+  }
+
   formatValue(obj: any, col: string): string {
     const val = obj[col];
     if (val === null || val === undefined) return '-';
     if (typeof val === 'boolean') return val ? 'Sim' : 'Não';
     if (col === 'senhaTemporaria') return val ? '🔴 Temporária' : '✅ Própria';
+
+    const mapa = this.valueLabels[col];
+    if (mapa && mapa[String(val)] !== undefined) return mapa[String(val)];
+
+    if (this.currencyColumns.includes(col)) {
+      const numero = Number(val);
+      return isNaN(numero) ? String(val) : numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
     return String(val);
   }
 }

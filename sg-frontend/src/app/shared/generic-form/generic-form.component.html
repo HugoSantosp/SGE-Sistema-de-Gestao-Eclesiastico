@@ -9,7 +9,8 @@
 
   <form [formGroup]="formGroup" (ngSubmit)="save()" novalidate>
     <div class="row g-3">
-      <div class="col-md-6" *ngFor="let field of fields" 
+      <ng-container *ngFor="let field of fields">
+      <div class="col-md-6" *ngIf="isFieldVisible(field)"
            [class.col-12]="field.type === 'textarea' || field.type === 'image'">
         
         <!-- Label -->
@@ -103,6 +104,7 @@
           {{ field.helpText }}
         </div>
       </div>
+      </ng-container>
     </div>
 
     <!-- Erro geral do formulário -->

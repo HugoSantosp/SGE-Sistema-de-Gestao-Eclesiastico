@@ -216,6 +216,7 @@ export class MobileLayoutComponent {
     { route: 'secretarios', label: 'Secretários', icon: 'people-outline' },
     { route: 'cargos', label: 'Cargos', icon: 'pricetags-outline' },
     { route: 'fornecedores', label: 'Fornecedores', icon: 'car-outline' },
+    { route: 'financeiro/doacoes', label: 'Doações', icon: 'gift-outline' },
     { route: 'notificacoes', label: 'Notificações', icon: 'notifications-outline' },
     { route: 'relatorios', label: 'Relatórios', icon: 'document-text-outline' },
     { route: 'eventos', label: 'Eventos', icon: 'calendar-outline' },

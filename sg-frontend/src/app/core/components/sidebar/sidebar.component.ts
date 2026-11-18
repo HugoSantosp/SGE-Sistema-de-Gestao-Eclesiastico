@@ -59,6 +59,7 @@ export class SidebarComponent implements OnInit {
       children: [
         { label: 'Contas à Pagar', icon: 'bi-arrow-down-circle', route: '/financeiro/pagar', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
         { label: 'Contas à Receber', icon: 'bi-arrow-up-circle', route: '/financeiro/receber', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
+        { label: 'Doações', icon: 'bi-gift', route: '/financeiro/doacoes', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
       ]
     },
     { label: 'Eventos', icon: 'bi-calendar-event', route: '/eventos', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },

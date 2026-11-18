@@ -13,6 +13,10 @@ const routes: Routes = [
     path: 'receber',
     loadChildren: () => import('./contas-receber.module').then(m => m.ContasReceberModule)
   },
+  {
+    path: 'doacoes',
+    loadChildren: () => import('./doacoes.module').then(m => m.DoacoesModule)
+  },
   { path: '', redirectTo: 'pagar', pathMatch: 'full' }
 ];
 

@@ -18,6 +18,8 @@ interface FieldConfig {
   optionLabel?: string;
   /** Campos limpos quando este select fica vazio */
   clearOnEmpty?: string[];
+  /** Exibe o campo apenas quando outro campo tem o valor indicado (ex.: { field: 'tipo', equals: 'OFERTA' }) */
+  showWhen?: { field: string; equals: string | string[] };
   uploadHint?: string;
   validators?: any[];
   placeholder?: string;
@@ -76,6 +78,7 @@ export class GenericFormComponent implements OnInit {
 
     // Inicializa formulário reativo com validações
     this.initForm();
+    this.setupConditionalFields();
 
     // Selects alimentados por API (ex.: líder da célula vindo do cadastro de membros)
     this.loadDynamicOptions();
@@ -145,6 +148,40 @@ export class GenericFormComponent implements OnInit {
         }
       });
     });
+  }
+
+  private setupConditionalFields(): void {
+    this.fields.filter(f => !!f.showWhen).forEach(field => {
+      const control = this.formGroup.get(field.name);
+      const watcher = this.formGroup.get(field.showWhen!.field);
+      if (!control || !watcher) return;
+
+      const aplicar = (valor: any) => {
+        const esperados = Array.isArray(field.showWhen!.equals)
+          ? field.showWhen!.equals
+          : [field.showWhen!.equals];
+        const visivel = esperados.includes(String(valor ?? ''));
+        if (visivel) {
+          control.enable({ emitEvent: false });
+        } else {
+          // Campo oculto não pode bloquear o formulário: desabilita e limpa
+          control.disable({ emitEvent: false });
+          control.setValue('', { emitEvent: false });
+        }
+      };
+
+      aplicar(watcher.value);
+      watcher.valueChanges.subscribe(aplicar);
+    });
+  }
+
+  isFieldVisible(field: FieldConfig): boolean {
+    if (!field.showWhen) return true;
+    const atual = String(this.formGroup?.get(field.showWhen.field)?.value ?? '');
+    const esperados = Array.isArray(field.showWhen.equals)
+      ? field.showWhen.equals
+      : [field.showWhen.equals];
+    return esperados.includes(atual);
   }
 
   private getValidatorsForField(field: FieldConfig): any[] {
@@ -318,6 +355,13 @@ export class GenericFormComponent implements OnInit {
 
     // Atualiza o objeto form com os valores do formulário
     this.form = { ...this.form, ...this.formGroup.value };
+
+    // Campos condicionais ocultos não são enviados ao backend
+    this.fields.forEach(f => {
+      if (f.showWhen && !this.isFieldVisible(f)) {
+        delete this.form[f.name];
+      }
+    });
 
     // Selects alimentados por API usam id numérico: vazio deve virar null, não ""
     this.fields.forEach(f => {

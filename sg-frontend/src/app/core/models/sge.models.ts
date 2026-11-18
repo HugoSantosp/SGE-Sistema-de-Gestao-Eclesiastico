@@ -131,6 +131,28 @@ export interface ContaReceber {
   contribuinte: string;
 }
 
+export type TipoDoacao = 'DIZIMO' | 'OFERTA' | 'PRIMICIA';
+
+export type FormaPagamento =
+  | 'DINHEIRO'
+  | 'PIX'
+  | 'CARTAO_DEBITO'
+  | 'CARTAO_CREDITO'
+  | 'TRANSFERENCIA'
+  | 'CHEQUE';
+
+export interface Doacao {
+  id: number;
+  tipo: TipoDoacao;
+  membroId: number | null;
+  nomeDoador: string | null;
+  dataDoacao: string;
+  formaPagamento: FormaPagamento;
+  valor: number;
+  descricao: string | null;
+  dataCad: string;
+}
+
 export interface Tarefa {
   id: number;
   titulo: string;
