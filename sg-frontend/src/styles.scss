@@ -587,6 +587,43 @@ a {
 .badge-warning { background: rgba(245,158,11,0.1); color: #a16207; border: 1px solid rgba(245,158,11,0.2); }
 .badge-danger { background: rgba(239,68,68,0.1); color: #dc2626; border: 1px solid rgba(239,68,68,0.2); }
 .badge-info { background: rgba(59,130,246,0.1); color: #2563eb; border: 1px solid rgba(59,130,246,0.2); }
+.badge-secondary { background: rgba(107,114,128,0.1); color: #4b5563; border: 1px solid rgba(107,114,128,0.2); }
+
+/* ===== Ações de linha com texto (financeiro) ===== */
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-acao-principal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.btn-acao-principal:hover { background: #15803d; color: #fff; }
+
+.btn-acao-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(59,130,246,0.1);
+  color: #2563eb;
+  border: 1px solid rgba(59,130,246,0.25);
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.btn-acao-status:hover { background: rgba(59,130,246,0.18); color: #1d4ed8; }
 .badge-orange { background: var(--orange-light); color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
 
 /* ===== Modal Overrides ===== */

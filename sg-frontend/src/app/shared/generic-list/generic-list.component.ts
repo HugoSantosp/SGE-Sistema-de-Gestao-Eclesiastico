@@ -20,7 +20,39 @@ export class GenericListComponent implements OnInit {
   valueLabels: Record<string, Record<string, string>> = {};
   /** Colunas exibidas como moeda (R$) */
   currencyColumns: string[] = [];
-  extraActions: { label: string; icon: string; class: string; api: string; method: string; confirm: string }[] = [];
+  /** Ações extras; visibleWhen restringe o botão a um valor do registro */
+  extraActions: {
+    label: string;
+    icon: string;
+    class: string;
+    api: string;
+    method: string;
+    confirm: string;
+    visibleWhen?: { field: string; equals: any };
+  }[] = [];
+  /** Permissões de tela: listas somente leitura escondem Novo/Editar/Excluir */
+  canCreate = true;
+  canEdit = true;
+  canDelete = true;
+  /** Ação de alterar status (contas a pagar/receber) */
+  statusAction: {
+    label: string;
+    icon: string;
+    api: string;
+    field: string;
+    options: { value: string; label: string; icon?: string; hint?: string }[];
+    /** Botão de texto em destaque na linha (ex.: "Pagar conta") */
+    quick?: {
+      label: string;
+      value: string;
+      icon: string;
+      successMessage: string;
+      visibleWhenStatusIn: string[];
+    };
+  } | null = null;
+  showStatusDialog = false;
+  statusItem: any = null;
+  savingStatus = false;
   itens: any[] = [];
   loading = true;
   searchTerm = '';
@@ -56,6 +88,10 @@ export class GenericListComponent implements OnInit {
     this.valueLabels = data['valueLabels'] || {};
     this.currencyColumns = data['currencyColumns'] || [];
     this.extraActions = data['extraActions'] || [];
+    this.canCreate = data['canCreate'] !== false;
+    this.canEdit = data['canEdit'] !== false;
+    this.canDelete = data['canDelete'] !== false;
+    this.statusAction = data['statusAction'] || null;
     this.filters = data['filters'] || [];
     this.itemsPerPage = data['itemsPerPage'] || 10;
     this.load();
@@ -169,6 +205,71 @@ export class GenericListComponent implements OnInit {
     }
   }
 
+  abrirStatus(item: any): void {
+    this.statusItem = item;
+    this.showStatusDialog = true;
+  }
+
+  cancelarStatus(): void {
+    this.showStatusDialog = false;
+    this.statusItem = null;
+  }
+
+  confirmarStatus(novoStatus: string): void {
+    if (!this.statusAction || !this.statusItem) return;
+
+    this.savingStatus = true;
+    const url = this.statusAction.api.replace('{id}', this.statusItem.id);
+    const body: any = {};
+    body[this.statusAction.field] = novoStatus;
+
+    this.http.patch(url, body).subscribe({
+      next: () => {
+        this.toastService.success('Status atualizado com sucesso!');
+        this.savingStatus = false;
+        this.showStatusDialog = false;
+        this.statusItem = null;
+        this.load();
+      },
+      error: (err: any) => {
+        this.savingStatus = false;
+        this.toastService.error(err?.error?.message || 'Erro ao alterar o status');
+      }
+    });
+  }
+
+  acaoVisivel(acao: any, item: any): boolean {
+    if (!acao.visibleWhen) return true;
+    return String(item[acao.visibleWhen.field]) === String(acao.visibleWhen.equals);
+  }
+
+  /** Mostra o botão "Pagar conta"/"Receber conta" apenas quando faz sentido */
+  podeAcaoRapida(item: any): boolean {
+    const quick = this.statusAction?.quick;
+    if (!quick) return false;
+    const atual = String(item[this.statusAction!.field] || '');
+    return quick.visibleWhenStatusIn.includes(atual);
+  }
+
+  executarAcaoRapida(item: any): void {
+    const quick = this.statusAction?.quick;
+    if (!quick || !this.statusAction) return;
+
+    const url = this.statusAction.api.replace('{id}', item.id);
+    const body: any = {};
+    body[this.statusAction.field] = quick.value;
+
+    this.http.patch(url, body).subscribe({
+      next: () => {
+        this.toastService.success(quick.successMessage);
+        this.load();
+      },
+      error: (err: any) => {
+        this.toastService.error(err?.error?.message || 'Não foi possível concluir a ação');
+      }
+    });
+  }
+
   private executeAction(acao: any, item: any): void {
     const url = acao.api.replace('{id}', item.id);
     const method = acao.method?.toLowerCase() || 'post';
@@ -177,7 +278,9 @@ export class GenericListComponent implements OnInit {
       ? this.http.delete(url)
       : method === 'put'
         ? this.http.put(url, {})
-        : this.http.post(url, {});
+        : method === 'patch'
+          ? this.http.patch(url, {})
+          : this.http.post(url, {});
 
     request.subscribe({
       next: () => {

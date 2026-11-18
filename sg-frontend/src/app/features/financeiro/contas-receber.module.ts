@@ -10,7 +10,31 @@ const routes: Routes = [
   {
     path: '',
     component: GenericListComponent,
-    data: { title: 'Contas a Receber', api: '/api/financeiro/contas-receber', icon: 'bi-arrow-up-circle', columns: ['descricao', 'valor', 'vencimento', 'status'] }
+    data: {
+      title: 'Contas a Receber',
+      api: '/api/financeiro/contas-receber',
+      icon: 'bi-arrow-up-circle',
+      columns: ['descricao', 'valor', 'vencimento', 'status'],
+      currencyColumns: ['valor'],
+      statusAction: {
+        label: 'Alterar status',
+        icon: 'bi-arrow-repeat',
+        api: '/api/financeiro/contas-receber/{id}/status',
+        field: 'status',
+        quick: {
+          label: 'Receber conta',
+          value: 'PAGA',
+          icon: 'bi-check2-circle',
+          successMessage: 'Conta marcada como recebida.',
+          visibleWhenStatusIn: ['PENDENTE', 'VENCIDA']
+        },
+        options: [
+          { value: 'PENDENTE', label: 'Pendente', icon: 'bi-hourglass-split', hint: 'Ainda não foi recebida' },
+          { value: 'VENCIDA', label: 'Vencida', icon: 'bi-exclamation-triangle', hint: 'Passou do vencimento' },
+          { value: 'PAGA', label: 'Paga', icon: 'bi-check2-circle', hint: 'Recebimento concluído' }
+        ]
+      }
+    }
   },
   {
     path: 'novo',

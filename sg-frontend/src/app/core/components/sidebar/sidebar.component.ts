@@ -57,9 +57,13 @@ export class SidebarComponent implements OnInit {
       label: 'Financeiro', icon: 'bi-cash-coin', expanded: false,
       roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'],
       children: [
+        { label: 'Dashboard', icon: 'bi-graph-up-arrow', route: '/financeiro/dashboard', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
         { label: 'Contas à Pagar', icon: 'bi-arrow-down-circle', route: '/financeiro/pagar', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
         { label: 'Contas à Receber', icon: 'bi-arrow-up-circle', route: '/financeiro/receber', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
         { label: 'Doações', icon: 'bi-gift', route: '/financeiro/doacoes', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
+        { label: 'Categorias', icon: 'bi-tags', route: '/financeiro/categorias', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
+        { label: 'Saldo Inicial', icon: 'bi-wallet2', route: '/financeiro/saldo-inicial', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
+        { label: 'Relatórios', icon: 'bi-file-earmark-bar-graph', route: '/financeiro/relatorios', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'TESOUREIRO'] },
       ]
     },
     { label: 'Eventos', icon: 'bi-calendar-event', route: '/eventos', roles: ['PASTOR_PRESIDENTE', 'PASTOR_AUXILIAR', 'SECRETARIO'] },

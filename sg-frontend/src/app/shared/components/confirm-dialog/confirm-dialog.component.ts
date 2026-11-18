@@ -18,9 +18,9 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 @Component({
   selector: 'app-confirm-dialog',
   template: `
-    <div class="modal-overlay" *ngIf="visible" (click)="onCancel()">
-      <div class="modal-dialog" (click)="$event.stopPropagation()">
-        <div class="modal-icon" [ngClass]="'icon-' + type">
+    <div class="sge-overlay" *ngIf="visible">
+      <div class="sge-modal-box" role="dialog" aria-modal="true">
+        <div class="sge-modal-icon" [ngClass]="'icon-' + type">
           <i class="bi" [ngClass]="{
             'bi-exclamation-triangle-fill': type === 'danger',
             'bi-question-circle-fill': type === 'warning',
@@ -29,10 +29,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
           }"></i>
         </div>
         
-        <h3 class="modal-title">{{ title }}</h3>
-        <p class="modal-message">{{ message }}</p>
+        <h3 class="sge-modal-title">{{ title }}</h3>
+        <p class="sge-modal-message">{{ message }}</p>
         
-        <div class="modal-actions">
+        <div class="sge-modal-actions">
           <button class="btn btn-secondary" (click)="onCancel()" [disabled]="loading">
             {{ cancelText }}
           </button>
@@ -45,7 +45,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
     </div>
   `,
   styles: [`
-    .modal-overlay {
+    .sge-overlay {
       position: fixed;
       top: 0;
       left: 0;
@@ -59,7 +59,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
       animation: fadeIn 0.2s ease-out;
     }
 
-    .modal-dialog {
+    /* Não usar a classe "modal-dialog": o Bootstrap aplica
+       pointer-events: none nela, e os cliques atravessariam a caixa. */
+    .sge-modal-box {
+      pointer-events: auto;
       background: white;
       border-radius: 16px;
       padding: 32px;
@@ -70,7 +73,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
       animation: scaleIn 0.2s ease-out;
     }
 
-    .modal-icon {
+    .sge-modal-icon {
       width: 64px;
       height: 64px;
       border-radius: 50%;
@@ -101,27 +104,27 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
       color: var(--success, #22c55e);
     }
 
-    .modal-title {
+    .sge-modal-title {
       font-size: 1.25rem;
       font-weight: 600;
       color: var(--text-primary, #1a1a2e);
       margin-bottom: 12px;
     }
 
-    .modal-message {
+    .sge-modal-message {
       font-size: 0.9rem;
       color: var(--text-secondary, #4a5568);
       line-height: 1.5;
       margin-bottom: 24px;
     }
 
-    .modal-actions {
+    .sge-modal-actions {
       display: flex;
       gap: 12px;
       justify-content: center;
     }
 
-    .modal-actions .btn {
+    .sge-modal-actions .btn {
       min-width: 100px;
     }
 

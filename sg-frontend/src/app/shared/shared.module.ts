@@ -14,6 +14,7 @@ import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dial
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { SearchFilterComponent } from './components/search-filter/search-filter.component';
+import { StatusDialogComponent } from './components/status-dialog/status-dialog.component';
 
 // Pipes compartilhados (UploadUrlPipe)
 import { PipesModule } from './pipes/pipes.module';
@@ -27,7 +28,8 @@ import { PipesModule } from './pipes/pipes.module';
     ConfirmDialogComponent,
     LoadingSpinnerComponent,
     PaginationComponent,
-    SearchFilterComponent
+    SearchFilterComponent,
+    StatusDialogComponent
   ],
   imports: [
     CommonModule,
@@ -47,6 +49,7 @@ import { PipesModule } from './pipes/pipes.module';
     LoadingSpinnerComponent,
     PaginationComponent,
     SearchFilterComponent,
+    StatusDialogComponent,
     // Módulos
     CommonModule,
     FormsModule,

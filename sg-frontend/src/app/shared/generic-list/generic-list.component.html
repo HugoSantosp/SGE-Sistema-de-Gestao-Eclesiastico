@@ -14,10 +14,22 @@
   (cancel)="cancelDelete()">
 </app-confirm-dialog>
 
+<!-- Diálogo de alteração de status -->
+<app-status-dialog
+  [visible]="showStatusDialog"
+  [title]="statusAction?.label || 'Alterar status'"
+  [registro]="statusItem?.descricao || ''"
+  [currentStatus]="statusItem?.[statusAction?.field || 'status'] || ''"
+  [options]="statusAction?.options || []"
+  [loading]="savingStatus"
+  (confirm)="confirmarStatus($event)"
+  (cancel)="cancelarStatus()">
+</app-status-dialog>
+
 <div class="table-container">
   <div class="table-header">
     <h5 class="mb-0 fw-semibold"><i class="bi {{ icon }} me-2"></i>{{ title }}</h5>
-    <button class="btn btn-primary btn-sm" (click)="novo()">
+    <button class="btn btn-primary btn-sm" *ngIf="canCreate" (click)="novo()">
       <i class="bi bi-plus-lg"></i> Novo
     </button>
   </div>
@@ -26,7 +38,10 @@
   <div class="px-4 pt-4">
     <app-search-filter
       [filters]="filters"
-      [searchPlaceholder]="'Buscar ' + title.toLowerCase() + '...'"></app-search-filter>
+      [searchPlaceholder]="'Buscar ' + title.toLowerCase() + '...'"
+      (searchChange)="onSearchChange($event)"
+      (filterChange)="onFilterChange($event)"
+      (onClearFilters)="onClearFilters()"></app-search-filter>
   </div>
 
   <!-- Loading Spinner -->
@@ -36,7 +51,7 @@
   <div *ngIf="!loading && filtered.length === 0" class="empty-state">
     <i class="bi {{ icon }}"></i>
     <p>Nenhum registro encontrado</p>
-    <button class="btn btn-primary" (click)="novo()">Adicionar</button>
+    <button class="btn btn-primary" *ngIf="canCreate" (click)="novo()">Adicionar</button>
   </div>
 
   <!-- Tabela -->
@@ -45,25 +60,39 @@
       <thead>
         <tr>
           <th *ngFor="let col of columns">{{ columnLabel(col) }}</th>
-          <th style="width: 140px;">Ações</th>
+          <th style="width: 300px;">Ações</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let item of paginatedItems">
           <td *ngFor="let col of columns" class="fw-medium">{{ formatValue(item, col) }}</td>
-          <td>
-            <!-- Ações extras (ex: resetar senha) -->
+          <td class="acoes">
+            <!-- Ação principal com texto: Pagar conta / Receber conta -->
+            <button *ngIf="podeAcaoRapida(item)"
+                    class="btn btn-sm btn-acao-principal"
+                    (click)="executarAcaoRapida(item)"
+                    [title]="statusAction?.quick?.label">
+              <i class="bi" [ngClass]="statusAction?.quick?.icon"></i>
+              {{ statusAction?.quick?.label }}
+            </button>
+            <!-- Alterar status (contas a pagar/receber) -->
+            <button *ngIf="statusAction" class="btn btn-sm btn-acao-status" (click)="abrirStatus(item)"
+                    [title]="statusAction.label">
+              <i class="bi bi-arrow-repeat"></i>
+              Status
+            </button>
+            <!-- Ações extras (ex: ativar/desativar categoria) -->
             <ng-container *ngFor="let acao of extraActions">
-              <button class="btn btn-sm btn-icon" (click)="executarAcaoExtra(acao, item)"
+              <button *ngIf="acaoVisivel(acao, item)" class="btn btn-sm btn-icon" (click)="executarAcaoExtra(acao, item)"
                       [title]="acao.label" [ngStyle]="{'color': acao.class}">
                 <i [class]="acao.icon"></i>
               </button>
             </ng-container>
             <!-- Ações padrão -->
-            <button class="btn btn-sm btn-icon" (click)="editar(item.id)" title="Editar">
+            <button *ngIf="canEdit" class="btn btn-sm btn-icon" (click)="editar(item.id)" title="Editar">
               <i class="bi bi-pencil text-info"></i>
             </button>
-            <button class="btn btn-sm btn-icon" (click)="confirmDelete(item)" title="Excluir">
+            <button *ngIf="canDelete" class="btn btn-sm btn-icon" (click)="confirmDelete(item)" title="Excluir">
               <i class="bi bi-trash text-danger"></i>
             </button>
           </td>
