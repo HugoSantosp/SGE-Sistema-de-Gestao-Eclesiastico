@@ -1,5 +1,6 @@
 package com.sg.financeiro;
 
+import com.sg.financeiro.dto.AlterarStatusRequestDTO;
 import com.sg.financeiro.dto.ContaPagarRequestDTO;
 import com.sg.financeiro.dto.ContaReceberRequestDTO;
 import com.sg.financeiro.dto.PagamentoRequestDTO;
@@ -59,6 +60,15 @@ public class FinanceiroController {
     @Operation(summary = "Baixar conta a pagar")
     public ResponseEntity<ContaPagar> baixarContaPagar(@PathVariable Long id) {
         return ResponseEntity.ok(financeiroService.baixarContaPagar(id));
+    }
+
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
+    @PatchMapping("/contas-pagar/{id}/status")
+    @Operation(summary = "Alterar status da conta a pagar",
+            description = "Tesoureiro e bispo podem marcar como pendente, vencida ou paga. Cancelamento exige justificativa.")
+    public ResponseEntity<ContaPagar> alterarStatusContaPagar(@PathVariable Long id,
+                                                              @RequestBody @Valid AlterarStatusRequestDTO dto) {
+        return ResponseEntity.ok(financeiroService.alterarStatusContaPagar(id, dto.status()));
     }
 
     @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
@@ -129,6 +139,15 @@ public class FinanceiroController {
     @Operation(summary = "Receber conta")
     public ResponseEntity<ContaReceber> receberConta(@PathVariable Long id) {
         return ResponseEntity.ok(financeiroService.receberConta(id));
+    }
+
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
+    @PatchMapping("/contas-receber/{id}/status")
+    @Operation(summary = "Alterar status da conta a receber",
+            description = "Tesoureiro e bispo podem marcar como pendente, vencida ou paga. Cancelamento exige justificativa.")
+    public ResponseEntity<ContaReceber> alterarStatusContaReceber(@PathVariable Long id,
+                                                                  @RequestBody @Valid AlterarStatusRequestDTO dto) {
+        return ResponseEntity.ok(financeiroService.alterarStatusContaReceber(id, dto.status()));
     }
 
     @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")

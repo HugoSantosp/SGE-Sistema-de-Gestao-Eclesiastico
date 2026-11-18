@@ -115,6 +115,51 @@ class FinanceiroEndpointsSecurityTest {
 
     @Test
     @WithMockUser(roles = "TESOUREIRO")
+    @DisplayName("Tesoureiro altera o status de conta a pagar e a receber")
+    void tesoureiroAlteraStatusDasContas() throws Exception {
+        mockMvc.perform(patch("/api/financeiro/contas-pagar/999999/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"PAGA\"}"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(patch("/api/financeiro/contas-receber/999999/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"PAGA\"}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "PASTOR_PRESIDENTE")
+    @DisplayName("Bispo altera o status de conta a pagar e a receber")
+    void bispoAlteraStatusDasContas() throws Exception {
+        mockMvc.perform(patch("/api/financeiro/contas-pagar/999999/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"VENCIDA\"}"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(patch("/api/financeiro/contas-receber/999999/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"VENCIDA\"}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "MEMBRO")
+    @DisplayName("Membro não altera status de contas")
+    void membroNaoAlteraStatusDasContas() throws Exception {
+        mockMvc.perform(patch("/api/financeiro/contas-pagar/999999/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"PAGA\"}"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(patch("/api/financeiro/contas-receber/999999/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"PAGA\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "TESOUREIRO")
     @DisplayName("Tesoureiro acessa dashboard")
     void tesoureiroAcessaDashboard() throws Exception {
         mockMvc.perform(get("/api/financeiro/dashboard" + PERIODO))

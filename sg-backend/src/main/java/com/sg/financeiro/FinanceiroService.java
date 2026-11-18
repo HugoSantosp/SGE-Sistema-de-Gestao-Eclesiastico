@@ -84,6 +84,44 @@ public class FinanceiroService {
         return contaPagarRepository.save(conta);
     }
 
+    /**
+     * Alteração manual do status pelo tesoureiro ou pelo bispo.
+     * Cancelamento não passa por aqui: exige justificativa no endpoint próprio.
+     */
+    @Transactional
+    public ContaPagar alterarStatusContaPagar(Long id, StatusConta novoStatus) {
+        ContaPagar conta = buscarContaPagar(id);
+        if (novoStatus == StatusConta.CANCELADA) {
+            throw new BusinessException("Para cancelar, use o cancelamento com justificativa.");
+        }
+        if (conta.getStatus() == StatusConta.CANCELADA) {
+            throw new BusinessException("Conta cancelada não pode ter o status alterado.");
+        }
+        if (conta.getStatus() == novoStatus) {
+            return conta;
+        }
+
+        BigDecimal pago = totalPago(id);
+        if (novoStatus == StatusConta.PAGA) {
+            if (pago.compareTo(BigDecimal.ZERO) > 0 && pago.compareTo(conta.getValor()) < 0) {
+                throw new BusinessException("A conta tem pagamento parcial de R$ " + pago
+                        + ". Registre o pagamento restante para quitá-la.");
+            }
+            conta.setStatus(StatusConta.PAGA);
+            if (conta.getDataBaixa() == null) {
+                conta.setDataBaixa(LocalDate.now());
+            }
+        } else {
+            if (pago.compareTo(conta.getValor()) >= 0) {
+                throw new BusinessException("Conta já quitada não pode voltar para " + novoStatus + ".");
+            }
+            conta.setStatus(novoStatus);
+            conta.setDataBaixa(null);
+        }
+
+        return contaPagarRepository.save(conta);
+    }
+
     @Transactional
     public ContaPagar cancelarContaPagar(Long id, String justificativa, Long usuarioId) {
         ContaPagar conta = buscarContaPagar(id);
@@ -204,6 +242,32 @@ public class FinanceiroService {
         }
         conta.setStatus(StatusConta.PAGA);
         conta.setDataRecebimento(LocalDate.now());
+        return contaReceberRepository.save(conta);
+    }
+
+    @Transactional
+    public ContaReceber alterarStatusContaReceber(Long id, StatusConta novoStatus) {
+        ContaReceber conta = buscarContaReceber(id);
+        if (novoStatus == StatusConta.CANCELADA) {
+            throw new BusinessException("Para cancelar, use o cancelamento com justificativa.");
+        }
+        if (conta.getStatus() == StatusConta.CANCELADA) {
+            throw new BusinessException("Conta cancelada não pode ter o status alterado.");
+        }
+        if (conta.getStatus() == novoStatus) {
+            return conta;
+        }
+
+        if (novoStatus == StatusConta.PAGA) {
+            conta.setStatus(StatusConta.PAGA);
+            if (conta.getDataRecebimento() == null) {
+                conta.setDataRecebimento(LocalDate.now());
+            }
+        } else {
+            conta.setStatus(novoStatus);
+            conta.setDataRecebimento(null);
+        }
+
         return contaReceberRepository.save(conta);
     }
 

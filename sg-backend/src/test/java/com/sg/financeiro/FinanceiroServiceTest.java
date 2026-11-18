@@ -221,4 +221,80 @@ class FinanceiroServiceTest {
 
         verify(contaReceberRepository).delete(contaReceber);
     }
+
+    // ===== ALTERAÇÃO MANUAL DE STATUS =====
+
+    @Test
+    @DisplayName("Deve marcar conta a pagar como paga e preencher a data de baixa")
+    void deveAlterarStatusContaPagarParaPaga() {
+        when(contaPagarRepository.findById(1L)).thenReturn(Optional.of(contaPagar));
+        when(pagamentoDespesaRepository.totalPagoPorConta(1L)).thenReturn(BigDecimal.ZERO);
+        when(contaPagarRepository.save(any(ContaPagar.class))).thenAnswer(i -> i.getArgument(0));
+
+        ContaPagar result = financeiroService.alterarStatusContaPagar(1L, StatusConta.PAGA);
+
+        assertEquals(StatusConta.PAGA, result.getStatus());
+        assertEquals(LocalDate.now(), result.getDataBaixa());
+    }
+
+    @Test
+    @DisplayName("Deve voltar conta a pagar para pendente e limpar a data de baixa")
+    void deveAlterarStatusContaPagarParaPendente() {
+        contaPagar.setStatus(StatusConta.PAGA);
+        contaPagar.setDataBaixa(LocalDate.now());
+        when(contaPagarRepository.findById(1L)).thenReturn(Optional.of(contaPagar));
+        when(pagamentoDespesaRepository.totalPagoPorConta(1L)).thenReturn(BigDecimal.ZERO);
+        when(contaPagarRepository.save(any(ContaPagar.class))).thenAnswer(i -> i.getArgument(0));
+
+        ContaPagar result = financeiroService.alterarStatusContaPagar(1L, StatusConta.PENDENTE);
+
+        assertEquals(StatusConta.PENDENTE, result.getStatus());
+        assertNull(result.getDataBaixa());
+    }
+
+    @Test
+    @DisplayName("Não deve marcar como paga conta com pagamento parcial")
+    void naoDeveMarcarComoPagaContaComPagamentoParcial() {
+        when(contaPagarRepository.findById(1L)).thenReturn(Optional.of(contaPagar));
+        when(pagamentoDespesaRepository.totalPagoPorConta(1L)).thenReturn(new BigDecimal("50.00"));
+
+        assertThrows(com.sg.shared.exceptions.BusinessException.class,
+                () -> financeiroService.alterarStatusContaPagar(1L, StatusConta.PAGA));
+        verify(contaPagarRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Não deve cancelar pelo endpoint de status")
+    void naoDeveCancelarPeloEndpointDeStatus() {
+        when(contaPagarRepository.findById(1L)).thenReturn(Optional.of(contaPagar));
+
+        assertThrows(com.sg.shared.exceptions.BusinessException.class,
+                () -> financeiroService.alterarStatusContaPagar(1L, StatusConta.CANCELADA));
+    }
+
+    @Test
+    @DisplayName("Deve marcar conta a receber como paga e preencher a data de recebimento")
+    void deveAlterarStatusContaReceberParaPaga() {
+        when(contaReceberRepository.findById(1L)).thenReturn(Optional.of(contaReceber));
+        when(contaReceberRepository.save(any(ContaReceber.class))).thenAnswer(i -> i.getArgument(0));
+
+        ContaReceber result = financeiroService.alterarStatusContaReceber(1L, StatusConta.PAGA);
+
+        assertEquals(StatusConta.PAGA, result.getStatus());
+        assertEquals(LocalDate.now(), result.getDataRecebimento());
+    }
+
+    @Test
+    @DisplayName("Deve voltar conta a receber para vencida e limpar a data de recebimento")
+    void deveAlterarStatusContaReceberParaVencida() {
+        contaReceber.setStatus(StatusConta.PAGA);
+        contaReceber.setDataRecebimento(LocalDate.now());
+        when(contaReceberRepository.findById(1L)).thenReturn(Optional.of(contaReceber));
+        when(contaReceberRepository.save(any(ContaReceber.class))).thenAnswer(i -> i.getArgument(0));
+
+        ContaReceber result = financeiroService.alterarStatusContaReceber(1L, StatusConta.VENCIDA);
+
+        assertEquals(StatusConta.VENCIDA, result.getStatus());
+        assertNull(result.getDataRecebimento());
+    }
 }
