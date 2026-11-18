@@ -27,6 +27,7 @@ class FinanceiroServiceTest {
 
     @Mock private ContaPagarRepository contaPagarRepository;
     @Mock private ContaReceberRepository contaReceberRepository;
+    @Mock private PagamentoDespesaRepository pagamentoDespesaRepository;
 
     @InjectMocks
     private FinanceiroService financeiroService;
@@ -129,20 +130,20 @@ class FinanceiroServiceTest {
     @Test
     @DisplayName("Deve deletar conta a pagar com sucesso")
     void deveDeletarContaPagar() {
-        when(contaPagarRepository.existsById(1L)).thenReturn(true);
+        when(contaPagarRepository.findById(1L)).thenReturn(Optional.of(contaPagar));
 
         financeiroService.deletarContaPagar(1L);
 
-        verify(contaPagarRepository).deleteById(1L);
+        verify(contaPagarRepository).delete(contaPagar);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao deletar conta a pagar inexistente")
     void deveLancarExcecaoAoDeletarContaPagarInexistente() {
-        when(contaPagarRepository.existsById(99L)).thenReturn(false);
+        when(contaPagarRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> financeiroService.deletarContaPagar(99L));
-        verify(contaPagarRepository, never()).deleteById(anyLong());
+        verify(contaPagarRepository, never()).delete(any(ContaPagar.class));
     }
 
     // ===== CONTAS A RECEBER =====
@@ -214,10 +215,10 @@ class FinanceiroServiceTest {
     @Test
     @DisplayName("Deve deletar conta a receber com sucesso")
     void deveDeletarContaReceber() {
-        when(contaReceberRepository.existsById(1L)).thenReturn(true);
+        when(contaReceberRepository.findById(1L)).thenReturn(Optional.of(contaReceber));
 
         financeiroService.deletarContaReceber(1L);
 
-        verify(contaReceberRepository).deleteById(1L);
+        verify(contaReceberRepository).delete(contaReceber);
     }
 }

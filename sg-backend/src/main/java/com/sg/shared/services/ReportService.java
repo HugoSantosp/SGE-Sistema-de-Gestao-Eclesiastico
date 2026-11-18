@@ -20,6 +20,7 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.sg.membros.Membro;
 import com.sg.financeiro.ContaPagar;
 import com.sg.financeiro.ContaReceber;
+import com.sg.financeiro.dto.RelatorioFinanceiroDTO;
 import com.sg.escala.Escala;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -202,6 +203,321 @@ public class ReportService {
 
         document.close();
         return baos.toByteArray();
+    }
+
+    // ==================== PDF FINANCEIRO ====================
+
+    /** Cabeçalho comum: identidade SGE, igreja, título, período, emissão e responsável. */
+    private void addCabecalhoFinanceiro(Document document, RelatorioFinanceiroDTO cabecalho,
+                                        PdfFont titleFont, PdfFont bodyFont) {
+        document.add(new Paragraph("SGE - Sistema de Gestão Eclesiástico")
+                .setFont(titleFont).setFontSize(10).setFontColor(ORANGE)
+                .setTextAlignment(TextAlignment.CENTER).setMarginBottom(2));
+
+        document.add(new Paragraph(cabecalho.igreja() != null ? cabecalho.igreja() : "Igreja")
+                .setFont(titleFont).setFontSize(14)
+                .setTextAlignment(TextAlignment.CENTER).setMarginBottom(10));
+
+        document.add(new Paragraph(cabecalho.titulo())
+                .setFont(titleFont).setFontSize(18).setFontColor(ORANGE)
+                .setTextAlignment(TextAlignment.CENTER).setMarginBottom(6));
+
+        document.add(new Paragraph("Período: " + formatarData(cabecalho.inicio())
+                + " a " + formatarData(cabecalho.fim()))
+                .setFont(bodyFont).setFontSize(10).setFontColor(ColorConstants.GRAY)
+                .setTextAlignment(TextAlignment.CENTER).setMarginBottom(2));
+
+        document.add(new Paragraph("Emitido em: " + formatarData(cabecalho.emissao())
+                + "   |   Responsável: " + (cabecalho.responsavel() != null ? cabecalho.responsavel() : "-"))
+                .setFont(bodyFont).setFontSize(10).setFontColor(ColorConstants.GRAY)
+                .setTextAlignment(TextAlignment.CENTER).setMarginBottom(16));
+    }
+
+    private Table tabelaFinanceira(String[] headers, float[] widths, PdfFont titleFont, DeviceRgb cor) {
+        Table table = new Table(UnitValue.createPercentArray(widths)).useAllAvailableWidth();
+        for (String header : headers) {
+            Cell cell = new Cell().add(new Paragraph(header).setFont(titleFont).setFontSize(9).setFontColor(WHITE));
+            cell.setBackgroundColor(cor).setPadding(5).setTextAlignment(TextAlignment.CENTER);
+            table.addHeaderCell(cell);
+        }
+        return table;
+    }
+
+    private void addRodapeFinanceiro(Document document, String rotulo, BigDecimal total, PdfFont titleFont) {
+        document.add(new Paragraph("\n"));
+        document.add(new Paragraph(rotulo + ": " + moeda(total))
+                .setFont(titleFont).setFontSize(12)
+                .setTextAlignment(TextAlignment.RIGHT));
+    }
+
+    /** Formata valor monetário em pt-BR; "-" quando nulo. */
+    private String moeda(BigDecimal valor) {
+        if (valor == null) {
+            return "-";
+        }
+        return java.text.NumberFormat.getCurrencyInstance(java.util.Locale.forLanguageTag("pt-BR"))
+                .format(valor);
+    }
+
+    public byte[] generateRelatorioReceitasPdf(RelatorioFinanceiroDTO.RelatorioReceitas relatorio)
+            throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (PdfDocument pdfDoc = new PdfDocument(new PdfWriter(baos));
+             Document document = new Document(pdfDoc, PageSize.A4)) {
+
+            PdfFont titleFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont bodyFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+
+            addCabecalhoFinanceiro(document, relatorio.cabecalho(), titleFont, bodyFont);
+
+            Table table = tabelaFinanceira(
+                    new String[]{"Data", "Descrição", "Categoria", "Forma", "Valor"},
+                    new float[]{2, 5, 3, 2.5f, 2.5f}, titleFont, GREEN);
+
+            for (RelatorioFinanceiroDTO.ReceitaItem item : relatorio.itens()) {
+                table.addCell(createDataCell(formatarData(item.data()), bodyFont));
+                table.addCell(createDataCell(item.descricao(), bodyFont));
+                table.addCell(createDataCell(item.categoria(), bodyFont));
+                table.addCell(createDataCell(item.formaPagamento(), bodyFont));
+                table.addCell(createDataCell(moeda(item.valor()), bodyFont));
+            }
+
+            document.add(table);
+            addRodapeFinanceiro(document, "Total do período", relatorio.total(), titleFont);
+        }
+        return baos.toByteArray();
+    }
+
+    public byte[] generateRelatorioDespesasPdf(RelatorioFinanceiroDTO.RelatorioDespesas relatorio)
+            throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (PdfDocument pdfDoc = new PdfDocument(new PdfWriter(baos));
+             Document document = new Document(pdfDoc, PageSize.A4.rotate())) {
+
+            PdfFont titleFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont bodyFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+
+            addCabecalhoFinanceiro(document, relatorio.cabecalho(), titleFont, bodyFont);
+
+            Table table = tabelaFinanceira(
+                    new String[]{"Descrição", "Categoria", "Fornecedor", "Vencimento",
+                            "Valor original", "Valor pago", "Saldo pendente", "Status"},
+                    new float[]{4, 2.5f, 3, 2, 2.2f, 2.2f, 2.2f, 2.2f}, titleFont, RED);
+
+            for (RelatorioFinanceiroDTO.DespesaItem item : relatorio.itens()) {
+                table.addCell(createDataCell(item.descricao(), bodyFont));
+                table.addCell(createDataCell(item.categoria(), bodyFont));
+                table.addCell(createDataCell(item.fornecedor(), bodyFont));
+                table.addCell(createDataCell(formatarData(item.vencimento()), bodyFont));
+                table.addCell(createDataCell(moeda(item.valorOriginal()), bodyFont));
+                table.addCell(createDataCell(moeda(item.valorPago()), bodyFont));
+                table.addCell(createDataCell(moeda(item.saldoPendente()), bodyFont));
+                table.addCell(createDataCell(item.status(), bodyFont));
+            }
+
+            document.add(table);
+
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("Total original: " + moeda(relatorio.totalOriginal()))
+                    .setFont(titleFont).setFontSize(11).setTextAlignment(TextAlignment.RIGHT));
+            document.add(new Paragraph("Total pago: " + moeda(relatorio.totalPago()))
+                    .setFont(titleFont).setFontSize(11).setTextAlignment(TextAlignment.RIGHT));
+            document.add(new Paragraph("Total pendente: " + moeda(relatorio.totalPendente()))
+                    .setFont(titleFont).setFontSize(11).setTextAlignment(TextAlignment.RIGHT));
+        }
+        return baos.toByteArray();
+    }
+
+    public byte[] generateRelatorioFluxoCaixaPdf(RelatorioFinanceiroDTO.RelatorioFluxoCaixa relatorio)
+            throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (PdfDocument pdfDoc = new PdfDocument(new PdfWriter(baos));
+             Document document = new Document(pdfDoc, PageSize.A4)) {
+
+            PdfFont titleFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont bodyFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+
+            addCabecalhoFinanceiro(document, relatorio.cabecalho(), titleFont, bodyFont);
+
+            document.add(new Paragraph("Saldo inicial: " + moeda(relatorio.saldoInicial()))
+                    .setFont(titleFont).setFontSize(11).setMarginBottom(10));
+
+            Table table = tabelaFinanceira(
+                    new String[]{"Data", "Descrição", "Entradas", "Saídas", "Saldo acumulado"},
+                    new float[]{2, 5, 2.5f, 2.5f, 3}, titleFont, ORANGE);
+
+            for (RelatorioFinanceiroDTO.MovimentoCaixa m : relatorio.movimentos()) {
+                table.addCell(createDataCell(formatarData(m.data()), bodyFont));
+                table.addCell(createDataCell(m.descricao(), bodyFont));
+                table.addCell(createDataCell(m.entradas() != null
+                        && m.entradas().compareTo(BigDecimal.ZERO) > 0 ? moeda(m.entradas()) : "-", bodyFont));
+                table.addCell(createDataCell(m.saidas() != null
+                        && m.saidas().compareTo(BigDecimal.ZERO) > 0 ? moeda(m.saidas()) : "-", bodyFont));
+                table.addCell(createDataCell(moeda(m.saldoAcumulado()), bodyFont));
+            }
+
+            document.add(table);
+
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("Receitas recebidas: " + moeda(relatorio.receitasRecebidas()))
+                    .setFont(titleFont).setFontSize(11).setTextAlignment(TextAlignment.RIGHT));
+            document.add(new Paragraph("Despesas pagas: " + moeda(relatorio.despesasPagas()))
+                    .setFont(titleFont).setFontSize(11).setTextAlignment(TextAlignment.RIGHT));
+            document.add(new Paragraph("Saldo final: " + moeda(relatorio.saldoFinal()))
+                    .setFont(titleFont).setFontSize(12).setTextAlignment(TextAlignment.RIGHT));
+        }
+        return baos.toByteArray();
+    }
+
+    public byte[] generateRelatorioDemonstrativoPdf(RelatorioFinanceiroDTO.RelatorioDemonstrativo relatorio)
+            throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (PdfDocument pdfDoc = new PdfDocument(new PdfWriter(baos));
+             Document document = new Document(pdfDoc, PageSize.A4)) {
+
+            PdfFont titleFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont bodyFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+
+            addCabecalhoFinanceiro(document, relatorio.cabecalho(), titleFont, bodyFont);
+
+            Table table = new Table(UnitValue.createPercentArray(new float[]{6, 4})).useAllAvailableWidth();
+
+            String[][] linhas = {
+                    {"Total de receitas", moeda(relatorio.totalReceitas())},
+                    {"Total de despesas pagas", moeda(relatorio.totalDespesasPagas())},
+                    {"Resultado financeiro", moeda(relatorio.resultado())},
+                    {"Saldo inicial", moeda(relatorio.saldoInicial())},
+                    {"Saldo final", moeda(relatorio.saldoFinal())}
+            };
+
+            for (String[] linha : linhas) {
+                table.addCell(createDataCell(linha[0], titleFont));
+                table.addCell(createDataCell(linha[1], bodyFont));
+            }
+
+            document.add(table);
+
+            document.add(new Paragraph("\n\n"));
+            document.add(new Paragraph("_______________________________________")
+                    .setFont(bodyFont).setFontSize(10).setTextAlignment(TextAlignment.CENTER));
+            document.add(new Paragraph(relatorio.cabecalho().responsavel() != null
+                    ? relatorio.cabecalho().responsavel() : "-")
+                    .setFont(bodyFont).setFontSize(10).setTextAlignment(TextAlignment.CENTER));
+            document.add(new Paragraph("Responsável pela emissão")
+                    .setFont(bodyFont).setFontSize(8).setFontColor(ColorConstants.GRAY)
+                    .setTextAlignment(TextAlignment.CENTER));
+        }
+        return baos.toByteArray();
+    }
+
+    // ==================== EXCEL FINANCEIRO ====================
+
+    /**
+     * Planilha financeira com cabeçalho estilizado, filtros nas colunas, formatos
+     * numérico e de data, painel congelado e linha de totais.
+     */
+    public byte[] generateRelatorioFinanceiroExcel(String sheetName,
+                                                   List<String> headers,
+                                                   List<Map<String, Object>> data,
+                                                   Map<String, BigDecimal> totais) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet(sheetName);
+
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerFont.setColor(IndexedColors.WHITE.getIndex());
+            headerStyle.setFont(headerFont);
+            headerStyle.setFillForegroundColor(new XSSFColor(new byte[]{(byte) 249, (byte) 115, (byte) 22}, null));
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setAlignment(HorizontalAlignment.CENTER);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+
+            CellStyle dataStyle = workbook.createCellStyle();
+            dataStyle.setBorderBottom(BorderStyle.THIN);
+            dataStyle.setBorderTop(BorderStyle.THIN);
+            dataStyle.setBorderRight(BorderStyle.THIN);
+            dataStyle.setBorderLeft(BorderStyle.THIN);
+
+            CellStyle moedaStyle = workbook.createCellStyle();
+            moedaStyle.cloneStyleFrom(dataStyle);
+            moedaStyle.setDataFormat(workbook.createDataFormat().getFormat("#,##0.00"));
+
+            CellStyle dataFormato = workbook.createCellStyle();
+            dataFormato.cloneStyleFrom(dataStyle);
+            dataFormato.setDataFormat(workbook.createDataFormat().getFormat("dd/MM/yyyy"));
+
+            CellStyle totalStyle = workbook.createCellStyle();
+            totalStyle.cloneStyleFrom(moedaStyle);
+            Font totalFont = workbook.createFont();
+            totalFont.setBold(true);
+            totalStyle.setFont(totalFont);
+
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.size(); i++) {
+                org.apache.poi.ss.usermodel.Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers.get(i));
+                cell.setCellStyle(headerStyle);
+            }
+
+            int rowNum = 1;
+            for (Map<String, Object> rowData : data) {
+                Row row = sheet.createRow(rowNum++);
+                int colNum = 0;
+                for (String header : headers) {
+                    org.apache.poi.ss.usermodel.Cell cell = row.createCell(colNum++);
+                    Object value = rowData.get(header);
+                    if (value instanceof BigDecimal bd) {
+                        cell.setCellValue(bd.doubleValue());
+                        cell.setCellStyle(moedaStyle);
+                    } else if (value instanceof Number numero) {
+                        cell.setCellValue(numero.doubleValue());
+                        cell.setCellStyle(moedaStyle);
+                    } else if (value instanceof LocalDate dataValor) {
+                        cell.setCellValue(dataValor);
+                        cell.setCellStyle(dataFormato);
+                    } else {
+                        cell.setCellValue(value != null ? value.toString() : "");
+                        cell.setCellStyle(dataStyle);
+                    }
+                }
+            }
+
+            if (totais != null && !totais.isEmpty()) {
+                Row totalRow = sheet.createRow(rowNum);
+                int colNum = 0;
+                for (String header : headers) {
+                    org.apache.poi.ss.usermodel.Cell cell = totalRow.createCell(colNum);
+                    BigDecimal total = totais.get(header);
+                    if (total != null) {
+                        cell.setCellValue(total.doubleValue());
+                        cell.setCellStyle(totalStyle);
+                    } else if (colNum == 0) {
+                        cell.setCellValue("TOTAL");
+                        cell.setCellStyle(totalStyle);
+                    }
+                    colNum++;
+                }
+            }
+
+            if (!headers.isEmpty()) {
+                sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
+                        0, Math.max(rowNum - 1, 0), 0, headers.size() - 1));
+                sheet.createFreezePane(0, 1);
+            }
+
+            for (int i = 0; i < headers.size(); i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(baos);
+            return baos.toByteArray();
+        }
     }
 
     /**

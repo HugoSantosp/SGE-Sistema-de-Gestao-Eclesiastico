@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -81,6 +82,14 @@ public class GlobalExceptionHandler {
         String valor = String.valueOf(ex.getValue());
         return buildResponse(HttpStatus.BAD_REQUEST,
                 "Valor inválido para o parâmetro '" + nome + "': " + valor + ".");
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingParameter(MissingServletRequestParameterException ex) {
+        // Sem este handler, um @RequestParam obrigatório ausente (ex.: justificativa
+        // do cancelamento) caía no handler genérico e virava 500 em vez de 400.
+        return buildResponse(HttpStatus.BAD_REQUEST,
+                "Parâmetro obrigatório ausente: '" + ex.getParameterName() + "'.");
     }
 
     @ExceptionHandler(AccessDeniedException.class)

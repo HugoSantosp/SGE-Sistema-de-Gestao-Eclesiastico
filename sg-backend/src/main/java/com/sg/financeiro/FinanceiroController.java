@@ -2,6 +2,8 @@ package com.sg.financeiro;
 
 import com.sg.financeiro.dto.ContaPagarRequestDTO;
 import com.sg.financeiro.dto.ContaReceberRequestDTO;
+import com.sg.financeiro.dto.PagamentoRequestDTO;
+import com.sg.shared.security.UsuarioAutenticado;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -45,10 +47,43 @@ public class FinanceiroController {
     }
 
     @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
+    @PutMapping("/contas-pagar/{id}")
+    @Operation(summary = "Atualizar conta a pagar")
+    public ResponseEntity<ContaPagar> atualizarContaPagar(@PathVariable Long id,
+                                                          @RequestBody @Valid ContaPagarRequestDTO dto) {
+        return ResponseEntity.ok(financeiroService.atualizarContaPagar(id, toEntity(dto)));
+    }
+
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
     @PatchMapping("/contas-pagar/{id}/baixar")
     @Operation(summary = "Baixar conta a pagar")
     public ResponseEntity<ContaPagar> baixarContaPagar(@PathVariable Long id) {
         return ResponseEntity.ok(financeiroService.baixarContaPagar(id));
+    }
+
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
+    @PatchMapping("/contas-pagar/{id}/cancelar")
+    @Operation(summary = "Cancelar conta a pagar", description = "Justificativa obrigatória")
+    public ResponseEntity<ContaPagar> cancelarContaPagar(@PathVariable Long id,
+                                                         @RequestParam String justificativa) {
+        return ResponseEntity.ok(
+                financeiroService.cancelarContaPagar(id, justificativa, UsuarioAutenticado.id()));
+    }
+
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','PASTOR_AUXILIAR','TESOUREIRO')")
+    @GetMapping("/contas-pagar/{id}/pagamentos")
+    @Operation(summary = "Listar pagamentos da conta a pagar")
+    public ResponseEntity<List<PagamentoDespesa>> listarPagamentos(@PathVariable Long id) {
+        return ResponseEntity.ok(financeiroService.listarPagamentos(id));
+    }
+
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
+    @PostMapping("/contas-pagar/{id}/pagamentos")
+    @Operation(summary = "Registrar pagamento integral ou parcial")
+    public ResponseEntity<ContaPagar> registrarPagamento(@PathVariable Long id,
+                                                         @RequestBody @Valid PagamentoRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(financeiroService.registrarPagamento(id, dto, UsuarioAutenticado.id()));
     }
 
     @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
@@ -82,10 +117,27 @@ public class FinanceiroController {
     }
 
     @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
+    @PutMapping("/contas-receber/{id}")
+    @Operation(summary = "Atualizar conta a receber")
+    public ResponseEntity<ContaReceber> atualizarContaReceber(@PathVariable Long id,
+                                                              @RequestBody @Valid ContaReceberRequestDTO dto) {
+        return ResponseEntity.ok(financeiroService.atualizarContaReceber(id, toEntity(dto)));
+    }
+
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
     @PatchMapping("/contas-receber/{id}/receber")
     @Operation(summary = "Receber conta")
     public ResponseEntity<ContaReceber> receberConta(@PathVariable Long id) {
         return ResponseEntity.ok(financeiroService.receberConta(id));
+    }
+
+    @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
+    @PatchMapping("/contas-receber/{id}/cancelar")
+    @Operation(summary = "Cancelar conta a receber", description = "Justificativa obrigatória")
+    public ResponseEntity<ContaReceber> cancelarContaReceber(@PathVariable Long id,
+                                                             @RequestParam String justificativa) {
+        return ResponseEntity.ok(
+                financeiroService.cancelarContaReceber(id, justificativa, UsuarioAutenticado.id()));
     }
 
     @PreAuthorize("hasAnyRole('PASTOR_PRESIDENTE','TESOUREIRO')")
@@ -97,11 +149,15 @@ public class FinanceiroController {
     }
 
     private ContaPagar toEntity(ContaPagarRequestDTO dto) {
+        Long responsavel = UsuarioAutenticado.id();
         return ContaPagar.builder()
                 .descricao(dto.descricao()).fornecedorId(dto.fornecedorId())
                 .valor(dto.valor()).vencimento(dto.vencimento())
-                .usuarioCadId(dto.usuarioCadId()).frequencia(dto.frequencia())
-                .status(dto.status()).arquivo(dto.arquivo()).build();
+                .dataEmissao(dto.dataEmissao()).categoriaId(dto.categoriaId())
+                .usuarioCadId(responsavel != null ? responsavel : dto.usuarioCadId())
+                .frequencia(dto.frequencia())
+                .status(dto.status()).observacao(dto.observacao())
+                .arquivo(dto.arquivo()).build();
     }
 
     private ContaReceber toEntity(ContaReceberRequestDTO dto) {
@@ -109,6 +165,9 @@ public class FinanceiroController {
                 .descricao(dto.descricao()).valor(dto.valor())
                 .vencimento(dto.vencimento()).frequencia(dto.frequencia())
                 .status(dto.status())
-                .contribuinte(dto.contribuinte()).build();
+                .contribuinte(dto.contribuinte())
+                .categoriaId(dto.categoriaId())
+                .formaPagamento(dto.formaPagamento())
+                .observacao(dto.observacao()).build();
     }
 }

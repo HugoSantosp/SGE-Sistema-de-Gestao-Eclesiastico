@@ -46,4 +46,23 @@ public class ContaReceber {
 
     @Column(length = 150)
     private String contribuinte;
+
+    @Column(name = "categoria_id")
+    private Long categoriaId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "forma_pagamento", length = 30)
+    private com.sg.shared.enums.FormaPagamento formaPagamento;
+
+    @Column(length = 255)
+    private String observacao;
+
+    @Column(name = "justificativa_cancelamento", length = 255)
+    private String justificativaCancelamento;
+
+    @Column(name = "usuario_cancelamento_id")
+    private Long usuarioCancelamentoId;
+
+    @Column(name = "data_cancelamento")
+    private LocalDate dataCancelamento;
 }

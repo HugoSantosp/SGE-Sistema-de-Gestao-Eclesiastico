@@ -55,4 +55,31 @@ public class ContaPagar {
 
     @Column(length = 150)
     private String arquivo;
+
+    @Column(name = "categoria_id")
+    private Long categoriaId;
+
+    @Column(name = "data_emissao")
+    private LocalDate dataEmissao;
+
+    @Column(length = 255)
+    private String observacao;
+
+    @Column(name = "justificativa_cancelamento", length = 255)
+    private String justificativaCancelamento;
+
+    @Column(name = "usuario_cancelamento_id")
+    private Long usuarioCancelamentoId;
+
+    @Column(name = "data_cancelamento")
+    private LocalDate dataCancelamento;
+
+    public String statusExibicao(BigDecimal totalPago) {
+        if (status == null) return "-";
+        boolean emAberto = status == StatusConta.PENDENTE || status == StatusConta.VENCIDA;
+        if (emAberto && totalPago != null && totalPago.compareTo(BigDecimal.ZERO) > 0) {
+            return "PARCIALMENTE_PAGA";
+        }
+        return status.name();
+    }
 }
